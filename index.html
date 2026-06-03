@@ -347,6 +347,15 @@
   .orm-pct-item .pct-label { font-size: 10px; color: var(--text3); font-weight: 600; }
   .orm-pct-item .pct-val { font-size: 15px; font-weight: 800; color: var(--text); margin-top: 2px; }
 
+  /* ── ACTIVITY BUTTONS ── */
+  .activity-btn {
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text2); border-radius: 8px; padding: 10px 8px;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    transition: all 0.15s; text-align: center; line-height: 1.4;
+  }
+  .activity-btn.active { background: var(--yellow-bg); border-color: var(--yellow); color: var(--yellow); }
+
   /* ── SECTION HEADERS ── */
   .section-header {
     font-size: 11px; font-weight: 700; color: var(--text3);
@@ -354,6 +363,18 @@
     margin-bottom: 10px; margin-top: 16px;
     padding-left: 2px;
   }
+
+  /* ── SKIP BUTTON ── */
+  .skip-btn {
+    margin-top: 8px; width: 100%;
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text3); border-radius: 6px;
+    padding: 7px; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .skip-btn:active { background: var(--bg3); }
+  .skip-btn.skipped { background: var(--bg3); color: var(--text3); border-color: var(--border); text-decoration: line-through; }
+  .ex-card.skipped-card { opacity: 0.4; }
 
   /* ── COMPLETE WORKOUT BTN ── */
   .complete-workout-btn {
@@ -380,6 +401,155 @@
   .scroll-top { position: fixed; bottom: calc(var(--nav-h) + 16px); right: 16px; z-index: 150; }
 
   svg { display: block; }
+
+  /* ── LIGHT MODE ── */
+  body.light {
+    --bg: #f5f5f5;
+    --bg2: #ffffff;
+    --bg3: #ebebeb;
+    --bg4: #ddd;
+    --border: #ddd;
+    --text: #111;
+    --text2: #555;
+    --text3: #999;
+  }
+  body.light #app-header { background: rgba(245,245,245,0.95); }
+  body.light #app-nav { background: rgba(245,245,245,0.97); }
+
+  /* ── THEME TOGGLE ── */
+  #theme-toggle {
+    background: none; border: none; cursor: pointer; font-size: 20px;
+    padding: 4px; line-height: 1; color: var(--text2);
+  }
+
+  /* ── NUTRITION BANNER ── */
+  #nutrition-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px; margin-bottom: 16px;
+  }
+  #nutrition-card.banner-mode {
+    background: var(--yellow-bg); border-color: var(--yellow-border);
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .nutrition-inputs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .nutrition-inputs label { font-size: 12px; color: var(--text2); white-space: nowrap; }
+  .nutrition-inputs input {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-size: 14px; font-weight: 600;
+    padding: 6px 10px; width: 80px; text-align: center;
+    outline: none; transition: border-color 0.15s;
+  }
+  .nutrition-inputs input:focus { border-color: var(--yellow); }
+  .goal-toggle { display: flex; gap: 4px; }
+  .goal-btn {
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text2); border-radius: 6px; padding: 6px 10px;
+    font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.15s;
+  }
+  .goal-btn.active { background: var(--yellow-bg); border-color: var(--yellow); color: var(--yellow); }
+  .nutrition-set-btn {
+    background: var(--yellow); color: #000; border: none; border-radius: 6px;
+    font-size: 13px; font-weight: 800; padding: 8px 14px; cursor: pointer;
+    transition: opacity 0.15s; margin-top: 8px;
+  }
+  .nutrition-set-btn:active { opacity: 0.8; }
+  #nutrition-banner-text { font-size: 14px; font-weight: 700; color: var(--yellow); flex: 1; }
+  #nutrition-edit-btn {
+    background: none; border: 1px solid var(--yellow-border); color: var(--yellow);
+    border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 700;
+    cursor: pointer; flex-shrink: 0;
+  }
+
+  /* ── REST DAY CARD ── */
+  #rest-day-card {
+    background: linear-gradient(135deg, #1a1a1a 0%, #242424 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px; margin-bottom: 16px;
+    text-align: center;
+  }
+  #rest-day-card h2 { font-size: 28px; font-weight: 900; margin-bottom: 6px; }
+  #rest-day-card .rest-day-name { font-size: 14px; color: var(--text2); margin-bottom: 16px; }
+  #rest-day-card .rest-tip {
+    font-size: 14px; color: var(--text2); line-height: 1.6;
+    background: var(--bg3); border-radius: var(--radius-sm);
+    padding: 14px; text-align: left;
+  }
+
+  /* ── STREAK DISPLAY ── */
+  #streak-display {
+    margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
+  }
+  .streak-badge { font-size: 15px; font-weight: 800; color: var(--yellow); }
+  .streak-badge.zero { color: var(--text3); font-size: 13px; font-weight: 600; }
+  .streak-total { font-size: 12px; color: var(--text3); }
+
+  /* ── PROGRESSIVE OVERLOAD NUDGE ── */
+  .po-nudge {
+    font-size: 12px; font-weight: 600; margin-top: 6px;
+    padding: 5px 8px; border-radius: 6px;
+  }
+  .po-nudge.up { color: var(--green); background: rgba(76,175,80,0.1); }
+  .po-nudge.same { color: var(--yellow); background: rgba(245,200,66,0.1); }
+  .po-nudge.none { color: var(--text3); background: rgba(255,255,255,0.04); }
+
+  /* ── WORKOUT NOTES ── */
+  .workout-notes-wrap { margin-top: 16px; margin-bottom: 0; }
+  .workout-notes-wrap textarea {
+    width: 100%; background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); color: var(--text);
+    font-size: 13px; line-height: 1.55; padding: 12px;
+    resize: vertical; min-height: 80px; outline: none;
+    font-family: inherit; transition: border-color 0.15s;
+  }
+  .workout-notes-wrap textarea:focus { border-color: var(--yellow); }
+  .workout-notes-wrap label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
+
+  /* ── BODY WEIGHT VIEW ── */
+  #view-weight .bw-log-row {
+    display: flex; gap: 8px; align-items: center; margin-bottom: 16px;
+  }
+  #view-weight .bw-log-row input {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-size: 16px; font-weight: 700;
+    padding: 10px 14px; width: 120px; text-align: center;
+    outline: none; transition: border-color 0.15s;
+  }
+  #view-weight .bw-log-row input:focus { border-color: var(--yellow); }
+  #view-weight .bw-log-btn {
+    background: var(--yellow); color: #000; border: none; border-radius: 6px;
+    font-size: 14px; font-weight: 800; padding: 10px 18px; cursor: pointer;
+    transition: opacity 0.15s; flex-shrink: 0;
+  }
+  #view-weight .bw-log-btn:active { opacity: 0.8; }
+  .bw-chart-wrap {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 12px; overflow: hidden;
+  }
+  .bw-stat { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 16px; }
+  .bw-stat strong { color: var(--yellow); }
+  .bw-list { display: flex; flex-direction: column; gap: 6px; }
+  .bw-list-item {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 10px 14px;
+    font-size: 14px;
+  }
+  .bw-list-item .bw-date { color: var(--text2); font-size: 12px; }
+  .bw-list-item .bw-val { font-weight: 800; color: var(--text); }
+  .bw-del-btn {
+    background: none; border: none; color: var(--text3); font-size: 16px;
+    cursor: pointer; padding: 0 4px; line-height: 1;
+    transition: color 0.15s;
+  }
+  .bw-del-btn:hover { color: var(--red); }
+
+  /* ── HISTORY SESSION NOTE ── */
+  .hi-note {
+    font-size: 12px; color: var(--text2); font-style: italic;
+    background: var(--bg3); border-radius: 6px; padding: 8px 10px;
+    margin-top: 8px; line-height: 1.5; border-left: 3px solid var(--border);
+  }
 </style>
 </head>
 <body>
@@ -389,20 +559,53 @@
     <div id="header-title">HC 1.2</div>
     <div id="header-phase">Loading...</div>
   </div>
-  <div style="text-align:right">
-    <div id="header-week" style="font-size:13px;font-weight:700;"></div>
-    <div id="header-day" style="font-size:11px;color:var(--text3);margin-top:1px;"></div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div style="text-align:right">
+      <div id="header-week" style="font-size:13px;font-weight:700;"></div>
+      <div id="header-day" style="font-size:11px;color:var(--text3);margin-top:1px;"></div>
+    </div>
+    <button id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">☀️</button>
   </div>
 </header>
 
 <main id="app-main">
   <!-- TODAY VIEW -->
   <div id="view-today" class="view active">
-    <div class="today-hero">
+    <!-- Hero card (workout day) -->
+    <div class="today-hero" id="today-hero-card">
       <div class="phase-badge" id="hero-phase">Phase 1</div>
       <h2 id="hero-day">Monday Upper</h2>
       <div class="subtitle" id="hero-sub">Week 1 · 8×5 Cluster</div>
+      <div id="streak-display"></div>
       <button class="start-btn" onclick="startWorkout()">Start Today's Workout →</button>
+    </div>
+
+    <!-- Rest day card (shown instead of hero on rest days) -->
+    <div id="rest-day-card" style="display:none;">
+      <h2 id="rest-day-heading">Rest Day 💪</h2>
+      <div class="rest-day-name" id="rest-day-name"></div>
+      <div class="rest-tip" id="rest-day-tip"></div>
+      <div id="streak-display-rest" style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:16px;align-items:center;flex-wrap:wrap;"></div>
+    </div>
+
+    <!-- Nutrition Target Card -->
+    <div id="nutrition-card">
+      <div id="nutrition-setup">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text);">Nutrition Target</div>
+        <div class="nutrition-inputs">
+          <label>Bodyweight (lbs)</label>
+          <input type="number" id="nutr-bw" placeholder="185" min="50" max="500" step="1">
+          <div class="goal-toggle">
+            <button class="goal-btn active" id="goal-bulk" onclick="setGoalMode('bulk')">Bulk</button>
+            <button class="goal-btn" id="goal-maintain" onclick="setGoalMode('maintain')">Maintain</button>
+          </div>
+        </div>
+        <button class="nutrition-set-btn" onclick="saveNutrition()">Set Targets</button>
+      </div>
+      <div id="nutrition-banner" style="display:none;width:100%;display:none;align-items:center;justify-content:space-between;gap:8px;">
+        <span id="nutrition-banner-text"></span>
+        <button id="nutrition-edit-btn" onclick="editNutrition()">Edit</button>
+      </div>
     </div>
 
     <div class="section-header">Select Day</div>
@@ -435,11 +638,66 @@
 
   <!-- 1RM VIEW -->
   <div id="view-orm" class="view">
-    <div class="section-header" style="margin-top:0">1RM Calculator</div>
+
+    <!-- MASS GAIN CALCULATOR -->
+    <div class="section-header" style="margin-top:0">Mass Gain Calculator</div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:20px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Current Weight</label>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input id="mass-current" type="number" placeholder="lbs" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 10px;width:100%;outline:none;" oninput="calcMassGain()">
+          </div>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Goal Weight</label>
+          <input id="mass-goal" type="number" placeholder="lbs" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 10px;width:100%;outline:none;" oninput="calcMassGain()">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Height</label>
+          <div style="display:flex;gap:4px;">
+            <input id="mass-ft" type="number" placeholder="ft" min="4" max="7" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 6px;width:100%;outline:none;text-align:center;" oninput="calcMassGain()">
+            <input id="mass-in" type="number" placeholder="in" min="0" max="11" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 6px;width:100%;outline:none;text-align:center;" oninput="calcMassGain()">
+          </div>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Age</label>
+          <input id="mass-age" type="number" placeholder="yrs" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 10px;width:100%;outline:none;" oninput="calcMassGain()">
+        </div>
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Activity Level</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;" id="activity-btns">
+          <button class="activity-btn active" data-val="1.55" onclick="selectActivity(this)">Moderate<br><span style="font-size:10px;font-weight:400;">3-5 days/wk</span></button>
+          <button class="activity-btn" data-val="1.725" onclick="selectActivity(this)">Very Active<br><span style="font-size:10px;font-weight:400;">6-7 days/wk</span></button>
+        </div>
+      </div>
+      <div id="mass-result" style="display:none;margin-top:14px;border-top:1px solid var(--border);padding-top:14px;"></div>
+    </div>
+
+    <!-- 1RM CALCULATOR -->
+    <div class="section-header">1RM Calculator</div>
     <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.5;">
       Enter your 3-rep max weight to calculate estimated 1RM and training percentages.
     </p>
     <div id="orm-cards"></div>
+  </div>
+
+  <!-- BODY WEIGHT VIEW -->
+  <div id="view-weight" class="view">
+    <div class="section-header" style="margin-top:0">Body Weight Tracker</div>
+    <div class="bw-log-row">
+      <input type="number" id="bw-input" placeholder="lbs" step="0.1" min="0">
+      <button class="bw-log-btn" onclick="logBodyWeight()">Log</button>
+    </div>
+    <div class="bw-chart-wrap" id="bw-chart-wrap">
+      <div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No data yet — log your first weigh-in above.</div>
+    </div>
+    <div class="bw-stat" id="bw-stat"></div>
+    <div class="section-header">Past Entries</div>
+    <div class="bw-list" id="bw-list"></div>
   </div>
 </main>
 
@@ -484,6 +742,12 @@
     </svg>
     1RM Calc
   </div>
+  <div class="nav-tab" data-view="weight" onclick="switchView('weight')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 9a6 6 0 1 0 12 0A6 6 0 0 0 6 9z"/><path d="M12 9v-1"/><path d="M4.22 14.22l1.06 1.06"/><path d="M1 17h2"/><path d="M21 17h2"/><path d="M18.72 15.28l1.06-1.06"/><path d="M12 21v-2"/><path d="M4.34 19.66l1.06-1.06"/><path d="M18.6 18.6l1.06 1.06"/>
+    </svg>
+    Weight
+  </div>
 </nav>
 
 <div id="toast"></div>
@@ -497,6 +761,10 @@ const PROGRAM = {
   phases: [
     {
       id: 1, name: "Phase 1", weeks: [1,2,3], scheme: "8×5",
+      title: "Ol' Reliable 8×5",
+      goal: "Build the foundation — size AND strength together.",
+      description: "8 sets of 5 is the classic cluster. Research by Jonathan Oliver, PhD found similar hypertrophy to 4×10, but with significantly better strength and power gains. 40 total reps at your working weight. Your CNS will be buzzing when you leave. After a few weeks, size gets added and PRs come. This is where it starts.",
+      loads: "Yellow exercises: 65-70% 1RM lower body, 70-75% 1RM upper body. Rest 30-45 sec between supersets (upper), ~60 sec (lower). Orange: 2-3 min. Red: ~90 sec.",
       days: [
         {
           id: "mon", label: "Monday", name: "Upper",
@@ -549,6 +817,10 @@ const PROGRAM = {
     },
     {
       id: 2, name: "Phase 2", weeks: [4,5,6], scheme: "10×4",
+      title: "10×4 — More Volume, Heavier Loads",
+      goal: "Increase total volume and push the weight up.",
+      description: "10 sets of 4 means more total sets than Phase 1, with heavier loads and lower reps. The cluster scheme shifts toward more mechanical tension — the key driver of hypertrophy. You're building on the base you laid in Phase 1. The accessories change too, hitting the same muscles from new angles to ensure complete development.",
+      loads: "Yellow exercises: 70-75% 1RM lower body, 75-80% 1RM upper body. Same rest as Phase 1 — 30-45 sec supersets (upper), ~60 sec (lower). Orange: 2-3 min. Red: ~90 sec.",
       days: [
         {
           id: "mon", label: "Monday", name: "Upper",
@@ -601,6 +873,10 @@ const PROGRAM = {
     },
     {
       id: 3, name: "Phase 3", weeks: [7,8], scheme: "12×3",
+      title: "12×3 — The Final Cluster",
+      goal: "Maximum intensity. Heaviest loads. Prove your seriousness.",
+      description: "12 sets of 3 is the peak of the program. Loads jump to 80-85% 1RM — this is heavy, focused work. Only 2 weeks because the intensity is extreme. Most people are not serious. They say they want something and do the opposite. If you are serious, you only care about one thing: Results. Results prove your level of seriousness. Finish strong.",
+      loads: "Yellow exercises: 75-80% 1RM lower body, 80-85% 1RM upper body. Rest 30-45 sec supersets (upper), ~60 sec (lower). Orange: 2-3 min. Red: ~90 sec.",
       days: [
         {
           id: "mon", label: "Monday", name: "Upper",
@@ -783,6 +1059,7 @@ function switchView(viewName) {
   if (viewName === 'program') renderProgram();
   if (viewName === 'history') renderHistory();
   if (viewName === 'orm') renderORM();
+  if (viewName === 'weight') renderWeightView();
   updateHeader();
   window.scrollTo(0, 0);
 }
@@ -808,9 +1085,32 @@ function renderToday() {
   const dayData = getCurrentDayData();
   const wi = getWeekInPhase(state.currentWeek);
 
-  document.getElementById('hero-phase').textContent = `${phase.name}`;
-  document.getElementById('hero-day').textContent = `${dayData.label} ${dayData.name}`;
-  document.getElementById('hero-sub').textContent = `Week ${state.currentWeek} · ${phase.scheme} Cluster`;
+  // ── Rest Day Detection ──
+  const REST_DAY_TIPS = {
+    3: "💤 Sleep — aim for 8+ hours tonight. Growth hormone peaks during deep sleep. This is when you actually grow.",
+    6: "🍽️ Eat big today. Your muscles are still repairing from Friday. Hit your protein and calorie targets.",
+    0: "🧘 Active recovery — a 20 min walk, light stretching, or foam rolling keeps blood flowing without taxing the CNS."
+  };
+  const REST_DAY_NAMES = {3:'Wednesday', 6:'Saturday', 0:'Sunday'};
+  const todayDow = new Date().getDay(); // 0=Sun,1=Mon,...,6=Sat
+  const isRestDay = todayDow in REST_DAY_TIPS;
+  const heroCard = document.getElementById('today-hero-card');
+  const restCard = document.getElementById('rest-day-card');
+  if (isRestDay) {
+    heroCard.style.display = 'none';
+    restCard.style.display = 'block';
+    document.getElementById('rest-day-name').textContent = REST_DAY_NAMES[todayDow];
+    document.getElementById('rest-day-tip').textContent = REST_DAY_TIPS[todayDow];
+    // streak in rest card
+    document.getElementById('streak-display-rest').innerHTML = buildStreakHTML();
+  } else {
+    heroCard.style.display = '';
+    restCard.style.display = 'none';
+    document.getElementById('hero-phase').textContent = `${phase.name}`;
+    document.getElementById('hero-day').textContent = `${dayData.label} ${dayData.name}`;
+    document.getElementById('hero-sub').textContent = `Week ${state.currentWeek} · ${phase.scheme} Cluster`;
+    document.getElementById('streak-display').innerHTML = buildStreakHTML();
+  }
 
   // Day selector
   const daySel = document.getElementById('day-selector');
@@ -865,6 +1165,8 @@ function renderToday() {
       <div style="font-size:16px;font-weight:800;">${s.value}</div>
     </div>
   `).join('');
+
+  renderNutritionCard();
 }
 
 // ════════════════════════════════════════════════════════════
@@ -885,13 +1187,22 @@ function renderWorkout() {
   const groups = groupExercises(dayData.exercises);
 
   let html = `
-    <div style="margin-bottom:16px;">
+    <div style="margin-bottom:14px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
         <span style="background:var(--yellow);color:#000;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;">${phase.name}</span>
         <span style="font-size:12px;color:var(--text3);">${phase.scheme}</span>
       </div>
       <h2 style="font-size:22px;font-weight:800;">${dayData.label} ${dayData.name}</h2>
       <p style="font-size:13px;color:var(--text2);margin-top:2px;">Week ${state.currentWeek}</p>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--yellow-border);border-left:3px solid var(--yellow);border-radius:8px;padding:12px 14px;margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:800;color:var(--yellow);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">🎯 ${phase.title}</div>
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">${phase.goal}</div>
+      <details style="margin:0;">
+        <summary style="font-size:12px;color:var(--text3);cursor:pointer;user-select:none;">More details</summary>
+        <div style="font-size:12px;color:var(--text2);line-height:1.55;margin-top:8px;">${phase.description}</div>
+        <div style="font-size:11px;color:var(--text3);background:var(--bg3);border-radius:6px;padding:8px 10px;margin-top:8px;line-height:1.5;"><strong style="color:var(--text2);">Loads & Rest:</strong> ${phase.loads}</div>
+      </details>
     </div>
   `;
 
@@ -918,6 +1229,15 @@ function renderWorkout() {
     }
   });
 
+  // Workout notes textarea
+  const savedNote = ls(`notes_week${state.currentWeek}_${dayData.id}`, '');
+  html += `
+    <div class="workout-notes-wrap">
+      <label>Session Notes</label>
+      <textarea id="workout-notes-area" placeholder="How did this feel? What hurt? What crushed it?">${savedNote}</textarea>
+    </div>
+  `;
+
   html += `<button class="complete-workout-btn" onclick="completeWorkout()">Complete Workout ✓</button>`;
 
   container.innerHTML = html;
@@ -939,8 +1259,35 @@ function renderWorkout() {
       weightInput.addEventListener('change', () => {
         setWeight(ex.id, state.currentWeek, weightInput.value);
       });
+      // Progressive overload nudge (yellow/orange only)
+      if (ex.type === 'yellow' || ex.type === 'orange') {
+        updatePONudge(ex.id, weightInput.value);
+        weightInput.addEventListener('input', () => {
+          setWeight(ex.id, state.currentWeek, weightInput.value);
+          updatePONudge(ex.id, weightInput.value);
+        });
+      }
+    }
+    // Restore skipped state
+    if (ls(`skip_${ex.id}_${state.currentWeek}`, false)) {
+      const card = document.getElementById(`card-${ex.id}`);
+      const btn = document.getElementById(`skip-${ex.id}`);
+      if (card) card.classList.add('skipped-card');
+      if (btn) { btn.classList.add('skipped'); btn.textContent = 'Skipped'; }
     }
   });
+
+  // Notes textarea debounce
+  let notesDebounce = null;
+  const notesArea = document.getElementById('workout-notes-area');
+  if (notesArea) {
+    notesArea.addEventListener('input', () => {
+      clearTimeout(notesDebounce);
+      notesDebounce = setTimeout(() => {
+        lsSet(`notes_week${state.currentWeek}_${dayData.id}`, notesArea.value);
+      }, 500);
+    });
+  }
 }
 
 function renderExCard(ex, weekIdx) {
@@ -954,12 +1301,17 @@ function renderExCard(ex, weekIdx) {
     setsHtml += `<div class="set-circle" id="set-${ex.id}-${i}">${i+1}</div>`;
   }
 
+  const poNudge = (ex.type === 'yellow' || ex.type === 'orange')
+    ? `<div class="po-nudge none" id="po-${ex.id}">First time — establish your baseline</div>`
+    : '';
+
   const weightSection = ex.type !== 'cns' ? `
     <div class="ex-weight">
       <label>Weight used:</label>
       <input type="number" id="weight-${ex.id}" placeholder="lbs" step="2.5" min="0">
       <span class="weight-unit">lbs</span>
-    </div>` : '';
+    </div>
+    ${poNudge}` : '';
 
   const notesSection = ex.notes ? `
     <div class="ex-notes-toggle" onclick="this.nextElementSibling.classList.toggle('open');this.classList.toggle('open')">
@@ -1048,17 +1400,23 @@ function renderExCard(ex, weekIdx) {
     : `https://www.youtube.com/results?search_query=${encodeURIComponent(ex.name + ' exercise form')}`;
 
   const videoSection = ytId ? `
-    <a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;margin:8px 0;text-decoration:none;background:var(--bg3);border-radius:8px;overflow:hidden;padding-right:10px;">
-      <div style="position:relative;flex-shrink:0;width:96px;height:54px;">
-        <img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg" style="width:96px;height:54px;object-fit:cover;display:block;" loading="lazy">
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-          <div style="width:28px;height:28px;background:rgba(255,0,0,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="white"><polygon points="3,1 9,5 3,9"/></svg>
+    <div style="margin:8px 0;border-radius:8px;overflow:hidden;background:var(--bg3);" id="vid-wrap-${ex.id}">
+      <div onclick="expandVideo('${ex.id}','${ytId}')" style="display:flex;align-items:center;gap:10px;cursor:pointer;padding-right:10px;">
+        <div style="position:relative;flex-shrink:0;width:96px;height:54px;">
+          <img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg" style="width:96px;height:54px;object-fit:cover;display:block;" loading="lazy">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <div style="width:28px;height:28px;background:rgba(255,0,0,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="white"><polygon points="3,1 9,5 3,9"/></svg>
+            </div>
           </div>
         </div>
+        <span style="font-size:12px;font-weight:600;color:var(--text2);">▶ Play Demo</span>
       </div>
-      <span style="font-size:12px;font-weight:600;color:var(--text2);">Watch Demo</span>
-    </a>` : '';
+      <div id="vid-player-${ex.id}" style="display:none;position:relative;padding-bottom:56.25%;height:0;">
+        <iframe id="vid-iframe-${ex.id}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen allow="autoplay;encrypted-media"></iframe>
+        <button onclick="collapseVideo('${ex.id}')" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.7);border:none;color:#fff;border-radius:4px;padding:4px 8px;font-size:12px;font-weight:700;cursor:pointer;z-index:10;">✕</button>
+      </div>
+    </div>` : '';
 
   return `
     <div class="ex-card ${ex.type}" id="card-${ex.id}">
@@ -1075,8 +1433,26 @@ function renderExCard(ex, weekIdx) {
       ${notesSection}
       <div class="ex-sets">${setsHtml}</div>
       ${weightSection}
+      <button class="skip-btn" id="skip-${ex.id}" onclick="skipExercise('${ex.id}')">Skip Exercise</button>
     </div>
   `;
+}
+
+function skipExercise(exId) {
+  const card = document.getElementById(`card-${exId}`);
+  const btn = document.getElementById(`skip-${exId}`);
+  const isSkipped = card.classList.contains('skipped-card');
+  if (isSkipped) {
+    card.classList.remove('skipped-card');
+    btn.classList.remove('skipped');
+    btn.textContent = 'Skip Exercise';
+    lsSet(`skip_${exId}_${state.currentWeek}`, false);
+  } else {
+    card.classList.add('skipped-card');
+    btn.classList.add('skipped');
+    btn.textContent = 'Skipped';
+    lsSet(`skip_${exId}_${state.currentWeek}`, true);
+  }
 }
 
 function groupExercises(exercises) {
@@ -1142,11 +1518,17 @@ function completeWorkout() {
     if (w) weights[ex.name] = w;
   });
 
+  // Collect notes
+  const notesArea = document.getElementById('workout-notes-area');
+  const note = notesArea ? notesArea.value : ls(`notes_week${state.currentWeek}_${dayData.id}`, '');
+  if (note) lsSet(`notes_week${state.currentWeek}_${dayData.id}`, note);
+
   const entry = {
     date: new Date().toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}),
     dateRaw: Date.now(),
     phase: phase.name,
     week: state.currentWeek,
+    dayId: dayData.id,
     day: `${dayData.label} ${dayData.name}`,
     weights
   };
@@ -1182,10 +1564,18 @@ function renderProgram() {
       <div class="phase-card">
         <div class="phase-header">
           <div>
-            <h3>${phase.name}</h3>
+            <h3>${phase.name} — ${phase.title}</h3>
             <div class="phase-scheme">${phase.scheme}</div>
           </div>
           <div class="phase-weeks">${weekRange}</div>
+        </div>
+        <div style="padding:12px 16px;border-bottom:1px solid var(--border);">
+          <div style="font-size:12px;font-weight:800;color:var(--yellow);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">🎯 Goal</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;">${phase.goal}</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.55;margin-bottom:10px;">${phase.description}</div>
+          <div style="font-size:11px;color:var(--text3);background:var(--bg3);border-radius:6px;padding:8px 10px;line-height:1.5;">
+            <strong style="color:var(--text2);">Loads & Rest:</strong> ${phase.loads}
+          </div>
         </div>
         <div class="phase-days">
           ${phase.days.map(day => {
@@ -1262,6 +1652,7 @@ function renderHistory() {
   } else {
     history.forEach(session => {
       const weights = Object.entries(session.weights || {});
+      const sessionNote = session.dayId ? ls(`notes_week${session.week}_${session.dayId}`, '') : '';
       html += `
         <div class="history-item">
           <div class="hi-header">
@@ -1269,6 +1660,7 @@ function renderHistory() {
             <div class="hi-badge">${session.day} · W${session.week}</div>
           </div>
           ${weights.length > 0 ? `<div class="hi-weights">${weights.map(([name,w]) => `<div class="hi-weight-row"><span>${name}</span><strong>${w} lbs</strong></div>`).join('')}</div>` : '<div style="font-size:12px;color:var(--text3);">No weights logged</div>'}
+          ${sessionNote ? `<div class="hi-note">"${sessionNote}"</div>` : ''}
         </div>
       `;
     });
@@ -1387,14 +1779,422 @@ function showToast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+// ════════════════════════════════════════════════════════════
+// DARK / LIGHT MODE TOGGLE
+// ════════════════════════════════════════════════════════════
+function applyTheme(theme) {
+  if (theme === 'light') {
+    document.body.classList.add('light');
+    document.getElementById('theme-toggle').textContent = '🌙';
+  } else {
+    document.body.classList.remove('light');
+    document.getElementById('theme-toggle').textContent = '☀️';
+  }
+}
+
+function toggleTheme() {
+  const current = ls('theme', 'dark');
+  const next = current === 'dark' ? 'light' : 'dark';
+  lsSet('theme', next);
+  applyTheme(next);
+}
+
+// ════════════════════════════════════════════════════════════
+// NUTRITION TARGET
+// ════════════════════════════════════════════════════════════
+let nutritionGoalMode = 'bulk';
+
+function setGoalMode(mode) {
+  nutritionGoalMode = mode;
+  document.getElementById('goal-bulk').classList.toggle('active', mode === 'bulk');
+  document.getElementById('goal-maintain').classList.toggle('active', mode === 'maintain');
+}
+
+function saveNutrition() {
+  const bwInput = document.getElementById('nutr-bw');
+  const bw = parseFloat(bwInput.value);
+  if (!bw || bw <= 0) { showToast('Enter a valid bodyweight'); return; }
+  lsSet('nutr_bw', bw);
+  lsSet('nutr_goal', nutritionGoalMode);
+  renderNutritionCard();
+}
+
+function editNutrition() {
+  const setup = document.getElementById('nutrition-setup');
+  const banner = document.getElementById('nutrition-banner');
+  setup.style.display = '';
+  banner.style.display = 'none';
+  document.getElementById('nutrition-card').classList.remove('banner-mode');
+  const bw = ls('nutr_bw', '');
+  const goal = ls('nutr_goal', 'bulk');
+  if (bw) document.getElementById('nutr-bw').value = bw;
+  setGoalMode(goal);
+}
+
+function renderNutritionCard() {
+  const bw = ls('nutr_bw', null);
+  const goal = ls('nutr_goal', 'bulk');
+  if (!bw) {
+    // Show setup form
+    const setup = document.getElementById('nutrition-setup');
+    const banner = document.getElementById('nutrition-banner');
+    if (setup) setup.style.display = '';
+    if (banner) banner.style.display = 'none';
+    document.getElementById('nutrition-card').classList.remove('banner-mode');
+    return;
+  }
+  // Show banner
+  const protein = goal === 'bulk' ? Math.round(bw * 1.0) : Math.round(bw * 0.8);
+  const calories = goal === 'bulk' ? Math.round(bw * 18) : Math.round(bw * 15);
+  const bannerText = `🥩 Protein: ${protein}g · 🔥 Calories: ${calories} kcal`;
+  document.getElementById('nutrition-banner-text').textContent = bannerText;
+  const setup = document.getElementById('nutrition-setup');
+  const banner = document.getElementById('nutrition-banner');
+  if (setup) setup.style.display = 'none';
+  if (banner) { banner.style.display = 'flex'; }
+  document.getElementById('nutrition-card').classList.add('banner-mode');
+  // Sync goal mode buttons state
+  nutritionGoalMode = goal;
+  const bulkBtn = document.getElementById('goal-bulk');
+  const maintBtn = document.getElementById('goal-maintain');
+  if (bulkBtn) bulkBtn.classList.toggle('active', goal === 'bulk');
+  if (maintBtn) maintBtn.classList.toggle('active', goal === 'maintain');
+}
+
+// ════════════════════════════════════════════════════════════
+// WORKOUT STREAK COUNTER
+// ════════════════════════════════════════════════════════════
+function buildStreakHTML() {
+  // Count streak: consecutive weeks where all 4 workouts done (from current week backwards)
+  const dayIds = ['mon','tue','thu','fri'];
+  let streak = 0;
+  let w = state.currentWeek;
+  // Walk backwards from current week
+  while (w >= 1) {
+    const phase = getPhaseForWeek(w);
+    const allDone = phase.days.every(d => ls(`wk_done_${w}_${d.id}`, false));
+    if (allDone) { streak++; w--; }
+    else break;
+  }
+  // Total workouts
+  let total = 0;
+  for (let wk = 1; wk <= 8; wk++) {
+    const ph = getPhaseForWeek(wk);
+    ph.days.forEach(d => { if (ls(`wk_done_${wk}_${d.id}`, false)) total++; });
+  }
+  if (streak > 0) {
+    return `<span class="streak-badge">🔥 ${streak} week streak</span><span class="streak-total">${total} total workouts</span>`;
+  } else {
+    return `<span class="streak-badge zero">Start your streak today</span><span class="streak-total">${total} total workouts</span>`;
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// PROGRESSIVE OVERLOAD NUDGE
+// ════════════════════════════════════════════════════════════
+function updatePONudge(exId, currentVal) {
+  const el = document.getElementById(`po-${exId}`);
+  if (!el) return;
+  const lastWeekVal = parseFloat(ls(`w_${exId}_${state.currentWeek - 1}`, ''));
+  const thisVal = parseFloat(currentVal);
+  if (isNaN(lastWeekVal) || state.currentWeek <= 1) {
+    el.textContent = 'First time — establish your baseline';
+    el.className = 'po-nudge none';
+  } else if (!isNaN(thisVal) && thisVal > lastWeekVal) {
+    el.textContent = `↑ Up from ${lastWeekVal} lbs — great progress!`;
+    el.className = 'po-nudge up';
+  } else if (!isNaN(thisVal) && thisVal === lastWeekVal) {
+    el.textContent = `→ Same as last week (${lastWeekVal} lbs) — try adding 2.5-5 lbs`;
+    el.className = 'po-nudge same';
+  } else if (isNaN(thisVal)) {
+    el.textContent = `Last week: ${lastWeekVal} lbs`;
+    el.className = 'po-nudge none';
+  } else {
+    el.textContent = `↓ Down from ${lastWeekVal} lbs last week`;
+    el.className = 'po-nudge same';
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// BODY WEIGHT TRACKER
+// ════════════════════════════════════════════════════════════
+function bwDateKey(date) {
+  const d = date || new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `bw_${y}-${m}-${day}`;
+}
+
+function getAllBWEntries() {
+  const entries = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('bw_')) {
+      const dateStr = key.slice(3); // YYYY-MM-DD
+      const val = ls(key, null);
+      if (val !== null) {
+        entries.push({ date: dateStr, weight: parseFloat(val) });
+      }
+    }
+  }
+  entries.sort((a,b) => a.date.localeCompare(b.date));
+  return entries;
+}
+
+function logBodyWeight() {
+  const input = document.getElementById('bw-input');
+  const val = parseFloat(input.value);
+  if (!val || val <= 0) { showToast('Enter a valid weight'); return; }
+  const key = bwDateKey(new Date());
+  lsSet(key, val);
+  input.value = '';
+  showToast(`Logged ${val} lbs`);
+  renderWeightView();
+}
+
+function deleteBWEntry(dateStr) {
+  try { localStorage.removeItem(`bw_${dateStr}`); } catch(e) {}
+  renderWeightView();
+}
+
+function renderWeightView() {
+  const allEntries = getAllBWEntries();
+  // Last 30 days
+  const last30 = allEntries.slice(-30);
+
+  // Chart
+  const chartWrap = document.getElementById('bw-chart-wrap');
+  if (chartWrap) {
+    if (last30.length >= 2) {
+      chartWrap.innerHTML = renderBWChart(last30);
+    } else {
+      chartWrap.innerHTML = `<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">Log at least 2 entries to see a chart.</div>`;
+    }
+  }
+
+  // Stat
+  const statEl = document.getElementById('bw-stat');
+  if (statEl && allEntries.length >= 2) {
+    const first = allEntries[0].weight;
+    const latest = allEntries[allEntries.length-1].weight;
+    const diff = (latest - first).toFixed(1);
+    const sign = diff >= 0 ? '+' : '';
+    statEl.innerHTML = `Total gained: <strong>${sign}${diff} lbs</strong> since first log entry`;
+  } else if (statEl) {
+    statEl.innerHTML = '';
+  }
+
+  // List (all entries, newest first)
+  const listEl = document.getElementById('bw-list');
+  if (listEl) {
+    if (allEntries.length === 0) {
+      listEl.innerHTML = `<div style="text-align:center;color:var(--text3);font-size:13px;padding:20px 0;">No entries yet.</div>`;
+    } else {
+      const reversed = [...allEntries].reverse();
+      listEl.innerHTML = reversed.map(e => {
+        const d = new Date(e.date + 'T00:00:00');
+        const label = d.toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'});
+        return `
+          <div class="bw-list-item">
+            <span class="bw-date">${label}</span>
+            <span class="bw-val">${e.weight} lbs</span>
+            <button class="bw-del-btn" onclick="deleteBWEntry('${e.date}')" title="Delete">×</button>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+}
+
+function renderBWChart(data) {
+  const W = 300, H = 120, PAD_L = 36, PAD_R = 10, PAD_T = 14, PAD_B = 20;
+  const weights = data.map(d => d.weight);
+  const minW = Math.min(...weights), maxW = Math.max(...weights);
+  const range = maxW - minW || 1;
+
+  const pts = data.map((d, i) => {
+    const x = PAD_L + (i / (data.length - 1)) * (W - PAD_L - PAD_R);
+    const y = PAD_T + (1 - (d.weight - minW) / range) * (H - PAD_T - PAD_B);
+    return { x, y, d };
+  });
+
+  const pathD = pts.map((p,i) => (i===0?'M':'L') + `${p.x},${p.y}`).join(' ');
+  const areaD = `${pathD} L${pts[pts.length-1].x},${H-PAD_B} L${PAD_L},${H-PAD_B} Z`;
+
+  const dots = pts.map(p => `<circle cx="${p.x}" cy="${p.y}" r="3.5" fill="var(--yellow)"/>`).join('');
+
+  // Axes
+  const axisX = `<line x1="${PAD_L}" y1="${H-PAD_B}" x2="${W-PAD_R}" y2="${H-PAD_B}" stroke="var(--text3)" stroke-width="1"/>`;
+  const axisY = `<line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${H-PAD_B}" stroke="var(--text3)" stroke-width="1"/>`;
+
+  // Date labels
+  const firstDate = new Date(data[0].date + 'T00:00:00').toLocaleDateString('en-US', {month:'short',day:'numeric'});
+  const lastDate = new Date(data[data.length-1].date + 'T00:00:00').toLocaleDateString('en-US', {month:'short',day:'numeric'});
+
+  return `
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;overflow:visible">
+      <defs>
+        <linearGradient id="bw-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--yellow)" stop-opacity="0.25"/>
+          <stop offset="100%" stop-color="var(--yellow)" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      ${axisX}${axisY}
+      <path d="${areaD}" fill="url(#bw-grad)"/>
+      <path d="${pathD}" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      ${dots}
+      <text x="${PAD_L}" y="${PAD_T - 2}" fill="var(--text2)" font-size="9" font-weight="700">${maxW} lbs</text>
+      <text x="${PAD_L}" y="${H - PAD_B + 10}" fill="var(--text3)" font-size="9" text-anchor="start">${minW} lbs</text>
+      <text x="${PAD_L}" y="${H}" fill="var(--text3)" font-size="9">${firstDate}</text>
+      <text x="${W - PAD_R}" y="${H}" fill="var(--text3)" font-size="9" text-anchor="end">${lastDate}</text>
+    </svg>
+  `;
+}
 
 // ════════════════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
+// INLINE VIDEO PLAYER
+// ════════════════════════════════════════════════════════════
+function expandVideo(exId, ytId) {
+  const thumb = document.querySelector(`#vid-wrap-${exId} > div:first-child`);
+  const player = document.getElementById(`vid-player-${exId}`);
+  const iframe = document.getElementById(`vid-iframe-${exId}`);
+  thumb.style.display = 'none';
+  player.style.display = 'block';
+  iframe.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`;
+}
+function collapseVideo(exId) {
+  const thumb = document.querySelector(`#vid-wrap-${exId} > div:first-child`);
+  const player = document.getElementById(`vid-player-${exId}`);
+  const iframe = document.getElementById(`vid-iframe-${exId}`);
+  iframe.src = '';
+  player.style.display = 'none';
+  thumb.style.display = 'flex';
+}
+
+// ════════════════════════════════════════════════════════════
+// MASS GAIN CALCULATOR
+// ════════════════════════════════════════════════════════════
+let selectedActivity = 1.55;
+
+function selectActivity(btn) {
+  document.querySelectorAll('.activity-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedActivity = parseFloat(btn.dataset.val);
+  calcMassGain();
+}
+
+function calcMassGain() {
+  const current = parseFloat(document.getElementById('mass-current').value);
+  const goal    = parseFloat(document.getElementById('mass-goal').value);
+  const ft      = parseFloat(document.getElementById('mass-ft').value) || 0;
+  const inches  = parseFloat(document.getElementById('mass-in').value) || 0;
+  const age     = parseFloat(document.getElementById('mass-age').value);
+  const result  = document.getElementById('mass-result');
+
+  if (!current || !goal || !ft || !age) { result.style.display = 'none'; return; }
+  if (goal <= current) { result.style.display = 'none'; return; }
+
+  // Mifflin-St Jeor BMR (male, assuming lifter)
+  const heightCm = (ft * 12 + inches) * 2.54;
+  const weightKg = current * 0.453592;
+  const bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + 5;
+  const tdee = Math.round(bmr * selectedActivity);
+
+  // To gain ~0.5 lb/week (lean bulk): +250 cal/day
+  // To gain ~1 lb/week (aggressive bulk): +500 cal/day
+  const leanCals = tdee + 250;
+  const aggressiveCals = tdee + 500;
+
+  const lbsToGain = goal - current;
+  // At 0.5 lb/week lean, at 1 lb/week aggressive
+  const leanWeeks = Math.round(lbsToGain / 0.5);
+  const aggWeeks  = Math.round(lbsToGain / 1.0);
+
+  const leanMonths = (leanWeeks / 4.3).toFixed(1);
+  const aggMonths  = (aggWeeks  / 4.3).toFixed(1);
+
+  // Protein: 1g per lb of goal bodyweight
+  const protein = Math.round(goal * 1.0);
+  // Fat: ~25% of calories
+  const leanFat  = Math.round(leanCals * 0.25 / 9);
+  const aggFat   = Math.round(aggressiveCals * 0.25 / 9);
+  // Carbs: fill the rest
+  const leanCarbs = Math.round((leanCals - protein * 4 - leanFat * 9) / 4);
+  const aggCarbs  = Math.round((aggressiveCals - protein * 4 - aggFat * 9) / 4);
+
+  result.style.display = 'block';
+  result.innerHTML = `
+    <div style="font-size:12px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">
+      Goal: ${current} → ${goal} lbs (+${lbsToGain} lbs)
+    </div>
+
+    <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">Your TDEE (maintenance calories)</div>
+    <div style="font-size:22px;font-weight:900;color:var(--text);margin-bottom:14px;">${tdee.toLocaleString()} <span style="font-size:13px;color:var(--text2);font-weight:500;">kcal/day to maintain</span></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;">
+        <div style="font-size:11px;font-weight:800;color:var(--yellow);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Lean Bulk</div>
+        <div style="font-size:24px;font-weight:900;color:var(--yellow);">${leanCals.toLocaleString()}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">kcal/day</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:8px;">+250 cal surplus</div>
+        <div style="font-size:12px;color:var(--text2);">~0.5 lb/week</div>
+        <div style="font-size:12px;color:var(--green);font-weight:700;margin-top:4px;">${leanMonths} months</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--orange-border);border-radius:8px;padding:12px;">
+        <div style="font-size:11px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Aggressive</div>
+        <div style="font-size:24px;font-weight:900;color:var(--orange);">${aggressiveCals.toLocaleString()}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">kcal/day</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:8px;">+500 cal surplus</div>
+        <div style="font-size:12px;color:var(--text2);">~1 lb/week</div>
+        <div style="font-size:12px;color:var(--orange);font-weight:700;margin-top:4px;">${aggMonths} months</div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg3);border-radius:8px;padding:12px;margin-bottom:10px;">
+      <div style="font-size:11px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Daily Macros (Lean Bulk)</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;text-align:center;">
+        <div><div style="font-size:20px;font-weight:900;color:var(--yellow);">${protein}g</div><div style="font-size:10px;color:var(--text3);">Protein</div></div>
+        <div><div style="font-size:20px;font-weight:900;color:var(--blue);">${leanCarbs}g</div><div style="font-size:10px;color:var(--text3);">Carbs</div></div>
+        <div><div style="font-size:20px;font-weight:900;color:var(--orange);">${leanFat}g</div><div style="font-size:10px;color:var(--text3);">Fat</div></div>
+      </div>
+    </div>
+
+    <div style="font-size:11px;color:var(--text3);line-height:1.6;background:var(--bg3);border-radius:6px;padding:10px;">
+      💡 <strong style="color:var(--text2);">Lean bulk recommended</strong> for most people — slower but you'll gain more muscle and less fat. Hit your protein first, fill remaining calories with carbs and fat. Weigh yourself every morning after waking and track the weekly average.
+    </div>
+  `;
+
+  // Save inputs
+  lsSet('mass_inputs', { current, goal, ft, inches: inches, age, activity: selectedActivity });
+}
+
+function loadMassInputs() {
+  const saved = ls('mass_inputs', null);
+  if (!saved) return;
+  if (saved.current) document.getElementById('mass-current').value = saved.current;
+  if (saved.goal)    document.getElementById('mass-goal').value    = saved.goal;
+  if (saved.ft)      document.getElementById('mass-ft').value      = saved.ft;
+  if (saved.inches != null) document.getElementById('mass-in').value = saved.inches;
+  if (saved.age)     document.getElementById('mass-age').value     = saved.age;
+  if (saved.activity) {
+    selectedActivity = saved.activity;
+    document.querySelectorAll('.activity-btn').forEach(b => {
+      b.classList.toggle('active', parseFloat(b.dataset.val) === selectedActivity);
+    });
+  }
+  calcMassGain();
+}
+
 function init() {
   loadState();
+  applyTheme(ls('theme', 'dark'));
   renderToday();
   updateHeader();
+  loadMassInputs();
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   }

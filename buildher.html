@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Build Her</title>
+<style>
+:root {
+  --pink: #e066a3;
+  --purple: #a855f7;
+  --bg: #0d0d0d;
+  --bg2: #1a1a1a;
+  --bg3: #242424;
+  --border: #333;
+  --text: #f0f0f0;
+  --text2: #aaa;
+  --text3: #666;
+  --green: #4caf50;
+  --red: #f54242;
+  --radius: 12px;
+  --nav-h: 64px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;overflow:hidden}
+body{display:flex;flex-direction:column}
+#app{flex:1;overflow:hidden;position:relative}
+.view{position:absolute;inset:0;overflow-y:auto;padding:16px 16px calc(var(--nav-h) + 24px);display:none}
+.view.active{display:block}
+
+/* NAV */
+nav{height:var(--nav-h);background:var(--bg2);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;background:none;border:none;cursor:pointer;color:var(--text3);transition:color .2s;font-size:10px;font-family:inherit}
+.nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav-btn.active{color:var(--pink)}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.card-sm{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 24px;border-radius:var(--radius);border:none;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s;width:100%}
+.btn-primary{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff}
+.btn-primary:active{opacity:.85}
+.btn-ghost{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:active{background:var(--border)}
+.btn-sm{padding:8px 16px;font-size:13px;width:auto;border-radius:8px}
+
+/* TODAY */
+.hero{background:linear-gradient(135deg,#1a0a14,#110a1a);border:1px solid #3a1a3a;border-radius:var(--radius);padding:20px;margin-bottom:16px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;background:radial-gradient(circle,rgba(224,102,163,.25),transparent 70%);border-radius:50%}
+.hero-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--pink);margin-bottom:6px}
+.hero-title{font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--pink),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;margin-bottom:4px}
+.hero-sub{font-size:13px;color:var(--text2);margin-bottom:16px}
+.hero-meta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;font-size:12px;font-weight:600;background:rgba(255,255,255,.07);color:var(--text2)}
+.pill.pink{background:rgba(224,102,163,.15);color:var(--pink)}
+.pill.purple{background:rgba(168,85,247,.15);color:var(--purple)}
+.streak{font-size:18px;font-weight:700;color:var(--text)}
+
+.day-sel{display:flex;gap:8px;margin-bottom:12px}
+.day-btn{flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.day-btn.active{background:var(--pink);border-color:var(--pink);color:#fff}
+.day-btn.done{border-color:var(--green);color:var(--green)}
+
+.week-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;scrollbar-width:none}
+.week-row::-webkit-scrollbar{display:none}
+.week-btn{flex-shrink:0;width:40px;height:40px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg3);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:all .2s}
+.week-btn.active{background:var(--pink);border-color:var(--pink);color:#fff}
+.week-btn.done{border-color:var(--green);color:var(--green)}
+
+.rest-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center}
+.rest-icon{font-size:36px;margin-bottom:10px}
+.rest-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px}
+.rest-tip{font-size:14px;color:var(--text2);line-height:1.5}
+
+/* WORKOUT VIEW */
+#workout-view{padding:16px 16px 100px}
+.back-row{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.back-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.back-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.wk-title{font-size:18px;font-weight:700;color:var(--text)}
+
+.phase-banner{border-radius:var(--radius);padding:14px 16px;margin-bottom:16px}
+.phase-banner.p1{background:linear-gradient(135deg,rgba(224,102,163,.12),rgba(168,85,247,.08));border:1px solid rgba(224,102,163,.25)}
+.phase-banner.p2{background:linear-gradient(135deg,rgba(168,85,247,.12),rgba(224,102,163,.08));border:1px solid rgba(168,85,247,.25)}
+.phase-banner.p3{background:linear-gradient(135deg,rgba(245,66,66,.12),rgba(224,102,163,.08));border:1px solid rgba(245,66,66,.25)}
+.phase-name{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px}
+.p1 .phase-name{color:var(--pink)}
+.p2 .phase-name{color:var(--purple)}
+.p3 .phase-name{color:var(--red)}
+.phase-goal{font-size:13px;color:var(--text2);line-height:1.5}
+
+/* EXERCISE CARDS */
+.ex-card{border-radius:var(--radius);margin-bottom:10px;overflow:hidden;border:1px solid var(--border)}
+.ex-card.type-pink{border-color:rgba(224,102,163,.3)}
+.ex-card.type-purple{border-color:rgba(168,85,247,.25)}
+.ex-card.type-red{border-color:rgba(245,66,66,.25)}
+.ex-card.type-cns{border-color:rgba(255,255,255,.1)}
+.ex-card.skipped{opacity:.4}
+
+.ex-header{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg2);cursor:pointer}
+.ex-type-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.type-pink .ex-type-dot{background:var(--pink)}
+.type-purple .ex-type-dot{background:var(--purple)}
+.type-red .ex-type-dot{background:var(--red)}
+.type-cns .ex-type-dot{background:var(--text3)}
+
+.ex-name{font-size:15px;font-weight:700;flex:1;color:var(--text)}
+.ex-reps-badge{font-size:12px;font-weight:600;padding:3px 10px;border-radius:100px;flex-shrink:0}
+.type-pink .ex-reps-badge{background:rgba(224,102,163,.15);color:var(--pink)}
+.type-purple .ex-reps-badge{background:rgba(168,85,247,.15);color:var(--purple)}
+.type-red .ex-reps-badge{background:rgba(245,66,66,.15);color:var(--red)}
+.type-cns .ex-reps-badge{background:rgba(255,255,255,.08);color:var(--text2)}
+
+.ex-body{background:var(--bg3);padding:14px;display:none}
+.ex-body.open{display:block}
+
+.yt-thumb{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px;margin-bottom:12px;cursor:pointer;text-decoration:none}
+.yt-img-wrap{width:96px;height:54px;border-radius:6px;background:#111;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.yt-play{width:28px;height:28px;background:rgba(255,0,0,.85);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.yt-play::after{content:'';border-left:10px solid #fff;border-top:6px solid transparent;border-bottom:6px solid transparent;margin-left:2px}
+.yt-label{font-size:12px;color:var(--text2);line-height:1.4}
+.yt-label strong{display:block;color:var(--text);font-size:13px;margin-bottom:2px}
+
+.how-to-toggle{font-size:12px;color:var(--pink);cursor:pointer;margin-bottom:10px;display:inline-flex;align-items:center;gap:4px}
+.how-to-text{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:12px;display:none}
+.how-to-text.open{display:block}
+
+.sets-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.set-circle{width:42px;height:42px;border-radius:50%;border:2px solid var(--border);background:var(--bg2);color:var(--text3);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0;font-family:inherit}
+.set-circle.done{background:var(--green);border-color:var(--green);color:#fff}
+.set-circle.active-set{border-color:var(--pink);color:var(--pink)}
+
+.weight-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.weight-label{font-size:12px;color:var(--text2);white-space:nowrap}
+.weight-input{flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-size:14px;font-weight:600;padding:8px 12px;border-radius:8px;outline:none;font-family:inherit}
+.weight-input:focus{border-color:var(--pink)}
+.weight-unit{font-size:12px;color:var(--text3)}
+.overload-nudge{font-size:11px;color:var(--green);margin-top:4px;display:none}
+.overload-nudge.show{display:block}
+
+.skip-btn{font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;padding:4px;font-family:inherit}
+.skip-btn:active{color:var(--red)}
+
+.notes-area{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-size:14px;padding:12px;border-radius:var(--radius);resize:none;outline:none;font-family:inherit;margin-bottom:12px;min-height:80px}
+.notes-area:focus{border-color:var(--purple)}
+
+/* HISTORY */
+.hist-item{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px}
+.hist-date{font-size:13px;color:var(--text2)}
+.hist-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px}
+.hist-detail{font-size:12px;color:var(--text3)}
+.hist-badge{padding:4px 10px;border-radius:100px;font-size:11px;font-weight:700;background:rgba(76,175,80,.15);color:var(--green)}
+
+.chart-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;overflow:hidden}
+.chart-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px}
+svg.progress-chart{width:100%;height:140px;display:block}
+
+/* NUTRITION */
+.section-title{font-size:13px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+.input-group{margin-bottom:12px}
+.input-label{font-size:13px;color:var(--text2);margin-bottom:6px;display:block}
+.input-field{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-size:15px;padding:12px 14px;border-radius:var(--radius);outline:none;font-family:inherit;-webkit-appearance:none}
+.input-field:focus{border-color:var(--pink)}
+.input-row{display:flex;gap:8px}
+.input-row .input-group{flex:1}
+
+.select-field{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-size:15px;padding:12px 14px;border-radius:var(--radius);outline:none;font-family:inherit;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.select-field:focus{border-color:var(--pink)}
+
+.result-card{background:linear-gradient(135deg,#1a0a14,#110a1a);border:1px solid rgba(224,102,163,.2);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.result-row:last-child{border-bottom:none}
+.result-label{font-size:13px;color:var(--text2)}
+.result-val{font-size:16px;font-weight:700;color:var(--text)}
+.result-val.pink{color:var(--pink)}
+.result-val.purple{color:var(--purple)}
+.result-val.green{color:var(--green)}
+
+.macro-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.macro-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+.macro-val{font-size:20px;font-weight:800;margin-bottom:2px}
+.macro-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px}
+.protein-v{color:var(--pink)}
+.carb-v{color:var(--purple)}
+.fat-v{color:#f0a500}
+
+.surplus-tabs{display:flex;gap:8px;margin-bottom:14px}
+.surplus-tab{flex:1;padding:10px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg3);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;text-align:center;transition:all .2s;font-family:inherit}
+.surplus-tab.active{border-color:var(--pink);color:var(--pink);background:rgba(224,102,163,.08)}
+
+.note-box{background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);line-height:1.6;margin-top:8px}
+
+/* REST OVERLAY */
+#rest-overlay{position:fixed;inset:0;background:rgba(13,13,13,.95);z-index:100;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+#rest-overlay.show{display:flex}
+.rest-label-ov{font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2)}
+.rest-ring-wrap{position:relative;width:160px;height:160px}
+.rest-ring-wrap svg{width:160px;height:160px;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--bg3);stroke-width:10}
+.ring-fg{fill:none;stroke:var(--pink);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .5s linear}
+.rest-time-big{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:800;color:var(--text)}
+.rest-next{font-size:14px;color:var(--text2);text-align:center;max-width:240px}
+.rest-skip-btn{padding:12px 32px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--bg3);color:var(--text2);font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
+
+/* TOAST */
+#toast{position:fixed;bottom:calc(var(--nav-h) + 20px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:10px 20px;border-radius:100px;font-size:14px;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;z-index:200}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:48px 24px;color:var(--text3)}
+.empty-state svg{width:48px;height:48px;stroke:var(--text3);fill:none;stroke-width:1.5;margin-bottom:16px;stroke-linecap:round;stroke-linejoin:round}
+.empty-state p{font-size:15px;margin-bottom:6px;color:var(--text2)}
+.empty-state small{font-size:13px}
+
+/* COMPLETE BADGE */
+.complete-badge{display:flex;align-items:center;justify-content:center;gap:8px;padding:16px;background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.3);border-radius:var(--radius);margin-bottom:12px;font-weight:700;color:var(--green)}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* SECTION HEAD */
+.section-head{font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px}
+.section-sub{font-size:13px;color:var(--text2);margin-bottom:16px}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- TODAY VIEW -->
+  <div id="today-view" class="view active">
+    <div class="hero">
+      <div class="hero-label">Build Her</div>
+      <div class="hero-title" id="hero-day-name">Monday</div>
+      <div class="hero-sub">Build the body you want.</div>
+      <div class="hero-meta">
+        <span class="pill pink" id="hero-phase">Phase 1</span>
+        <span class="pill purple" id="hero-week">Week 1</span>
+      </div>
+      <div class="streak" id="streak-display">&#x1F525; 0 week streak</div>
+    </div>
+
+    <div id="today-start-btn-wrap" style="margin-bottom:16px">
+      <button class="btn btn-primary" id="start-today-btn">Start Today&apos;s Workout &rarr;</button>
+    </div>
+    <div id="today-done-badge" class="complete-badge" style="display:none">
+      <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--green);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>
+      Workout Complete!
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div class="section-title" style="margin-bottom:8px">Day</div>
+      <div class="day-sel">
+        <button class="day-btn" data-day="mon" id="daybtn-mon">Mon</button>
+        <button class="day-btn" data-day="wed" id="daybtn-wed">Wed</button>
+        <button class="day-btn" data-day="fri" id="daybtn-fri">Fri</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px">
+      <div class="section-title" style="margin-bottom:8px">Week</div>
+      <div class="week-row" id="week-row"></div>
+    </div>
+
+    <div id="rest-day-card"></div>
+  </div>
+
+  <!-- WORKOUT VIEW -->
+  <div id="workout-view" class="view">
+    <div class="back-row">
+      <button class="back-btn" id="back-btn">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="wk-title" id="workout-title">Monday — Week 1</div>
+    </div>
+    <div class="phase-banner p1" id="phase-banner">
+      <div class="phase-name" id="phase-name-text">Phase 1: Foundation</div>
+      <div class="phase-goal" id="phase-goal-text"></div>
+    </div>
+    <div id="exercise-list"></div>
+    <div style="margin-top:16px">
+      <div class="section-title">Workout Notes</div>
+      <textarea class="notes-area" id="workout-notes" placeholder="How did it feel? Any PRs? Notes for next time..."></textarea>
+    </div>
+    <button class="btn btn-primary" id="complete-workout-btn">Complete Workout</button>
+  </div>
+
+  <!-- HISTORY VIEW -->
+  <div id="history-view" class="view">
+    <div class="section-head">History</div>
+    <div class="section-sub">Your completed sessions</div>
+    <div class="chart-wrap" id="thrust-chart-wrap">
+      <div class="chart-title">Hip Thrust Progress (lbs)</div>
+      <svg class="progress-chart" id="thrust-chart" viewBox="0 0 300 120"></svg>
+    </div>
+    <div class="chart-wrap" id="squat-chart-wrap">
+      <div class="chart-title">Squat Progress (lbs)</div>
+      <svg class="progress-chart" id="squat-chart" viewBox="0 0 300 120"></svg>
+    </div>
+    <div id="history-list"></div>
+  </div>
+
+  <!-- NUTRITION VIEW -->
+  <div id="nutrition-view" class="view">
+    <div class="section-head">Nutrition</div>
+    <div class="section-sub">Mass gain calculator for women</div>
+
+    <div class="card">
+      <div class="section-title">Your Stats</div>
+      <div class="input-row">
+        <div class="input-group">
+          <label class="input-label">Height (ft)</label>
+          <input type="number" class="input-field" id="n-height-ft" placeholder="5" min="3" max="7">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Height (in)</label>
+          <input type="number" class="input-field" id="n-height-in" placeholder="5" min="0" max="11">
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label class="input-label">Current Weight (lbs)</label>
+          <input type="number" class="input-field" id="n-weight" placeholder="140" min="80" max="400">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Goal Weight (lbs)</label>
+          <input type="number" class="input-field" id="n-goal-weight" placeholder="150" min="80" max="400">
+        </div>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Age</label>
+        <input type="number" class="input-field" id="n-age" placeholder="25" min="16" max="80">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Activity Level</label>
+        <select class="select-field" id="n-activity">
+          <option value="1.55">Moderate (3-5 days/week gym)</option>
+          <option value="1.725">Very Active (6-7 days/week)</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" id="calc-btn" style="margin-top:4px">Calculate</button>
+    </div>
+
+    <div id="nutrition-results" style="display:none">
+      <div class="section-title" style="margin-top:4px">Your Surplus Options</div>
+      <div class="surplus-tabs">
+        <button class="surplus-tab active" data-surplus="200" id="surplus-lean">Lean Bulk<br><small style="font-weight:400;color:var(--text3)">+200 cal &middot; ~0.4 lb/wk</small></button>
+        <button class="surplus-tab" data-surplus="350" id="surplus-mod">Moderate Bulk<br><small style="font-weight:400;color:var(--text3)">+350 cal &middot; ~0.7 lb/wk</small></button>
+      </div>
+
+      <div class="result-card">
+        <div class="result-row">
+          <span class="result-label">BMR</span>
+          <span class="result-val" id="r-bmr">—</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">TDEE</span>
+          <span class="result-val" id="r-tdee">—</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Daily Calories (goal)</span>
+          <span class="result-val pink" id="r-cals">—</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Weight to gain</span>
+          <span class="result-val" id="r-gain">—</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Estimated timeline</span>
+          <span class="result-val green" id="r-time">—</span>
+        </div>
+      </div>
+
+      <div class="section-title">Daily Macros</div>
+      <div class="macro-grid">
+        <div class="macro-card">
+          <div class="macro-val protein-v" id="r-protein">—</div>
+          <div class="macro-label">Protein (g)</div>
+        </div>
+        <div class="macro-card">
+          <div class="macro-val carb-v" id="r-carbs">—</div>
+          <div class="macro-label">Carbs (g)</div>
+        </div>
+        <div class="macro-card">
+          <div class="macro-val fat-v" id="r-fat">—</div>
+          <div class="macro-label">Fat (g)</div>
+        </div>
+      </div>
+
+      <div class="note-box">For women, a smaller surplus (200-350 cal) minimizes fat gain while maximizing muscle growth. Protein is your #1 lever — hit it every day.</div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav id="main-nav">
+  <button class="nav-btn active" data-view="today">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Today
+  </button>
+  <button class="nav-btn" data-view="workout">
+    <svg viewBox="0 0 24 24"><path d="M6 4v16M18 4v16M6 12h12M3 6h3M18 6h3M3 18h3M18 18h3"/></svg>
+    Workout
+  </button>
+  <button class="nav-btn" data-view="history">
+    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    History
+  </button>
+  <button class="nav-btn" data-view="nutrition">
+    <svg viewBox="0 0 24 24"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+    Nutrition
+  </button>
+</nav>
+
+<!-- REST OVERLAY -->
+<div id="rest-overlay">
+  <div class="rest-label-ov">Rest</div>
+  <div class="rest-ring-wrap">
+    <svg viewBox="0 0 160 160">
+      <circle class="ring-bg" cx="80" cy="80" r="70"/>
+      <circle class="ring-fg" cx="80" cy="80" r="70" id="ring-fg"/>
+    </svg>
+    <div class="rest-time-big" id="rest-time-display">90</div>
+  </div>
+  <div class="rest-next" id="rest-next-text">Next up: —</div>
+  <button class="rest-skip-btn" id="rest-skip">Skip Rest</button>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ==================== DATA ====================
+const PHASES = [
+  { name:'Phase 1: Foundation', short:'Phase 1', weeks:[1,2,3], scheme:'4×10', cls:'p1',
+    goal:'Build the foundation. Learn to feel your glutes working on every rep. These weeks set up everything that comes after.' },
+  { name:'Phase 2: Loading', short:'Phase 2', weeks:[4,5,6], scheme:'4×8', cls:'p2',
+    goal:'The weights go up. Your body is adapting. This is where real size starts to show.' },
+  { name:'Phase 3: Intensity', short:'Phase 3', weeks:[7,8], scheme:'5×6', cls:'p3',
+    goal:'Two weeks of your hardest work. Leave nothing in the tank.' }
+];
+
+function getPhase(week) {
+  return PHASES.find(p => p.weeks.includes(week)) || PHASES[0];
+}
+
+// Exercise types & rest times
+const REST = { cns:30, pink:90, purple:60, red:45 };
+
+// Full workout data keyed by phase index (0/1/2) and day (mon/wed/fri)
+const WORKOUTS = {
+  mon: {
+    name: 'Glutes & Hamstrings',
+    sub: 'Hip-dominant',
+    phases: [
+      // Phase 1
+      [
+        { id:'mon_cns1', type:'cns', name:'Banded Clamshells', sets:2, reps:'15/side', notes:'Lie on side, band above knees. Open and close like a clamshell. Feel the outer glute fire. Move slowly.' },
+        { id:'mon_cns2', type:'cns', name:'Banded Glute Bridge', sets:2, reps:'15', notes:'Band above knees, feet flat, push knees out against band. Squeeze glutes at the top. This is your warmup, not a workout.' },
+        { id:'mon_p1', type:'pink', name:'Barbell Hip Thrust', sets:4, reps:'10', notes:'The king of glute exercises. Back on bench, barbell across hips with pad. Drive hips up explosively, squeeze hard at top for 1 second. Control down. Feel every rep in your glutes, not your lower back.' },
+        { id:'mon_p2', type:'pink', name:'Romanian Deadlift (RDL)', sets:4, reps:'10', notes:'Hinge at hips, push them back. Bar stays close to legs. Feel the hamstring stretch at the bottom. Drive hips forward to stand. This builds the under-butt and hamstrings.' },
+        { id:'mon_a1', type:'purple', name:'Cable Pull-Through', sets:3, reps:'12', notes:'Face away from cable, rope between legs. Hinge and squeeze. Great for glute-ham connection.' },
+        { id:'mon_a2', type:'purple', name:'Lying Leg Curl', sets:3, reps:'12', notes:'Full range of motion. Control the eccentric (lower slowly). Squeeze hamstrings at top.' },
+        { id:'mon_f1', type:'red', name:'Glute Kickback', sets:3, reps:'15/side', notes:'Squeeze at the top of every rep. Slow and controlled. Feel the burn.' }
+      ],
+      // Phase 2
+      [
+        { id:'mon_cns1', type:'cns', name:'Banded Clamshells', sets:2, reps:'15/side', notes:'Lie on side, band above knees. Open and close like a clamshell. Feel the outer glute fire. Move slowly.' },
+        { id:'mon_cns2', type:'cns', name:'Banded Glute Bridge', sets:2, reps:'15', notes:'Band above knees, feet flat, push knees out against band. Squeeze glutes at the top. This is your warmup, not a workout.' },
+        { id:'mon_p1', type:'pink', name:'Barbell Hip Thrust', sets:4, reps:'8', notes:'Heavier than Phase 1. Same form — drive up explosively, hard squeeze at top. Load the bar with intention.' },
+        { id:'mon_p2', type:'pink', name:'Romanian Deadlift (RDL)', sets:4, reps:'8', notes:'Go heavier. Maintain that hinge, feel the stretch. More weight = more stimulus = more growth.' },
+        { id:'mon_a1', type:'purple', name:'Cable Pull-Through', sets:3, reps:'12', notes:'Face away from cable, rope between legs. Hinge and squeeze. Great for glute-ham connection.' },
+        { id:'mon_a2', type:'purple', name:'Lying Leg Curl', sets:3, reps:'12', notes:'Full range of motion. Control the eccentric (lower slowly). Squeeze hamstrings at top.' },
+        { id:'mon_f1', type:'red', name:'Glute Kickback', sets:3, reps:'15/side', notes:'Squeeze at the top of every rep. Slow and controlled. Feel the burn.' }
+      ],
+      // Phase 3
+      [
+        { id:'mon_cns1', type:'cns', name:'Banded Clamshells', sets:2, reps:'15/side', notes:'Lie on side, band above knees. Open and close like a clamshell. Feel the outer glute fire. Move slowly.' },
+        { id:'mon_cns2', type:'cns', name:'Banded Glute Bridge', sets:2, reps:'15', notes:'Band above knees, feet flat, push knees out against band. Squeeze glutes at the top. This is your warmup, not a workout.' },
+        { id:'mon_p1', type:'pink', name:'Barbell Hip Thrust', sets:5, reps:'6', notes:'Heaviest loads of the program. 5 sets of 6. Every rep counts. This is your peak week effort.' },
+        { id:'mon_p2', type:'pink', name:'Romanian Deadlift (RDL)', sets:5, reps:'6', notes:'Peak weights. Slow down the eccentric, explode up. Leave everything in the gym.' },
+        { id:'mon_a1', type:'purple', name:'Cable Pull-Through', sets:3, reps:'12', notes:'Face away from cable, rope between legs. Hinge and squeeze. Great for glute-ham connection.' },
+        { id:'mon_a2', type:'purple', name:'Lying Leg Curl', sets:3, reps:'12', notes:'Full range of motion. Control the eccentric (lower slowly). Squeeze hamstrings at top.' },
+        { id:'mon_f1', type:'red', name:'Glute Kickback', sets:3, reps:'15/side', notes:'Squeeze at the top of every rep. Slow and controlled. Feel the burn.' }
+      ]
+    ]
+  },
+  wed: {
+    name: 'Quads & Glutes',
+    sub: 'Knee-dominant',
+    phases: [
+      // Phase 1
+      [
+        { id:'wed_cns1', type:'cns', name:'Bodyweight Squat', sets:2, reps:'15', notes:'Feet shoulder-width, toes slightly out. Squat deep. Drive knees out. Warmup the hips and knees.' },
+        { id:'wed_cns2', type:'cns', name:'Hip Circle Walks', sets:2, reps:'10/side', notes:'Band above knees. Walk side to side, keeping tension in the band. Activates glutes before loading.' },
+        { id:'wed_p1', type:'pink', name:'Goblet Squat', sets:4, reps:'10', notes:'Hold a dumbbell at chest height. Feet shoulder-width, toes slightly out. Squat deep — below parallel if possible. Drive knees out. This teaches the squat pattern and builds quad and glute size.' },
+        { id:'wed_p2', type:'pink', name:'Bulgarian Split Squat', sets:4, reps:'10/side', notes:'Rear foot elevated on bench. Front foot far enough forward that your shin is vertical at the bottom. This is the best single-leg exercise for glute and quad size. It will burn.' },
+        { id:'wed_a1', type:'purple', name:'Leg Press', sets:3, reps:'12', notes:'Feet high and wide on the platform targets more glutes. Full range of motion — don\'t cut it short.' },
+        { id:'wed_a2', type:'purple', name:'Walking Lunges', sets:3, reps:'12/side', notes:'Hold dumbbells, take long strides. Front knee tracks over toes. Builds quads, glutes, and coordination.' },
+        { id:'wed_f1', type:'red', name:'Wall Sit', sets:3, reps:'30-45 sec', notes:'Thighs parallel to floor. This burns so good. Hold it.' }
+      ],
+      // Phase 2
+      [
+        { id:'wed_cns1', type:'cns', name:'Bodyweight Squat', sets:2, reps:'15', notes:'Feet shoulder-width, toes slightly out. Squat deep. Drive knees out. Warmup the hips and knees.' },
+        { id:'wed_cns2', type:'cns', name:'Hip Circle Walks', sets:2, reps:'10/side', notes:'Band above knees. Walk side to side, keeping tension in the band. Activates glutes before loading.' },
+        { id:'wed_p1', type:'pink', name:'Barbell Back Squat', sets:4, reps:'8', notes:'Bar on traps or low back. Brace your core, squat to parallel or below. Drive through heels. Knees track over toes. This is the big quad and glute builder.' },
+        { id:'wed_p2', type:'pink', name:'Bulgarian Split Squat', sets:4, reps:'8/side', notes:'Rear foot elevated on bench. Go heavier than Phase 1. Control the descent, drive through the heel.' },
+        { id:'wed_a1', type:'purple', name:'Leg Press', sets:3, reps:'12', notes:'Feet high and wide on the platform targets more glutes. Full range of motion — don\'t cut it short.' },
+        { id:'wed_a2', type:'purple', name:'Walking Lunges', sets:3, reps:'12/side', notes:'Hold dumbbells, take long strides. Front knee tracks over toes. Builds quads, glutes, and coordination.' },
+        { id:'wed_f1', type:'red', name:'Leg Extension', sets:3, reps:'15', notes:'Full extension at the top. Control the weight down. Pure quad isolation to finish.' }
+      ],
+      // Phase 3
+      [
+        { id:'wed_cns1', type:'cns', name:'Bodyweight Squat', sets:2, reps:'15', notes:'Feet shoulder-width, toes slightly out. Squat deep. Drive knees out. Warmup the hips and knees.' },
+        { id:'wed_cns2', type:'cns', name:'Hip Circle Walks', sets:2, reps:'10/side', notes:'Band above knees. Walk side to side, keeping tension in the band. Activates glutes before loading.' },
+        { id:'wed_p1', type:'pink', name:'Barbell Back Squat', sets:5, reps:'6', notes:'Heaviest squat of the program. 5 sets. Nail your form, push the weight. This is peak loading.' },
+        { id:'wed_p2', type:'pink', name:'Bulgarian Split Squat', sets:5, reps:'6/side', notes:'Peak effort. Load up the dumbbells or barbell. Every rep of every set counts.' },
+        { id:'wed_a1', type:'purple', name:'Leg Press', sets:4, reps:'10', notes:'Feet high and wide. Control the range, full depth. More volume this phase.' },
+        { id:'wed_a2', type:'purple', name:'Walking Lunges', sets:3, reps:'12/side', notes:'Hold dumbbells, take long strides. Front knee tracks over toes. Builds quads, glutes, and coordination.' },
+        { id:'wed_f1', type:'red', name:'Leg Extension', sets:3, reps:'15', notes:'Full extension at the top. Control the weight down. Pure quad isolation to finish.' }
+      ]
+    ]
+  },
+  fri: {
+    name: 'Full Glutes + Posterior Chain',
+    sub: 'Posterior focus',
+    phases: [
+      // Phase 1
+      [
+        { id:'fri_cns1', type:'cns', name:'Hip Thrust Hold', sets:2, reps:'10 sec', notes:'Hold at the top of a glute bridge for 10 seconds. Feel the full contraction. Activate before loading.' },
+        { id:'fri_cns2', type:'cns', name:'Fire Hydrants', sets:2, reps:'15/side', notes:'On all fours, lift knee out to the side. Band makes this harder. Targets outer glutes and hip abductors.' },
+        { id:'fri_p1', type:'pink', name:'Sumo Deadlift', sets:4, reps:'10', notes:'Wide stance, toes pointed out. This variation hits the glutes and inner thighs more than conventional. Keep the bar close, chest up, drive through heels.' },
+        { id:'fri_p2', type:'pink', name:'DB Step Up', sets:4, reps:'10/side', notes:'Hold dumbbells, step onto a bench or box. Drive through the heel of the elevated foot. Squeeze the glute at the top. Don\'t use momentum.' },
+        { id:'fri_a1', type:'purple', name:'Seated Hip Abduction', sets:3, reps:'15', notes:'The outer glute builder. Full range of motion, squeeze at the widest point. Go heavier than you think.' },
+        { id:'fri_a2', type:'purple', name:'Back Extension / Hyperextension', sets:3, reps:'12', notes:'Squeeze glutes at the top. Don\'t hyperextend the lower back. Control down.' },
+        { id:'fri_f1', type:'red', name:'Banded Glute Bridge', sets:3, reps:'20', notes:'Band above knees. Drive knees out against the band. 20 reps of pure glute burn to finish.' }
+      ],
+      // Phase 2
+      [
+        { id:'fri_cns1', type:'cns', name:'Hip Thrust Hold', sets:2, reps:'10 sec', notes:'Hold at the top of a glute bridge for 10 seconds. Feel the full contraction. Activate before loading.' },
+        { id:'fri_cns2', type:'cns', name:'Fire Hydrants', sets:2, reps:'15/side', notes:'On all fours, lift knee out to the side. Band makes this harder. Targets outer glutes and hip abductors.' },
+        { id:'fri_p1', type:'pink', name:'Trap Bar Deadlift', sets:4, reps:'8', notes:'Neutral grip on the hex bar. Feet hip-width. Push the floor away. Great for glutes, hams, and back. Go heavier than sumo deadlift.' },
+        { id:'fri_p2', type:'pink', name:'DB Step Up', sets:4, reps:'8/side', notes:'Hold dumbbells, step onto a bench or box. Drive through the heel of the elevated foot. Squeeze the glute at the top. Heavier this phase.' },
+        { id:'fri_a1', type:'purple', name:'Seated Hip Abduction', sets:3, reps:'15', notes:'The outer glute builder. Full range of motion, squeeze at the widest point. Go heavier than you think.' },
+        { id:'fri_a2', type:'purple', name:'Back Extension / Hyperextension', sets:3, reps:'12', notes:'Squeeze glutes at the top. Don\'t hyperextend the lower back. Control down.' },
+        { id:'fri_a3', type:'purple', name:'Glute Ham Raise', sets:3, reps:'8', notes:'Advanced movement. Anchor feet, lower body forward under control. Pull yourself back up using hamstrings and glutes.' },
+        { id:'fri_f1', type:'red', name:'Banded Glute Bridge', sets:3, reps:'20', notes:'Band above knees. Drive knees out against the band. 20 reps of pure glute burn to finish.' }
+      ],
+      // Phase 3
+      [
+        { id:'fri_cns1', type:'cns', name:'Hip Thrust Hold', sets:2, reps:'10 sec', notes:'Hold at the top of a glute bridge for 10 seconds. Feel the full contraction. Activate before loading.' },
+        { id:'fri_cns2', type:'cns', name:'Fire Hydrants', sets:2, reps:'15/side', notes:'On all fours, lift knee out to the side. Band makes this harder. Targets outer glutes and hip abductors.' },
+        { id:'fri_p1', type:'pink', name:'Trap Bar Deadlift', sets:5, reps:'6', notes:'Max load. 5 sets of 6. Full pull, full reset each rep. This is your peak deadlift performance.' },
+        { id:'fri_p2', type:'pink', name:'DB Step Up', sets:5, reps:'6/side', notes:'Heaviest step-ups. Drive hard through the heel. Control the descent. Single-leg strength at its peak.' },
+        { id:'fri_a1', type:'purple', name:'Seated Hip Abduction', sets:4, reps:'15', notes:'Load it up. 4 sets this phase. Squeeze every rep at the widest point.' },
+        { id:'fri_a2', type:'purple', name:'Back Extension / Hyperextension', sets:3, reps:'12', notes:'Squeeze glutes at the top. Don\'t hyperextend the lower back. Control down.' },
+        { id:'fri_f1', type:'red', name:'Banded Glute Bridge', sets:3, reps:'20', notes:'Band above knees. Drive knees out against the band. 20 reps of pure glute burn to finish.' }
+      ]
+    ]
+  }
+};
+
+const REST_TIPS = {
+  tue: { icon:'🍽️', title:'Fuel Your Recovery', tip:'Eat your protein today. Your muscles are repairing from Monday\'s session.' },
+  thu: { icon:'💤', title:'Prioritize Sleep', tip:'Sleep 8+ hours tonight. Growth happens at rest, not in the gym.' },
+  sat: { icon:'🚶', title:'Active Recovery', tip:'Light walk or stretching. Keep blood flowing without taxing recovery.' },
+  sun: { icon:'📋', title:'Prep for the Week', tip:'Plan your meals for the week. Nutrition is 50% of your results.' }
+};
+
+// ==================== STATE ====================
+let state = JSON.parse(localStorage.getItem('bh_state') || '{"week":1,"day":"mon"}');
+let currentWorkoutDay = null;
+let currentWorkoutWeek = null;
+
+function saveState() { localStorage.setItem('bh_state', JSON.stringify(state)); }
+
+function getW(exId, week) { return localStorage.getItem(`bh_w_${exId}_${week}`) || ''; }
+function setW(exId, week, val) { localStorage.setItem(`bh_w_${exId}_${week}`, val); }
+function getLastW(exId, week) {
+  for (let w = week-1; w >= 1; w--) {
+    const v = localStorage.getItem(`bh_w_${exId}_${w}`);
+    if (v) return { week: w, val: v };
+  }
+  return null;
+}
+
+function getSets(exId, week) {
+  const d = localStorage.getItem(`bh_sets_${exId}_${week}`);
+  return d ? JSON.parse(d) : [];
+}
+function saveSets(exId, week, arr) { localStorage.setItem(`bh_sets_${exId}_${week}`, JSON.stringify(arr)); }
+function isDone(week, day) { return !!localStorage.getItem(`bh_done_${week}_${day}`); }
+function setDone(week, day) { localStorage.setItem(`bh_done_${week}_${day}`, '1'); }
+function isSkipped(exId, week) { return !!localStorage.getItem(`bh_skip_${exId}_${week}`); }
+function setSkipped(exId, week, v) {
+  if (v) localStorage.setItem(`bh_skip_${exId}_${week}`, '1');
+  else localStorage.removeItem(`bh_skip_${exId}_${week}`);
+}
+
+function getHistory() { return JSON.parse(localStorage.getItem('bh_history') || '[]'); }
+function addHistory(entry) {
+  const h = getHistory();
+  h.unshift(entry);
+  if (h.length > 50) h.pop();
+  localStorage.setItem('bh_history', JSON.stringify(h));
+}
+function getNotes(week, day) { return localStorage.getItem(`bh_notes_${week}_${day}`) || ''; }
+function saveNotes(week, day, val) { localStorage.setItem(`bh_notes_${week}_${day}`, val); }
+
+function getNutrition() { return JSON.parse(localStorage.getItem('bh_nutrition') || '{}'); }
+function saveNutrition(obj) { localStorage.setItem('bh_nutrition', JSON.stringify(obj)); }
+
+// ==================== TOAST ====================
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ==================== REST TIMER ====================
+let restInterval = null;
+let restOnDone = null;
+
+function startRest(seconds, nextLabel, onDone) {
+  const overlay = document.getElementById('rest-overlay');
+  const timeEl = document.getElementById('rest-time-display');
+  const nextEl = document.getElementById('rest-next-text');
+  const ring = document.getElementById('ring-fg');
+  const circumference = 2 * Math.PI * 70; // r=70
+  ring.style.strokeDasharray = circumference;
+
+  nextEl.textContent = nextLabel ? 'Next up: ' + nextLabel : 'You\'re done!';
+  let remaining = seconds;
+  restOnDone = onDone;
+
+  function tick() {
+    timeEl.textContent = remaining;
+    const progress = remaining / seconds;
+    ring.style.strokeDashoffset = circumference * (1 - progress);
+    if (remaining <= 0) {
+      clearInterval(restInterval);
+      restInterval = null;
+      hideRest();
+      if (restOnDone) restOnDone();
+    }
+    remaining--;
+  }
+
+  clearInterval(restInterval);
+  overlay.classList.add('show');
+  tick();
+  restInterval = setInterval(tick, 1000);
+}
+
+function hideRest() {
+  document.getElementById('rest-overlay').classList.remove('show');
+  clearInterval(restInterval);
+  restInterval = null;
+}
+
+document.getElementById('rest-skip').addEventListener('click', () => {
+  hideRest();
+  if (restOnDone) restOnDone();
+});
+
+// ==================== NAVIGATION ====================
+const VIEWS = ['today', 'workout', 'history', 'nutrition'];
+
+function showView(name) {
+  VIEWS.forEach(v => {
+    document.getElementById(v + '-view').classList.toggle('active', v === name);
+  });
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.view === name);
+  });
+  if (name === 'history') renderHistory();
+  if (name === 'nutrition') loadNutritionInputs();
+  if (name === 'today') renderToday();
+}
+
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.dataset.view === 'workout') {
+      if (currentWorkoutDay) {
+        showView('workout');
+      } else {
+        launchWorkout(state.week, state.day);
+        showView('workout');
+      }
+    } else {
+      showView(btn.dataset.view);
+    }
+  });
+});
+
+document.getElementById('back-btn').addEventListener('click', () => {
+  showView('today');
+});
+
+// ==================== TODAY VIEW ====================
+function getStreakWeeks() {
+  let streak = 0;
+  for (let w = state.week; w >= 1; w--) {
+    const allDone = isDone(w,'mon') && isDone(w,'wed') && isDone(w,'fri');
+    if (allDone) streak++;
+    else if (w < state.week) break;
+  }
+  return streak;
+}
+
+function getDayOfWeek() {
+  const days = ['sun','mon','tue','wed','thu','fri','sat'];
+  return days[new Date().getDay()];
+}
+
+function renderToday() {
+  const phase = getPhase(state.week);
+  const dow = getDayOfWeek();
+  const isWorkoutDay = ['mon','wed','fri'].includes(dow);
+  const displayDay = state.day;
+  const wkData = WORKOUTS[displayDay];
+
+  document.getElementById('hero-day-name').textContent = wkData.name;
+  document.getElementById('hero-phase').textContent = phase.short;
+  document.getElementById('hero-week').textContent = 'Week ' + state.week;
+  document.getElementById('streak-display').textContent = '🔥 ' + getStreakWeeks() + ' week streak';
+
+  const done = isDone(state.week, displayDay);
+  document.getElementById('today-start-btn-wrap').style.display = done ? 'none' : 'block';
+  document.getElementById('today-done-badge').style.display = done ? 'flex' : 'none';
+
+  // Day buttons
+  ['mon','wed','fri'].forEach(d => {
+    const btn = document.getElementById('daybtn-' + d);
+    btn.classList.toggle('active', d === displayDay);
+    btn.classList.toggle('done', isDone(state.week, d));
+  });
+
+  // Week buttons
+  const wr = document.getElementById('week-row');
+  wr.innerHTML = '';
+  for (let w = 1; w <= 8; w++) {
+    const btn = document.createElement('button');
+    btn.className = 'week-btn';
+    btn.textContent = w;
+    if (w === state.week) btn.classList.add('active');
+    const allDone = isDone(w,'mon') && isDone(w,'wed') && isDone(w,'fri');
+    if (allDone && w !== state.week) btn.classList.add('done');
+    btn.addEventListener('click', () => {
+      state.week = w;
+      saveState();
+      renderToday();
+    });
+    wr.appendChild(btn);
+  }
+
+  // Rest day card (only show if today is a rest day and we're on today's week context)
+  const restCard = document.getElementById('rest-day-card');
+  if (!isWorkoutDay && dow in REST_TIPS) {
+    const rt = REST_TIPS[dow];
+    restCard.innerHTML = `<div class="rest-card">
+      <div class="rest-icon">${rt.icon}</div>
+      <div class="rest-title">${rt.title}</div>
+      <div class="rest-tip">${rt.tip}</div>
+    </div>`;
+  } else {
+    restCard.innerHTML = '';
+  }
+}
+
+document.getElementById('start-today-btn').addEventListener('click', () => {
+  launchWorkout(state.week, state.day);
+  showView('workout');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.view === 'workout'));
+});
+
+['mon','wed','fri'].forEach(d => {
+  document.getElementById('daybtn-' + d).addEventListener('click', () => {
+    state.day = d;
+    saveState();
+    renderToday();
+  });
+});
+
+// ==================== WORKOUT VIEW ====================
+function getPhaseIdx(week) {
+  if (week <= 3) return 0;
+  if (week <= 6) return 1;
+  return 2;
+}
+
+function launchWorkout(week, day) {
+  currentWorkoutDay = day;
+  currentWorkoutWeek = week;
+  const phase = getPhase(week);
+  const pIdx = getPhaseIdx(week);
+  const wkData = WORKOUTS[day];
+  const exercises = wkData.phases[pIdx];
+
+  document.getElementById('workout-title').textContent = wkData.name + ' — Week ' + week;
+
+  const pb = document.getElementById('phase-banner');
+  pb.className = 'phase-banner ' + phase.cls;
+  document.getElementById('phase-name-text').textContent = phase.name + ' (' + phase.scheme + ')';
+  document.getElementById('phase-goal-text').textContent = phase.goal;
+
+  // Notes
+  const notesEl = document.getElementById('workout-notes');
+  notesEl.value = getNotes(week, day);
+  notesEl.oninput = () => saveNotes(week, day, notesEl.value);
+
+  renderExerciseList(exercises, week);
+}
+
+function renderExerciseList(exercises, week) {
+  const list = document.getElementById('exercise-list');
+  list.innerHTML = '';
+  exercises.forEach((ex, idx) => {
+    list.appendChild(buildExCard(ex, week, exercises, idx));
+  });
+}
+
+function buildExCard(ex, week, exercises, idx) {
+  const skipped = isSkipped(ex.id, week);
+  const completedSets = getSets(ex.id, week);
+
+  const card = document.createElement('div');
+  card.className = `ex-card type-${ex.type}${skipped ? ' skipped' : ''}`;
+  card.id = `excard-${ex.id}`;
+
+  const ytQuery = encodeURIComponent(ex.name + ' exercise for women');
+  const ytUrl = `https://www.youtube.com/results?search_query=${ytQuery}`;
+
+  const setsHtml = buildSetsHtml(ex, week, completedSets);
+  const lastW = getLastW(ex.id, week);
+  const currentW = getW(ex.id, week);
+  const nudge = lastW && currentW && parseFloat(currentW) > parseFloat(lastW.val)
+    ? `<div class="overload-nudge show">+${(parseFloat(currentW)-parseFloat(lastW.val)).toFixed(1)} lbs over week ${lastW.week} — PR!</div>`
+    : lastW && !currentW
+    ? `<div class="overload-nudge show" style="color:var(--text2)">Last week ${lastW.week}: ${lastW.val} lbs</div>`
+    : '';
+
+  card.innerHTML = `
+    <div class="ex-header" data-exid="${ex.id}">
+      <div class="ex-type-dot"></div>
+      <div class="ex-name">${ex.name}</div>
+      <div class="ex-reps-badge">${ex.sets}&times;${ex.reps}</div>
+    </div>
+    <div class="ex-body${idx === 0 ? ' open' : ''}" id="exbody-${ex.id}">
+      <a class="yt-thumb" href="${ytUrl}" target="_blank" rel="noopener">
+        <div class="yt-img-wrap"><div class="yt-play"></div></div>
+        <div class="yt-label">
+          <strong>${ex.name}</strong>
+          Watch on YouTube
+        </div>
+      </a>
+      <div class="how-to-toggle" data-target="howto-${ex.id}">▶ How To</div>
+      <div class="how-to-text" id="howto-${ex.id}">${ex.notes}</div>
+      <div class="sets-row" id="sets-${ex.id}">${setsHtml}</div>
+      <div class="weight-row">
+        <span class="weight-label">Weight:</span>
+        <input type="number" class="weight-input" id="winput-${ex.id}" placeholder="lbs" value="${getW(ex.id, week)}" min="0" max="1000">
+        <span class="weight-unit">lbs</span>
+      </div>
+      ${nudge}
+      <div style="display:flex;justify-content:flex-end;margin-top:8px">
+        <button class="skip-btn" data-exid="${ex.id}">
+          ${skipped ? '✓ Unskip' : 'Skip exercise'}
+        </button>
+      </div>
+    </div>
+  `;
+
+  // Toggle body
+  card.querySelector('.ex-header').addEventListener('click', () => {
+    const body = card.querySelector('.ex-body');
+    body.classList.toggle('open');
+  });
+
+  // How-to toggle
+  card.querySelector('.how-to-toggle').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const howto = document.getElementById('howto-' + ex.id);
+    const tog = card.querySelector('.how-to-toggle');
+    howto.classList.toggle('open');
+    tog.textContent = howto.classList.contains('open') ? '▼ How To' : '▶ How To';
+  });
+
+  // Weight input
+  const winput = card.querySelector(`#winput-${ex.id}`);
+  winput.addEventListener('input', () => {
+    setW(ex.id, week, winput.value);
+    // update nudge
+    const lastW2 = getLastW(ex.id, week);
+    const nudgeEl = card.querySelector('.overload-nudge');
+    if (nudgeEl && lastW2 && winput.value) {
+      const diff = parseFloat(winput.value) - parseFloat(lastW2.val);
+      if (diff > 0) {
+        nudgeEl.textContent = `+${diff.toFixed(1)} lbs over week ${lastW2.week} — PR!`;
+        nudgeEl.style.color = 'var(--green)';
+        nudgeEl.classList.add('show');
+      } else {
+        nudgeEl.textContent = `Last week ${lastW2.week}: ${lastW2.val} lbs`;
+        nudgeEl.style.color = 'var(--text2)';
+        nudgeEl.classList.add('show');
+      }
+    }
+  });
+
+  // Set circles
+  card.querySelector(`#sets-${ex.id}`).addEventListener('click', (e) => {
+    const circle = e.target.closest('.set-circle');
+    if (!circle) return;
+    const setIdx = parseInt(circle.dataset.idx);
+    const current = getSets(ex.id, week);
+    const toggled = [...current];
+    if (toggled.includes(setIdx)) {
+      toggled.splice(toggled.indexOf(setIdx), 1);
+    } else {
+      toggled.push(setIdx);
+      // Trigger rest timer
+      const nextEx = exercises[idx + 1];
+      const restSecs = REST[ex.type] || 60;
+      if (toggled.length < ex.sets) {
+        startRest(restSecs, `Set ${toggled.length + 1} of ${ex.name}`, null);
+      } else if (nextEx) {
+        startRest(restSecs, nextEx.name, null);
+      }
+    }
+    saveSets(ex.id, week, toggled);
+    // Re-render circles
+    const setsRow = card.querySelector(`#sets-${ex.id}`);
+    setsRow.innerHTML = buildSetsHtml(ex, week, toggled);
+    // Check completion
+    checkWorkoutComplete();
+  });
+
+  // Skip
+  card.querySelector('.skip-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const skippedNow = isSkipped(ex.id, week);
+    setSkipped(ex.id, week, !skippedNow);
+    card.classList.toggle('skipped', !skippedNow);
+    e.target.textContent = !skippedNow ? '✓ Unskip' : 'Skip exercise';
+    checkWorkoutComplete();
+  });
+
+  return card;
+}
+
+function buildSetsHtml(ex, week, completedSets) {
+  let html = '';
+  for (let i = 0; i < ex.sets; i++) {
+    const done = completedSets.includes(i);
+    const nextActive = !done && (i === 0 || completedSets.includes(i - 1));
+    html += `<button class="set-circle${done ? ' done' : (nextActive ? ' active-set' : '')}" data-idx="${i}">${i + 1}</button>`;
+  }
+  return html;
+}
+
+function checkWorkoutComplete() {
+  const pIdx = getPhaseIdx(currentWorkoutWeek);
+  const exercises = WORKOUTS[currentWorkoutDay].phases[pIdx];
+  let allDone = true;
+  exercises.forEach(ex => {
+    if (isSkipped(ex.id, currentWorkoutWeek)) return;
+    const sets = getSets(ex.id, currentWorkoutWeek);
+    if (sets.length < ex.sets) allDone = false;
+  });
+  const btn = document.getElementById('complete-workout-btn');
+  if (allDone) {
+    btn.style.background = 'linear-gradient(135deg,var(--green),#2d8f30)';
+  } else {
+    btn.style.background = '';
+  }
+}
+
+document.getElementById('complete-workout-btn').addEventListener('click', () => {
+  if (isDone(currentWorkoutWeek, currentWorkoutDay)) {
+    showToast('Already marked complete!');
+    return;
+  }
+  setDone(currentWorkoutWeek, currentWorkoutDay);
+  const pIdx = getPhaseIdx(currentWorkoutWeek);
+  const exercises = WORKOUTS[currentWorkoutDay].phases[pIdx];
+  const totalSets = exercises.reduce((acc, ex) => acc + getSets(ex.id, currentWorkoutWeek).length, 0);
+  addHistory({
+    week: currentWorkoutWeek,
+    day: currentWorkoutDay,
+    name: WORKOUTS[currentWorkoutDay].name,
+    date: new Date().toLocaleDateString(),
+    sets: totalSets,
+    phase: getPhase(currentWorkoutWeek).short
+  });
+  showToast('Workout complete! Great work!');
+  renderToday();
+  setTimeout(() => showView('today'), 1200);
+});
+
+// ==================== HISTORY VIEW ====================
+function renderHistory() {
+  const hist = getHistory();
+  const list = document.getElementById('history-list');
+
+  if (hist.length === 0) {
+    list.innerHTML = `<div class="empty-state">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <p>No workouts yet</p>
+      <small>Complete your first session to see history here</small>
+    </div>`;
+  } else {
+    list.innerHTML = hist.map(h => `
+      <div class="hist-item">
+        <div>
+          <div class="hist-name">${h.name}</div>
+          <div class="hist-detail">${h.date} &middot; Week ${h.week} &middot; ${h.sets} sets</div>
+          <div class="hist-date">${h.phase}</div>
+        </div>
+        <div class="hist-badge">Done</div>
+      </div>
+    `).join('');
+  }
+
+  // Draw charts
+  drawProgressChart('thrust-chart', 'mon_p1');
+  drawProgressChart('squat-chart', 'wed_p1');
+}
+
+function drawProgressChart(svgId, exId) {
+  const svg = document.getElementById(svgId);
+  if (!svg) return;
+  const data = [];
+  for (let w = 1; w <= 8; w++) {
+    const v = getW(exId, w);
+    if (v && parseFloat(v) > 0) data.push({ week: w, val: parseFloat(v) });
+  }
+  if (data.length < 2) {
+    svg.innerHTML = `<text x="150" y="65" text-anchor="middle" fill="#555" font-size="13" font-family="system-ui">Complete workouts to see progress</text>`;
+    return;
+  }
+  const maxV = Math.max(...data.map(d => d.val));
+  const minV = Math.min(...data.map(d => d.val));
+  const pad = 20;
+  const W = 300, H = 120;
+  const chartW = W - pad * 2;
+  const chartH = H - pad * 2;
+  const range = maxV - minV || 1;
+
+  const pts = data.map(d => {
+    const x = pad + ((d.week - 1) / 7) * chartW;
+    const y = pad + chartH - ((d.val - minV) / range) * chartH;
+    return [x, y];
+  });
+
+  let pathD = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p[0] + ',' + p[1]).join(' ');
+
+  // Fill area
+  const fillPts = [...pts, [pts[pts.length-1][0], H - pad], [pts[0][0], H - pad]];
+  let fillD = fillPts.map((p, i) => (i === 0 ? 'M' : 'L') + p[0] + ',' + p[1]).join(' ') + 'Z';
+
+  let dotsHtml = pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#e066a3"/>`).join('');
+  let labelsHtml = data.map((d, i) =>
+    `<text x="${pts[i][0]}" y="${pts[i][1] - 8}" text-anchor="middle" fill="#aaa" font-size="10" font-family="system-ui">${d.val}</text>`
+  ).join('');
+
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="grad-${exId}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#e066a3" stop-opacity=".3"/>
+        <stop offset="100%" stop-color="#e066a3" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <path d="${fillD}" fill="url(#grad-${exId})"/>
+    <path d="${pathD}" fill="none" stroke="#e066a3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    ${dotsHtml}
+    ${labelsHtml}
+  `;
+}
+
+// ==================== NUTRITION VIEW ====================
+let currentSurplus = 200;
+
+function loadNutritionInputs() {
+  const n = getNutrition();
+  if (n.heightFt) document.getElementById('n-height-ft').value = n.heightFt;
+  if (n.heightIn !== undefined) document.getElementById('n-height-in').value = n.heightIn;
+  if (n.weight) document.getElementById('n-weight').value = n.weight;
+  if (n.goalWeight) document.getElementById('n-goal-weight').value = n.goalWeight;
+  if (n.age) document.getElementById('n-age').value = n.age;
+  if (n.activity) document.getElementById('n-activity').value = n.activity;
+}
+
+document.getElementById('calc-btn').addEventListener('click', () => {
+  const ft = parseFloat(document.getElementById('n-height-ft').value) || 0;
+  const ins = parseFloat(document.getElementById('n-height-in').value) || 0;
+  const weightLbs = parseFloat(document.getElementById('n-weight').value) || 0;
+  const goalLbs = parseFloat(document.getElementById('n-goal-weight').value) || 0;
+  const age = parseFloat(document.getElementById('n-age').value) || 0;
+  const activity = parseFloat(document.getElementById('n-activity').value) || 1.55;
+
+  if (!ft || !weightLbs || !age) { showToast('Fill in all fields first'); return; }
+
+  saveNutrition({ heightFt: ft, heightIn: ins, weight: weightLbs, goalWeight: goalLbs, age, activity });
+
+  const heightCm = (ft * 12 + ins) * 2.54;
+  const weightKg = weightLbs / 2.205;
+  const bmr = Math.round(10 * weightKg + 6.25 * heightCm - 5 * age - 161);
+  const tdee = Math.round(bmr * activity);
+
+  currentSurplus = 200;
+  document.getElementById('surplus-lean').classList.add('active');
+  document.getElementById('surplus-mod').classList.remove('active');
+
+  showNutritionResults(bmr, tdee, weightLbs, goalLbs, currentSurplus);
+  document.getElementById('nutrition-results').style.display = 'block';
+});
+
+function showNutritionResults(bmr, tdee, weightLbs, goalLbs, surplus) {
+  const cals = tdee + surplus;
+  const gainLbs = goalLbs - weightLbs;
+  const weekRate = surplus === 200 ? 0.4 : 0.7;
+  const weeks = gainLbs > 0 ? Math.ceil(gainLbs / weekRate) : 0;
+
+  const goalKg = goalLbs / 2.205;
+  const protein = Math.round(goalKg * 0.9 * 2.205); // g, based on goal weight in lbs effectively
+  const proteinG = Math.round(goalLbs * 0.9);
+  const fatCals = cals * 0.25;
+  const fatG = Math.round(fatCals / 9);
+  const proteinCals = proteinG * 4;
+  const carbG = Math.round((cals - fatCals - proteinCals) / 4);
+
+  document.getElementById('r-bmr').textContent = bmr + ' cal';
+  document.getElementById('r-tdee').textContent = tdee + ' cal';
+  document.getElementById('r-cals').textContent = cals + ' cal';
+  document.getElementById('r-gain').textContent = gainLbs > 0 ? `+${gainLbs} lbs to goal` : 'At or above goal';
+  document.getElementById('r-time').textContent = gainLbs > 0 ? `~${weeks} weeks` : '—';
+  document.getElementById('r-protein').textContent = proteinG;
+  document.getElementById('r-carbs').textContent = carbG > 0 ? carbG : '—';
+  document.getElementById('r-fat').textContent = fatG;
+}
+
+document.querySelectorAll('.surplus-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.surplus-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSurplus = parseInt(btn.dataset.surplus);
+
+    const ft = parseFloat(document.getElementById('n-height-ft').value) || 0;
+    const ins = parseFloat(document.getElementById('n-height-in').value) || 0;
+    const weightLbs = parseFloat(document.getElementById('n-weight').value) || 0;
+    const goalLbs = parseFloat(document.getElementById('n-goal-weight').value) || 0;
+    const age = parseFloat(document.getElementById('n-age').value) || 0;
+    const activity = parseFloat(document.getElementById('n-activity').value) || 1.55;
+    if (!ft || !weightLbs || !age) return;
+
+    const heightCm = (ft * 12 + ins) * 2.54;
+    const weightKg = weightLbs / 2.205;
+    const bmr = Math.round(10 * weightKg + 6.25 * heightCm - 5 * age - 161);
+    const tdee = Math.round(bmr * activity);
+    showNutritionResults(bmr, tdee, weightLbs, goalLbs, currentSurplus);
+  });
+});
+
+// ==================== INIT ====================
+renderToday();
+</script>
+</body>
+</html>
