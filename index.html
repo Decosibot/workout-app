@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f0f0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HC 1.2">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<title>Hypertrophy Clusters 1.2</title>
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --bg2: #1a1a1a;
+    --bg3: #242424;
+    --bg4: #2e2e2e;
+    --border: #333;
+    --text: #f0f0f0;
+    --text2: #aaa;
+    --text3: #666;
+    --yellow: #f5c842;
+    --yellow-bg: #2a2200;
+    --yellow-border: #5a4800;
+    --orange: #f5922a;
+    --orange-bg: #2a1500;
+    --orange-border: #5a3000;
+    --red: #f54242;
+    --red-bg: #2a0a0a;
+    --red-border: #5a1010;
+    --green: #4caf50;
+    --blue: #4a9eff;
+    --gray-bg: #1e1e1e;
+    --gray-border: #333;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --nav-h: 64px;
+    --header-h: 56px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  #app-header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: var(--header-h);
+    background: rgba(15,15,15,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px;
+  }
+  #header-title { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+  #header-phase { font-size: 12px; color: var(--yellow); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+
+  /* ── NAV ── */
+  #app-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    height: var(--nav-h);
+    background: rgba(15,15,15,0.97);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border);
+    display: flex;
+  }
+  .nav-tab {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; cursor: pointer; transition: color 0.15s; color: var(--text3);
+    font-size: 10px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .nav-tab.active { color: var(--yellow); }
+  .nav-tab svg { width: 22px; height: 22px; }
+
+  /* ── MAIN CONTENT ── */
+  #app-main {
+    padding-top: calc(var(--header-h) + 8px);
+    padding-bottom: calc(var(--nav-h) + 16px);
+    padding-left: 16px; padding-right: 16px;
+    min-height: 100vh;
+  }
+
+  /* ── VIEWS ── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── TODAY VIEW ── */
+  .today-hero {
+    background: linear-gradient(135deg, #1a1500 0%, #2a1a00 100%);
+    border: 1px solid var(--yellow-border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .today-hero .phase-badge {
+    display: inline-block;
+    background: var(--yellow);
+    color: #000;
+    font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 4px; margin-bottom: 8px;
+  }
+  .today-hero h2 { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+  .today-hero .subtitle { color: var(--text2); font-size: 14px; }
+  .today-hero .start-btn {
+    display: block; width: 100%; margin-top: 16px;
+    background: var(--yellow); color: #000;
+    border: none; border-radius: var(--radius-sm);
+    font-size: 16px; font-weight: 800; letter-spacing: 0.3px;
+    padding: 14px; cursor: pointer; transition: opacity 0.15s;
+  }
+  .today-hero .start-btn:active { opacity: 0.8; }
+
+  .day-selector {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+    margin-bottom: 16px;
+  }
+  .day-btn {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 10px 4px;
+    text-align: center; cursor: pointer; transition: all 0.15s;
+  }
+  .day-btn.active { background: var(--yellow-bg); border-color: var(--yellow); }
+  .day-btn .day-label { font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+  .day-btn.active .day-label { color: var(--yellow); }
+  .day-btn .day-name { font-size: 10px; color: var(--text3); margin-top: 2px; }
+  .day-btn.completed::after { content: '✓'; display: block; font-size: 14px; color: var(--green); margin-top: 2px; }
+
+  .week-selector {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;
+  }
+  .week-btn {
+    flex: 1; min-width: 0;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 8px 4px;
+    text-align: center; cursor: pointer; font-size: 12px; font-weight: 600;
+    color: var(--text2); transition: all 0.15s; white-space: nowrap;
+  }
+  .week-btn.active { background: var(--yellow-bg); border-color: var(--yellow); color: var(--yellow); }
+  .week-btn.completed { border-color: var(--green); color: var(--green); }
+
+  /* ── EXERCISE CARDS ── */
+  .exercise-section { margin-bottom: 8px; }
+  .superset-group { position: relative; margin-bottom: 12px; }
+  .superset-group .ss-connector {
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    width: 3px; background: var(--border); border-radius: 2px;
+    bottom: 0; top: 0;
+    pointer-events: none;
+  }
+  .superset-label {
+    text-align: center; font-size: 10px; font-weight: 700; color: var(--text3);
+    letter-spacing: 1px; text-transform: uppercase; padding: 4px 0; margin: -4px 0;
+  }
+
+  .ex-card {
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    padding: 14px;
+    margin-bottom: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .ex-card::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    border-radius: var(--radius) 0 0 var(--radius);
+  }
+  .ex-card.cns { background: var(--gray-bg); border-color: var(--gray-border); }
+  .ex-card.cns::before { background: var(--text3); }
+  .ex-card.yellow { background: var(--yellow-bg); border-color: var(--yellow-border); }
+  .ex-card.yellow::before { background: var(--yellow); }
+  .ex-card.orange { background: var(--orange-bg); border-color: var(--orange-border); }
+  .ex-card.orange::before { background: var(--orange); }
+  .ex-card.red { background: var(--red-bg); border-color: var(--red-border); }
+  .ex-card.red::before { background: var(--red); }
+
+  .ex-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .ex-name { font-size: 15px; font-weight: 700; line-height: 1.3; flex: 1; }
+  .ex-badge {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+    padding: 2px 6px; border-radius: 4px; white-space: nowrap; flex-shrink: 0;
+  }
+  .cns .ex-badge { background: var(--bg4); color: var(--text3); }
+  .yellow .ex-badge { background: rgba(245,200,66,0.2); color: var(--yellow); }
+  .orange .ex-badge { background: rgba(245,146,42,0.2); color: var(--orange); }
+  .red .ex-badge { background: rgba(245,66,66,0.2); color: var(--red); }
+
+  .ex-meta {
+    display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px;
+  }
+  .ex-meta span { font-size: 12px; color: var(--text2); }
+  .ex-meta strong { color: var(--text); }
+
+  .ex-notes { font-size: 12px; color: var(--text2); background: rgba(255,255,255,0.04); border-radius: 6px; padding: 8px 10px; margin-bottom: 10px; line-height: 1.5; }
+
+  .ex-notes-toggle {
+    font-size: 12px; font-weight: 700; color: var(--text3);
+    cursor: pointer; padding: 4px 0; user-select: none;
+    transition: color 0.15s;
+  }
+  .ex-notes-toggle.open { color: var(--yellow); }
+  .ex-notes-toggle.open::before { content: '▾ '; }
+  .ex-notes-body {
+    display: none; font-size: 13px; color: var(--text2);
+    line-height: 1.55; background: var(--bg3);
+    border-left: 3px solid var(--border);
+    border-radius: 0 6px 6px 0;
+    padding: 10px 12px; margin-top: 4px; margin-bottom: 6px;
+  }
+  .ex-notes-body.open { display: block; }
+
+  .ex-sets { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .set-circle {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--bg3); border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    transition: all 0.15s; color: var(--text2); flex-shrink: 0;
+  }
+  .set-circle.done { background: var(--green); border-color: var(--green); color: #fff; }
+  .set-circle.active-pulse { border-color: var(--yellow); color: var(--yellow); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(245,200,66,0.4); } 50% { box-shadow: 0 0 0 6px rgba(245,200,66,0); } }
+
+  .ex-weight {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ex-weight label { font-size: 12px; color: var(--text2); white-space: nowrap; }
+  .ex-weight input {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-size: 14px; font-weight: 600;
+    padding: 6px 10px; width: 90px; text-align: center;
+    outline: none; transition: border-color 0.15s;
+  }
+  .ex-weight input:focus { border-color: var(--yellow); }
+  .ex-weight .weight-unit { font-size: 12px; color: var(--text3); }
+
+  /* ── REST TIMER OVERLAY ── */
+  #rest-overlay {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(0,0,0,0.92);
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    gap: 16px; padding: 32px;
+  }
+  #rest-overlay.show { display: flex; }
+  #rest-title { font-size: 14px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; }
+  #rest-exercise { font-size: 18px; font-weight: 700; color: var(--text); text-align: center; }
+  #rest-ring {
+    position: relative; width: 180px; height: 180px;
+  }
+  #rest-ring svg { transform: rotate(-90deg); }
+  #rest-ring circle.bg { fill: none; stroke: var(--bg3); stroke-width: 10; }
+  #rest-ring circle.fg { fill: none; stroke: var(--yellow); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+  #rest-count {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 52px; font-weight: 900; color: var(--yellow);
+  }
+  #rest-skip {
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text2); border-radius: var(--radius-sm);
+    padding: 12px 32px; font-size: 15px; font-weight: 700; cursor: pointer;
+    transition: all 0.15s;
+  }
+  #rest-skip:active { background: var(--bg4); }
+  #rest-next { font-size: 13px; color: var(--text3); text-align: center; }
+
+  /* ── PROGRAM VIEW ── */
+  .phase-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); margin-bottom: 16px; overflow: hidden;
+  }
+  .phase-header {
+    padding: 14px 16px; background: var(--bg3);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .phase-header h3 { font-size: 16px; font-weight: 800; }
+  .phase-header .phase-weeks { font-size: 12px; color: var(--text2); }
+  .phase-scheme {
+    display: inline-block; background: var(--yellow); color: #000;
+    font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 4px; margin-top: 4px;
+  }
+  .phase-days { padding: 12px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .phase-day-card {
+    background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 10px; cursor: pointer; transition: all 0.15s;
+  }
+  .phase-day-card:hover { border-color: var(--yellow); }
+  .phase-day-card .pdc-day { font-size: 11px; font-weight: 700; color: var(--yellow); text-transform: uppercase; letter-spacing: 0.5px; }
+  .phase-day-card .pdc-name { font-size: 14px; font-weight: 700; margin-top: 2px; }
+  .phase-day-card .pdc-count { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+  /* ── HISTORY VIEW ── */
+  .history-empty { text-align: center; padding: 48px 16px; color: var(--text3); }
+  .history-item {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px; margin-bottom: 10px;
+  }
+  .history-item .hi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .history-item .hi-date { font-size: 13px; font-weight: 700; }
+  .history-item .hi-badge { font-size: 10px; color: var(--text3); background: var(--bg3); padding: 2px 8px; border-radius: 4px; }
+  .history-item .hi-weights { display: flex; flex-direction: column; gap: 4px; }
+  .history-item .hi-weight-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); }
+  .history-item .hi-weight-row strong { color: var(--text); }
+
+  .chart-section { margin-bottom: 20px; }
+  .chart-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+  .chart-wrap {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; overflow: hidden;
+  }
+
+  /* ── 1RM VIEW ── */
+  .orm-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+  }
+  .orm-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+  .orm-input-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .orm-input-row label { font-size: 13px; color: var(--text2); flex: 1; }
+  .orm-input {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-size: 16px; font-weight: 700;
+    padding: 8px 12px; width: 100px; text-align: center; outline: none;
+    transition: border-color 0.15s;
+  }
+  .orm-input:focus { border-color: var(--yellow); }
+  .orm-calc-btn {
+    background: var(--yellow); color: #000; border: none; border-radius: 6px;
+    font-size: 14px; font-weight: 800; padding: 10px 16px; cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .orm-calc-btn:active { opacity: 0.8; }
+  .orm-result { display: none; }
+  .orm-result.show { display: block; }
+  .orm-1rm { font-size: 28px; font-weight: 900; color: var(--yellow); margin-bottom: 12px; }
+  .orm-1rm span { font-size: 14px; color: var(--text2); font-weight: 600; }
+  .orm-pcts { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .orm-pct-item { background: var(--bg3); border-radius: 6px; padding: 8px 4px; text-align: center; }
+  .orm-pct-item .pct-label { font-size: 10px; color: var(--text3); font-weight: 600; }
+  .orm-pct-item .pct-val { font-size: 15px; font-weight: 800; color: var(--text); margin-top: 2px; }
+
+  /* ── SECTION HEADERS ── */
+  .section-header {
+    font-size: 11px; font-weight: 700; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 10px; margin-top: 16px;
+    padding-left: 2px;
+  }
+
+  /* ── COMPLETE WORKOUT BTN ── */
+  .complete-workout-btn {
+    display: block; width: 100%; margin-top: 20px;
+    background: var(--green); color: #fff;
+    border: none; border-radius: var(--radius-sm);
+    font-size: 16px; font-weight: 800; letter-spacing: 0.3px;
+    padding: 16px; cursor: pointer; transition: opacity 0.15s;
+  }
+  .complete-workout-btn:active { opacity: 0.8; }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: calc(var(--nav-h) + 16px); left: 50%; transform: translateX(-50%);
+    background: #333; color: #fff; border-radius: 20px;
+    padding: 10px 20px; font-size: 14px; font-weight: 600;
+    z-index: 200; opacity: 0; transition: opacity 0.3s;
+    pointer-events: none; white-space: nowrap;
+  }
+  #toast.show { opacity: 1; }
+
+  /* ── MISC ── */
+  .divider { height: 1px; background: var(--border); margin: 12px 0; }
+  .scroll-top { position: fixed; bottom: calc(var(--nav-h) + 16px); right: 16px; z-index: 150; }
+
+  svg { display: block; }
+</style>
+</head>
+<body>
+
+<header id="app-header">
+  <div>
+    <div id="header-title">HC 1.2</div>
+    <div id="header-phase">Loading...</div>
+  </div>
+  <div style="text-align:right">
+    <div id="header-week" style="font-size:13px;font-weight:700;"></div>
+    <div id="header-day" style="font-size:11px;color:var(--text3);margin-top:1px;"></div>
+  </div>
+</header>
+
+<main id="app-main">
+  <!-- TODAY VIEW -->
+  <div id="view-today" class="view active">
+    <div class="today-hero">
+      <div class="phase-badge" id="hero-phase">Phase 1</div>
+      <h2 id="hero-day">Monday Upper</h2>
+      <div class="subtitle" id="hero-sub">Week 1 · 8×5 Cluster</div>
+      <button class="start-btn" onclick="startWorkout()">Start Today's Workout →</button>
+    </div>
+
+    <div class="section-header">Select Day</div>
+    <div class="day-selector" id="day-selector"></div>
+
+    <div class="section-header">Select Week</div>
+    <div class="week-selector" id="week-selector"></div>
+
+    <div class="section-header">Quick Stats</div>
+    <div id="quick-stats" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;"></div>
+  </div>
+
+  <!-- WORKOUT VIEW -->
+  <div id="view-workout" class="view">
+    <button onclick="switchView('today')" style="display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:12px;">
+      ← Back
+    </button>
+    <div id="workout-content"></div>
+  </div>
+
+  <!-- PROGRAM VIEW -->
+  <div id="view-program" class="view">
+    <div id="program-content"></div>
+  </div>
+
+  <!-- HISTORY VIEW -->
+  <div id="view-history" class="view">
+    <div id="history-content"></div>
+  </div>
+
+  <!-- 1RM VIEW -->
+  <div id="view-orm" class="view">
+    <div class="section-header" style="margin-top:0">1RM Calculator</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.5;">
+      Enter your 3-rep max weight to calculate estimated 1RM and training percentages.
+    </p>
+    <div id="orm-cards"></div>
+  </div>
+</main>
+
+<!-- REST TIMER OVERLAY -->
+<div id="rest-overlay">
+  <div id="rest-title">Rest Timer</div>
+  <div id="rest-exercise"></div>
+  <div id="rest-ring">
+    <svg viewBox="0 0 180 180" width="180" height="180">
+      <circle class="bg" cx="90" cy="90" r="80"/>
+      <circle class="fg" id="rest-arc" cx="90" cy="90" r="80"/>
+    </svg>
+    <div id="rest-count">0</div>
+  </div>
+  <div id="rest-next"></div>
+  <button id="rest-skip" onclick="skipRest()">Skip Rest</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav id="app-nav">
+  <div class="nav-tab active" data-view="today" onclick="switchView('today')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+    </svg>
+    Today
+  </div>
+  <div class="nav-tab" data-view="program" onclick="switchView('program')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+    </svg>
+    Program
+  </div>
+  <div class="nav-tab" data-view="history" onclick="switchView('history')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+    </svg>
+    History
+  </div>
+  <div class="nav-tab" data-view="orm" onclick="switchView('orm')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+    </svg>
+    1RM Calc
+  </div>
+</nav>
+
+<div id="toast"></div>
+
+
+<script>
+// ════════════════════════════════════════════════════════════
+// WORKOUT DATA
+// ════════════════════════════════════════════════════════════
+const PROGRAM = {
+  phases: [
+    {
+      id: 1, name: "Phase 1", weeks: [1,2,3], scheme: "8×5",
+      days: [
+        {
+          id: "mon", label: "Monday", name: "Upper",
+          exercises: [
+            { id:"p1-mon-1", type:"cns", name:"Med Ball Rotation Pass", sets:3, reps:"3/side", tempo:"Explosive", weekLoads:["15 lbs","10 lbs","5 lbs"], notes:"Back elbow up to start, slam it into the ribs and throw. Be Aggressive! Have some OOMF! Rest ~45 sec between sets. Week 1: 15 lbs → Week 2: 10 lbs → Week 3: 5 lbs" },
+            { id:"p1-mon-2", type:"cns", name:"Med Ball Slam", sets:3, reps:"5", tempo:"Explosive", weekLoads:["20 lbs","15 lbs","10 lbs"], notes:"No explanation needed. Be aggressive. Rest ~45 sec between sets. Week 1: 20 lbs → Week 2: 15 lbs → Week 3: 10 lbs" },
+            { id:"p1-mon-3", type:"yellow", name:"DB Bench Press", sets:8, reps:"5", tempo:"Normal", load:"70-75% 1RM", superset:"A", notes:"Superset with Inverted Row. DB Bench for 5 reps, rest 30-45 sec, Row for 10 reps, rest 30-45 sec, repeat 8 sets. Week 1: Find your DB Bench 3RM, calculate 1RM, use 70-75% of that. Week 2-3: Just hop in. Do 2-3 warm-up sets first." },
+            { id:"p1-mon-4", type:"yellow", name:"TRX / Barbell Inverted Row", sets:8, reps:"10", tempo:"Normal", load:"7-8 RPE", superset:"A", notes:"Done back-to-back with DB Bench. Change body position or TRX height to hit 7-8 RPE. Chest to bar. Rest 30-45 sec then back to bench." },
+            { id:"p1-mon-5", type:"orange", name:"DB Shoulder Press", sets:3, reps:"10", tempo:"Normal", load:"8 RPE", notes:"Seated or standing — avoid using legs. 8 RPE across all 3 weeks. Increase weight weekly. Rest 2-3 min between sets. One warm-up set." },
+            { id:"p1-mon-6", type:"orange", name:"Push Up", sets:3, reps:"MAX", tempo:"Pump", weekLoads:["3 in tank","2 in tank","1 in tank"], notes:"Pump them out. Touch chest to ground each rep. Rest 2-3 min between sets. Week 1: leave 3 in the tank. Week 2: leave 2. Week 3: leave 1." },
+            { id:"p1-mon-7", type:"red", name:"DB Curl (Supinated)", sets:4, reps:"30", tempo:"Pump", load:"8-9 RPE", notes:"Standing. Curl both together. Palms face up the entire set. No controlled eccentric — just pump it out, use the hips toward the end. Blood flow for days. 8-9 RPE. No warm-up sets." },
+          ]
+        },
+        {
+          id: "tue", label: "Tuesday", name: "Lower",
+          exercises: [
+            { id:"p1-tue-1", type:"cns", name:"Trap Bar Jump", sets:3, reps:"5", tempo:"Explosive", weekLoads:["~20% 1RM","~15% 1RM","~10% 1RM"], notes:"Start on the ground every rep. Let the weight hit the ground instead of absorbing it. Rest ~60 sec between sets. Week 1: ~20% 1RM. Week 2: ~15% 1RM. Week 3: ~10% 1RM." },
+            { id:"p1-tue-2", type:"yellow", name:"Front Squat", sets:8, reps:"5", tempo:"Normal", load:"65-70% 1RM", superset:"B", notes:"Superset with mobility. 8 sets of 5 back-to-back. Elbows high, upright torso. If you suck at front squat — get better. Rest ~60 sec. Week 1: Find 1RM, use 65-70%. Weeks 2-3: 2-3 warm-up sets then get into it." },
+            { id:"p1-tue-3", type:"yellow", name:"DB Step Up", sets:8, reps:"5/side", tempo:"Normal", load:"7-8 RPE", superset:"B", notes:"Superset with Front Squat. Hold a DB in each hand. Only touch toes on ground between reps. Use mainly the leg on the box. Do one side, then the other, rest 45-60 sec. 7-8 RPE." },
+            { id:"p1-tue-4", type:"orange", name:"Barbell Glute Bridge", sets:3, reps:"10", tempo:"Top ISO", load:"8 RPE", notes:"Back on the ground, feet on the ground. Hold the top for ~1 second, squeeze the glutes. Let it crash down. One warm-up set. 8 RPE, should be able to go up weekly." },
+            { id:"p1-tue-5", type:"red", name:"Back Extension", sets:3, reps:"MAX", tempo:"Pump", load:"8-9 RPE", notes:"Bodyweight only. Pump it out and squeeze the glutes at the top. Try not to pass out when done. Rest only ~90 sec. 8-9 RPE — it shouldn't feel good." },
+          ]
+        },
+        {
+          id: "thu", label: "Thursday", name: "Upper",
+          exercises: [
+            { id:"p1-thu-1", type:"cns", name:"Med Ball Scoop Pass", sets:3, reps:"3/side", tempo:"Explosive", weekLoads:["15 lbs","10 lbs","5 lbs"], notes:"Similar execution to Rotation Pass. Scoop from below, explode through. Back to back with Overhead Throw. Rest ~45 sec. Week 1: 15 lbs → Week 2: 10 lbs → Week 3: 5 lbs" },
+            { id:"p1-thu-2", type:"cns", name:"Med Ball Overhead Throw", sets:3, reps:"5", tempo:"Explosive", weekLoads:["20 lbs","15 lbs","10 lbs"], notes:"Start on the floor in a squat, get rid of it quick. As high as possible. Rest ~45 sec. Week 1: 20 lbs → Week 2: 15 lbs → Week 3: 10 lbs" },
+            { id:"p1-thu-3", type:"yellow", name:"DB Push-Press", sets:8, reps:"5", tempo:"Normal", load:"70-75% 1RM", superset:"A", notes:"Superset with Pull-Up. Push-Press for 5, rest 30-45 sec, Pull-Up for 10, rest 30-45 sec, 8 sets. Use leg drive — shallow dip, explosive drive, lockout overhead. 70-75% 1RM. Week 1: Find 3RM, calculate 1RM." },
+            { id:"p1-thu-4", type:"yellow", name:"Pull Up", sets:8, reps:"10", tempo:"Normal", load:"7-8 RPE", superset:"A", notes:"Superset with DB Push-Press. Can use a band if needed. Aim to reduce band assistance each week. 7-8 RPE." },
+            { id:"p1-thu-5", type:"orange", name:"DB Alternating Curl (Seated)", sets:3, reps:"12/ea", tempo:"Normal", load:"8 RPE", superset:"C", notes:"Superset with French Press. Start with palms facing you, supinate as you curl up. Only one DB at a time. Rest ~60 sec, go to French Press. 8 RPE, one warm-up set." },
+            { id:"p1-thu-6", type:"orange", name:"DB French Press (Kneeling)", sets:3, reps:"15", tempo:"Normal", load:"8 RPE", superset:"C", notes:"Superset with Alternating Curl. Kneeling keeps the core engaged. Full extension overhead, lower to skull level. Rest ~60 sec back to curls. 8 RPE." },
+            { id:"p1-thu-7", type:"orange", name:"DB Alternating Hammer Curl (Seated)", sets:3, reps:"12", tempo:"Normal", load:"8 RPE", superset:"D", notes:"Superset with Cable Pushdown. Neutral grip, hammer curl one arm at a time. Rest ~60 sec, go to Pushdown. 8 RPE, one warm-up set." },
+            { id:"p1-thu-8", type:"orange", name:"Cable Pushdown", sets:3, reps:"15", tempo:"Normal", load:"8 RPE", superset:"D", notes:"Superset with Hammer Curl. Use rope, straight bar, or V-bar — your choice. Full extension at bottom, elbows stay at sides. 8 RPE." },
+            { id:"p1-thu-9", type:"red", name:"DB Side Delt Raise (Seated)", sets:4, reps:"25", tempo:"Pump", load:"9 RPE", superset:"E", notes:"Superset with Rear Delt. Start super light — 5 or 10 lbs. Do 25 to the side, rest ~90 sec, do 25 to the rear, rest ~90 sec. 9 RPE means it shouldn't be enjoyable. 3D shoulders guaranteed." },
+            { id:"p1-thu-10", type:"red", name:"DB Rear Delt Raise (Seated)", sets:4, reps:"25", tempo:"Pump", load:"9 RPE", superset:"E", notes:"Superset with Side Delt Raise. Hinge forward, raise elbows to shoulder height. Light weight, strict form. 9 RPE." },
+          ]
+        },
+        {
+          id: "fri", label: "Friday", name: "Total",
+          exercises: [
+            { id:"p1-fri-1", type:"cns", name:"Resisted Sprints", sets:3, reps:"5 sec", tempo:"Explosive", weekLoads:["Heavy ~20yds","Medium ~25yds","Light ~30yds"], notes:"Use a sled or band with a partner. Do 3-5 step accelerations as part of warm-up. Rest ~60 sec between sets. Week 1: Big resistance, ~20 yards in 5 sec. Week 2: Medium, ~25 yards. Week 3: Light, ~30 yards." },
+            { id:"p1-fri-2", type:"yellow", name:"Deadlift", sets:8, reps:"5", tempo:"Normal", load:"65-70% 1RM", superset:"B", notes:"Superset with mobility. Sumo or conventional — your choice. Straps OK. Mixed grip — switch each set. Rest ~60 sec, stretch between sets. Week 1: Find 1RM, use 65-70%. Weeks 2-3: 2-3 warm-up sets then go." },
+            { id:"p1-fri-3", type:"orange", name:"Slight Decline DB Bench Press", sets:5, reps:"15", tempo:"Normal", load:"9 RPE", superset:"F", notes:"Superset with 1-Arm DB Row. Put a plate under the foot end of the bench for a slight decline. Rest 60-120 sec between each. 9 RPE — should be tough. Go up weekly." },
+            { id:"p1-fri-4", type:"orange", name:"1-Arm DB Row", sets:5, reps:"15/ea", tempo:"Normal", load:"9 RPE", superset:"F", notes:"Superset with Decline Bench. Brace against the bench or stand bent over. Full range of motion, row to the hip. 9 RPE." },
+            { id:"p1-fri-5", type:"red", name:"DB Forward to Reverse Lunge", sets:4, reps:"10/ea", tempo:"Pump", load:"9 RPE", notes:"Hold a DB in each hand. All reps one side, rest ~1 min, all reps other side, rest ~1 min. Step forward into lunge, then step back into reverse lunge — that's 1 rep. 9 RPE. One warm-up bodyweight set." },
+          ]
+        }
+      ]
+    },
+    {
+      id: 2, name: "Phase 2", weeks: [4,5,6], scheme: "10×4",
+      days: [
+        {
+          id: "mon", label: "Monday", name: "Upper",
+          exercises: [
+            { id:"p2-mon-1", type:"cns", name:"Med Ball Rotation Pass w/ Step", sets:3, reps:"3/side", tempo:"Explosive", weekLoads:["15 lbs","10 lbs","5 lbs"], notes:"Pick up the inside foot, step down, slam elbow into ribs and throw. Back to back with Rotation Slam. Rest ~45 sec. Week 1: 15 lbs → Week 2: 10 lbs → Week 3: 5 lbs" },
+            { id:"p2-mon-2", type:"cns", name:"Med Ball Rotation Slam", sets:3, reps:"3/side", tempo:"Explosive", weekLoads:["15 lbs","10 lbs","5 lbs"], notes:"Start at one hip, go over the head, throw outside the opposite foot. If the ball is breakable, break it. Then be proud. Rest ~45 sec." },
+            { id:"p2-mon-3", type:"yellow", name:"Bench Press", sets:10, reps:"4", tempo:"Normal", load:"75-80% 1RM", superset:"A", notes:"Superset with 1-Arm DB Row. Bench for 4, rest 30-45 sec, Row for 4 each side, rest 30-45 sec, 10 sets. 75-80% 1RM. Week 1: Find 1RM. Week 2-3: 2-3 warm-up sets then go." },
+            { id:"p2-mon-4", type:"yellow", name:"1-Arm DB Row", sets:10, reps:"4/side", tempo:"Normal", load:"7-8 RPE", superset:"A", notes:"Superset with Bench Press. Get that DB Row to 7-8 RPE. If your DBs aren't heavy enough, find a way." },
+            { id:"p2-mon-5", type:"orange", name:"Barbell Military Press", sets:3, reps:"8", tempo:"Normal", load:"8 RPE", notes:"No leg drive. 8 RPE all weeks. Increase weight weekly. Rest 2-3 min. One warm-up set." },
+            { id:"p2-mon-6", type:"orange", name:"Bodyweight Dips", sets:3, reps:"MAX", tempo:"Pump", weekLoads:["3 in tank","2 in tank","1 in tank"], notes:"Pump them out with control. Huge chest and triceps activation. Rest 2-3 min. Week 1: 3 in tank. Week 2: 2 in tank. Week 3: 1 in tank." },
+            { id:"p2-mon-7", type:"red", name:"DB Hammer Curl", sets:4, reps:"25", tempo:"Pump", load:"9 RPE", notes:"Standing. Neutral grip. Just pump it out, use hips if needed. Engorged with blood. 9 RPE. No warm-up sets." },
+          ]
+        },
+        {
+          id: "tue", label: "Tuesday", name: "Lower",
+          exercises: [
+            { id:"p2-tue-1", type:"cns", name:"Approach Box Jump", sets:3, reps:"2/side", tempo:"Explosive", weekLoads:["Ascending box ht","Ascending box ht","Ascending box ht"], notes:"Start with a low box. Alternate approach styles with each rep. Land on two legs. Rest ~60 sec between sets. 4 total jumps each set. Increase box height each week." },
+            { id:"p2-tue-2", type:"yellow", name:"High Bar Back Squat", sets:10, reps:"4", tempo:"Normal", load:"70-75% 1RM", notes:"Bar high on the traps — make a pad so it's not on the spine. 70-75% 1RM. 10 sets of 4. Week 1: Find 1RM. Rest ~60 sec or more if needed. Mobility between sets optional." },
+            { id:"p2-tue-3", type:"yellow", name:"DB Reverse Lunge", sets:10, reps:"4/side", tempo:"Normal", load:"7-8 RPE", notes:"Hold a DB in each hand. 4 reps one side, 4 reps other, rest 45-60 sec. 7-8 RPE. Start light and build up." },
+            { id:"p2-tue-4", type:"orange", name:"Barbell Hip Thrust", sets:3, reps:"8", tempo:"Ecc", load:"8 RPE", notes:"Feet on the ground, back on bench. Squeeze glutes at top, control down 2-3 seconds. 8 RPE. One warm-up set. Go up weekly." },
+            { id:"p2-tue-5", type:"red", name:"Glute Ham Raise", sets:3, reps:"MAX", tempo:"Ecc", load:"9 RPE", notes:"Bodyweight only. Control the eccentric 3-4 seconds down. Use arms to help if needed. Rest ~2 min. The hammies will be shot. 9 RPE." },
+          ]
+        },
+        {
+          id: "thu", label: "Thursday", name: "Upper",
+          exercises: [
+            { id:"p2-thu-1", type:"cns", name:"Med Ball Scoop Pass w/ Step", sets:3, reps:"3/side", tempo:"Explosive", weekLoads:["15 lbs","10 lbs","5 lbs"], notes:"Bring the foot up, step down, BOOM! Low ground contact. Back to back with Overhead Throw off Box. Rest ~45 sec." },
+            { id:"p2-thu-2", type:"cns", name:"Med Ball Overhead Throw off Box", sets:3, reps:"5", tempo:"Explosive", weekLoads:["20 lbs","15 lbs","10 lbs"], notes:"Stand on a box, drop off, land in a half squat, throw immediately. Minimize ground contact time. As high as possible." },
+            { id:"p2-thu-3", type:"yellow", name:"Barbell Push-Press", sets:10, reps:"4", tempo:"Normal", load:"75-80% 1RM", superset:"A", notes:"Superset with Chin Up. Press for 4, rest 30-45 sec, Chin for 8, rest 30-45 sec, 10 sets. 75-80% 1RM. Use a band for Chin Up if needed." },
+            { id:"p2-thu-4", type:"yellow", name:"Chin Up", sets:10, reps:"8", tempo:"Normal", load:"7-8 RPE", superset:"A", notes:"Superset with Push-Press. Reduce band help each week. 7-8 RPE." },
+            { id:"p2-thu-5", type:"orange", name:"Cable Pushdown", sets:3, reps:"12", tempo:"Normal", load:"8 RPE", superset:"C", notes:"Superset with Hammer Curl. Heavier than Phase 1 since reps are lower. Full extension, elbows stay at sides. 8 RPE." },
+            { id:"p2-thu-6", type:"orange", name:"DB Hammer Curl (Standing)", sets:3, reps:"12", tempo:"Normal", load:"8 RPE", superset:"C", notes:"Superset with Pushdown. Neutral grip, can use a little momentum. Rest ~60 sec between exercises. 8 RPE." },
+            { id:"p2-thu-7", type:"orange", name:"DB JM Press", sets:3, reps:"12", tempo:"Normal", load:"8 RPE", superset:"D", notes:"Superset with Barbell Curl. Lower to the anterior deltoid (front delt). Full extension, stay controlled. 8 RPE." },
+            { id:"p2-thu-8", type:"orange", name:"Barbell Curl", sets:3, reps:"12", tempo:"Normal", load:"8 RPE", superset:"D", notes:"Superset with JM Press. Standing. Don't swing — no swinging each rep. 8 RPE." },
+            { id:"p2-thu-9", type:"red", name:"DB Side Delt Raise (Standing)", sets:4, reps:"20", tempo:"Pump", load:"9 RPE", superset:"E", notes:"Superset with Rear Delt. Start at 5-10 lbs. 20 reps to the side, rest ~90 sec, 20 to the rear. 9 RPE — should have to grunt for some reps." },
+            { id:"p2-thu-10", type:"red", name:"DB Rear Delt Raise (Standing)", sets:4, reps:"20", tempo:"Pump", load:"9 RPE", superset:"E", notes:"Superset with Side Delt. Hinged forward, raise to shoulder height. 9 RPE." },
+          ]
+        },
+        {
+          id: "fri", label: "Friday", name: "Total",
+          exercises: [
+            { id:"p2-fri-1", type:"cns", name:"Acceleration Sprints", sets:3, reps:"5 sec", tempo:"Explosive", weekLoads:["Bodyweight","Bodyweight","Bodyweight"], notes:"Do 3-5 step accelerations before these sets. Find an area that takes ~5 seconds to cover. Run against a partner to go faster. Rest 1-2 min between sets. Bodyweight all weeks." },
+            { id:"p2-fri-2", type:"yellow", name:"Sumo / Semi-Sumo Deadlift", sets:10, reps:"4", tempo:"Drop", load:"70-75% 1RM", notes:"If last phase you did Sumo, do Semi-Sumo (closer stance). Reset each rep. Straps OK, switch grip each set. 70-75% 1RM. 10 sets of 4. Week 1: Find 1RM." },
+            { id:"p2-fri-3", type:"orange", name:"DB Bench Press", sets:5, reps:"12", tempo:"Normal", load:"9 RPE", superset:"F", notes:"Superset with 1-Arm DB Row. Rest 60-120 sec between exercises. High mechanical tension. One warm-up set. Go up weekly. 9 RPE." },
+            { id:"p2-fri-4", type:"orange", name:"1-Arm DB Row", sets:5, reps:"12/side", tempo:"Normal", load:"9 RPE", superset:"F", notes:"Superset with DB Bench. Row the same weight as pressing. 9 RPE." },
+            { id:"p2-fri-5", type:"red", name:"DB Step Up to Reverse Lunge", sets:4, reps:"10/ea", tempo:"Pump", load:"9 RPE", notes:"Step up onto box, immediately step back into reverse lunge. All reps one side, rest ~1 min, other side. One warm-up bodyweight set. 9 RPE. When finished, legs should barely work." },
+          ]
+        }
+      ]
+    },
+    {
+      id: 3, name: "Phase 3", weeks: [7,8], scheme: "12×3",
+      days: [
+        {
+          id: "mon", label: "Monday", name: "Upper",
+          exercises: [
+            { id:"p3-mon-1", type:"cns", name:"Med Ball Rotation Pass (Running)", sets:3, reps:"3/ea", tempo:"Explosive", weekLoads:["5 lbs","2-3 lbs"], notes:"Get a few running steps going, slam the elbow into the body and throw. Violence is key. Rest ~45 sec. Week 1: 5 lbs → Week 2: 2-3 lbs" },
+            { id:"p3-mon-2", type:"cns", name:"Med Ball Slam", sets:3, reps:"5", tempo:"Explosive", weekLoads:["5 lbs","2-3 lbs"], notes:"Same as Phase 1 but super light. Pure speed. Week 1: 5 lbs → Week 2: 2-3 lbs" },
+            { id:"p3-mon-3", type:"yellow", name:"Bench Press", sets:12, reps:"3", tempo:"Normal", load:"80-85% 1RM", superset:"A", notes:"Superset with Landmine Row. Bench for 3, rest 30-45 sec, Row for 3 each side, rest 30-45 sec, 12 sets. 80-85% 1RM — this is heavy. Week 1: Test your max again. Set landmine on a box for convenience." },
+            { id:"p3-mon-4", type:"yellow", name:"Landmine 1-Arm Row", sets:12, reps:"3/ea", tempo:"Normal", load:"8 RPE", superset:"A", notes:"Superset with Bench Press. Set the landmine on a box for easy pickup. Heavy — 8 RPE. 3 reps each side." },
+            { id:"p3-mon-5", type:"orange", name:"1-Arm Landmine Press", sets:3, reps:"6/ea", tempo:"Normal", load:"8 RPE", notes:"One leg back, slight knee bend, press overhead. Control the weight down. 8 RPE. Rest 2-3 min. Find 8 RPE in a warm-up set or two." },
+            { id:"p3-mon-6", type:"orange", name:"Weighted Dips", sets:3, reps:"10", tempo:"Normal", load:"8 RPE", notes:"Now you need added weight — chains, belt, or DB between the feet. 8 RPE. Rest 2-3 min." },
+            { id:"p3-mon-7", type:"red", name:"Barbell Curl", sets:4, reps:"20", tempo:"Pump", load:"9 RPE", notes:"20 reps. For extreme pump — hold the bar during the 60-sec rest period. One warm-up set. Use EZ-Bar if needed. 9 RPE." },
+          ]
+        },
+        {
+          id: "tue", label: "Tuesday", name: "Lower",
+          exercises: [
+            { id:"p3-tue-1", type:"cns", name:"Band Assisted Jump", sets:3, reps:"5", tempo:"Explosive", weekLoads:["Medium","Medium"], notes:"Attach bands overhead, pull down to shoulder level. Double-leg jump for 5 reps. Rest ~60 sec. Medium resistance both weeks." },
+            { id:"p3-tue-2", type:"cns", name:"Band Assisted Split Squat Jump", sets:3, reps:"3/side", tempo:"Explosive", weekLoads:["Medium","Medium"], notes:"Band attached overhead. Split squat position, explosive jump. 3 each side, rest ~60 sec. Medium resistance both weeks." },
+            { id:"p3-tue-3", type:"yellow", name:"Low Bar Back Squat", sets:12, reps:"3", tempo:"Normal", load:"75-80% 1RM", notes:"Bar low on the traps. Rippetoe would be proud. You can go heavier than high bar. Rest more than 1 min if needed. 75-80% 1RM. 12 sets of 3. Week 1: Find 1RM." },
+            { id:"p3-tue-4", type:"yellow", name:"DB Bulgarian Split Squat", sets:12, reps:"3/ea", tempo:"Normal", load:"7-8 RPE", notes:"Rear foot elevated on bench. Vertical shin, drive through front heel. Start light, build to 7-8 RPE. One side then the other, rest ~60 sec. 12 sets." },
+            { id:"p3-tue-5", type:"orange", name:"Barbell Glute Bridge (Feet Up)", sets:3, reps:"6", tempo:"ISO & Ecc", load:"8 RPE", notes:"Back on ground, feet elevated on bench. More hamstring involvement. 1-sec ISO hold at top + 3-sec eccentric. 8 RPE. Rest 2-3 min." },
+            { id:"p3-tue-6", type:"red", name:"Barbell Good Morning", sets:3, reps:"10", tempo:"Ecc", load:"9 RPE", notes:"Big hamstring stretch. Hinge until hamstrings load — neutral spine always. 4-sec slow eccentric. Squeeze glutes at top. Short rest ~60 sec. 9 RPE." },
+          ]
+        },
+        {
+          id: "thu", label: "Thursday", name: "Upper",
+          exercises: [
+            { id:"p3-thu-1", type:"cns", name:"Med Ball Scoop Pass (Running)", sets:3, reps:"3/ea", tempo:"Explosive", weekLoads:["5 lbs","2-3 lbs"], notes:"Running steps into the throw, same as rotation pass. Explosive. Week 1: 5 lbs → Week 2: 2-3 lbs" },
+            { id:"p3-thu-2", type:"cns", name:"Approach Med Ball Overhead Throw", sets:3, reps:"2/ea", tempo:"Explosive", weekLoads:["15 lbs","10 lbs"], notes:"Full approach, throw it as high as possible. Week 1: 15 lbs → Week 2: 10 lbs" },
+            { id:"p3-thu-3", type:"yellow", name:"Barbell Push-Press", sets:12, reps:"3", tempo:"Normal", load:"80-85% 1RM", superset:"A", notes:"Superset with Neutral-Grip Chin Up. Press for 3, rest 30-45 sec, Chin for 6, rest 45-60 sec, 12 sets. 80-85% 1RM. Week 1: Test max. Use added weight for Chin Up — only 6 reps." },
+            { id:"p3-thu-4", type:"yellow", name:"Neutral-grip Chin Up", sets:12, reps:"6", tempo:"Normal", load:"7-8 RPE", superset:"A", notes:"Superset with Push-Press. Add weight if possible. Neutral grip (palms facing each other). 7-8 RPE." },
+            { id:"p3-thu-5", type:"orange", name:"Barbell Curl", sets:3, reps:"10", tempo:"Normal", load:"8 RPE", superset:"C", notes:"Superset with DB Skullcrusher. Standing. Biceps then triceps — confuse the body. Rest ~90 sec between exercises. 8 RPE. One warm-up set." },
+            { id:"p3-thu-6", type:"orange", name:"DB Skullcrusher", sets:3, reps:"10", tempo:"Normal", load:"8 RPE", superset:"C", notes:"Superset with Barbell Curl. Lying. Lower to forehead level, full extension. 8 RPE." },
+            { id:"p3-thu-7", type:"orange", name:"Cross-Body DB Hammer Curl", sets:3, reps:"10/ea", tempo:"Normal", load:"8 RPE", superset:"D", notes:"Superset with Barbell Floor Press. Curl across the body toward the opposite shoulder. One arm at a time, 10 reps each. 8 RPE." },
+            { id:"p3-thu-8", type:"orange", name:"Barbell Floor Press", sets:3, reps:"10", tempo:"Normal", load:"8 RPE", superset:"D", notes:"Superset with Cross-Body Curl. Lying on floor — elbows contact floor at bottom. Full extension at top. 8 RPE." },
+            { id:"p3-thu-9", type:"red", name:"DB Side Delt Raise (Leaning)", sets:4, reps:"15/ea", tempo:"Pump", load:"9 RPE", superset:"E", notes:"Superset with Rear Delt. Leaning variation — grab a rack or cable, lean away, raise laterally. 15 reps each side. Rest ~1 min. 9 RPE." },
+            { id:"p3-thu-10", type:"red", name:"DB Rear Delt Raise (Incline Bench)", sets:4, reps:"15", tempo:"Pump", load:"9 RPE", superset:"E", notes:"Superset with Side Delt. Lie face-down on incline bench, raise DBs to shoulder height. 15 reps. 9 RPE." },
+          ]
+        },
+        {
+          id: "fri", label: "Friday", name: "Total",
+          exercises: [
+            { id:"p3-fri-1", type:"cns", name:"Flying Sprints", sets:3, reps:"5 sec", tempo:"Explosive", weekLoads:["Bodyweight","Bodyweight"], notes:"Build from a jog to max speed, hold max for 5 sec. Rest ~90 sec. Do 2 sub-max warm-up sprints first at 70-90%. Need a big area. Bodyweight both weeks." },
+            { id:"p3-fri-2", type:"yellow", name:"Trap Bar Deadlift", sets:12, reps:"3", tempo:"Fast Ecc", load:"75-80% 1RM", notes:"High handles. Pick it up fast, basically drop it, but keep hands on bar, reset, pull again. Rest 60-90 sec. Fast eccentric — don't fight the descent. 75-80% 1RM. 12 sets of 3. Week 1: Find 1RM." },
+            { id:"p3-fri-3", type:"orange", name:"Slight Incline DB Bench Press", sets:5, reps:"10", tempo:"Normal", load:"9 RPE", superset:"F", notes:"Superset with 1-Arm DB Row. Set bench at small incline. Rest 60-120 sec between exercises. One warm-up set. 9 RPE — use more weight week 2." },
+            { id:"p3-fri-4", type:"orange", name:"1-Arm DB Row", sets:5, reps:"10/ea", tempo:"Normal", load:"9 RPE", superset:"F", notes:"Superset with Incline Bench. You should be able to row more than you press. 9 RPE." },
+            { id:"p3-fri-5", type:"red", name:"Plate Bulgarian Split Squat", sets:4, reps:"15/ea", tempo:"Pump", load:"9 RPE", notes:"Hold a plate out front. Pump concentric, control eccentric. All reps one side, all reps other side, rest ~1 min. One warm-up set with light plate. If not heavy enough, slow the eccentric more. 9 RPE." },
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+// Rest times in seconds by type
+const REST_TIMES = {
+  cns: 60,
+  yellow_upper: 40,
+  yellow_lower: 60,
+  orange: 150,  // PDF says 2-3 min; using 2:30 as midpoint
+  red: 90
+};
+
+// ════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════
+let state = {
+  currentWeek: 1,
+  currentDayIdx: 0, // 0=Mon,1=Tue,2=Thu,3=Fri
+  activeView: 'today'
+};
+
+function getPhaseForWeek(w) {
+  if (w <= 3) return PROGRAM.phases[0];
+  if (w <= 6) return PROGRAM.phases[1];
+  return PROGRAM.phases[2];
+}
+function getWeekInPhase(w) {
+  if (w <= 3) return w - 1;
+  if (w <= 6) return w - 4;
+  return w - 7;
+}
+
+// ── localStorage helpers ──
+function ls(key, def) {
+  try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : def; }
+  catch(e) { return def; }
+}
+function lsSet(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {}
+}
+
+function loadState() {
+  const s = ls('hc_state', null);
+  if (s) { state.currentWeek = s.currentWeek || 1; state.currentDayIdx = s.currentDayIdx || 0; }
+}
+function saveState() {
+  lsSet('hc_state', { currentWeek: state.currentWeek, currentDayIdx: state.currentDayIdx });
+}
+
+// Weight log: key = "weight_exId_week"
+function getWeight(exId, week) { return ls(`w_${exId}_${week}`, ''); }
+function setWeight(exId, week, val) { lsSet(`w_${exId}_${week}`, val); }
+
+// Set completion: key = "sets_exId_week_day"
+function getSets(exId, week) { return ls(`sets_${exId}_${week}`, []); }
+function saveSets(exId, week, arr) { lsSet(`sets_${exId}_${week}`, arr); }
+
+// History
+function getHistory() { return ls('hc_history', []); }
+function addHistory(entry) {
+  const h = getHistory();
+  h.unshift(entry);
+  lsSet('hc_history', h.slice(0, 100));
+}
+
+// 1RM values
+function get1RM(name) { return ls(`orm_${name}`, ''); }
+function set1RM(name, val) { lsSet(`orm_${name}`, val); }
+
+// ════════════════════════════════════════════════════════════
+// REST TIMER
+// ════════════════════════════════════════════════════════════
+let restTimer = null;
+let restRemaining = 0;
+let restTotal = 0;
+
+const CIRCUMFERENCE = 2 * Math.PI * 80; // r=80
+
+function startRest(seconds, exerciseName, nextInfo) {
+  clearInterval(restTimer);
+  restTotal = seconds;
+  restRemaining = seconds;
+  document.getElementById('rest-arc').style.strokeDasharray = CIRCUMFERENCE;
+  document.getElementById('rest-exercise').textContent = exerciseName;
+  document.getElementById('rest-next').textContent = nextInfo || '';
+  updateRestDisplay();
+  document.getElementById('rest-overlay').classList.add('show');
+  restTimer = setInterval(() => {
+    restRemaining--;
+    updateRestDisplay();
+    if (restRemaining <= 0) {
+      clearInterval(restTimer);
+      document.getElementById('rest-overlay').classList.remove('show');
+      // vibrate
+      if (navigator.vibrate) navigator.vibrate([200,100,200]);
+    }
+  }, 1000);
+}
+
+function updateRestDisplay() {
+  document.getElementById('rest-count').textContent = restRemaining;
+  const progress = restRemaining / restTotal;
+  const offset = CIRCUMFERENCE * (1 - progress);
+  document.getElementById('rest-arc').style.strokeDashoffset = offset;
+  // Color shift
+  const arc = document.getElementById('rest-arc');
+  if (restRemaining <= 10) arc.style.stroke = '#f54242';
+  else if (restRemaining <= 20) arc.style.stroke = '#f5922a';
+  else arc.style.stroke = '#f5c842';
+}
+
+function skipRest() {
+  clearInterval(restTimer);
+  document.getElementById('rest-overlay').classList.remove('show');
+}
+
+// ════════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════════
+function switchView(viewName) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`view-${viewName}`).classList.add('active');
+  const navTab = document.querySelector(`[data-view="${viewName}"]`);
+  if (navTab) navTab.classList.add('active');
+  state.activeView = viewName;
+
+  if (viewName === 'today') renderToday();
+  if (viewName === 'program') renderProgram();
+  if (viewName === 'history') renderHistory();
+  if (viewName === 'orm') renderORM();
+  updateHeader();
+  window.scrollTo(0, 0);
+}
+
+function updateHeader() {
+  const phase = getPhaseForWeek(state.currentWeek);
+  const dayData = getCurrentDayData();
+  document.getElementById('header-phase').textContent = `${phase.name} · ${phase.scheme}`;
+  document.getElementById('header-week').textContent = `Week ${state.currentWeek}`;
+  document.getElementById('header-day').textContent = dayData ? `${dayData.label} ${dayData.name}` : '';
+}
+
+// ════════════════════════════════════════════════════════════
+// TODAY VIEW
+// ════════════════════════════════════════════════════════════
+function getCurrentDayData() {
+  const phase = getPhaseForWeek(state.currentWeek);
+  return phase.days[state.currentDayIdx] || phase.days[0];
+}
+
+function renderToday() {
+  const phase = getPhaseForWeek(state.currentWeek);
+  const dayData = getCurrentDayData();
+  const wi = getWeekInPhase(state.currentWeek);
+
+  document.getElementById('hero-phase').textContent = `${phase.name}`;
+  document.getElementById('hero-day').textContent = `${dayData.label} ${dayData.name}`;
+  document.getElementById('hero-sub').textContent = `Week ${state.currentWeek} · ${phase.scheme} Cluster`;
+
+  // Day selector
+  const daySel = document.getElementById('day-selector');
+  daySel.innerHTML = '';
+  phase.days.forEach((d, i) => {
+    const completed = ls(`wk_done_${state.currentWeek}_${d.id}`, false);
+    const btn = document.createElement('div');
+    btn.className = `day-btn${i === state.currentDayIdx ? ' active' : ''}${completed ? ' completed' : ''}`;
+    btn.innerHTML = `<div class="day-label">${d.label.slice(0,3)}</div><div class="day-name">${d.name}</div>`;
+    btn.onclick = () => {
+      state.currentDayIdx = i;
+      saveState();
+      renderToday();
+      updateHeader();
+    };
+    daySel.appendChild(btn);
+  });
+
+  // Week selector
+  const weekSel = document.getElementById('week-selector');
+  weekSel.innerHTML = '';
+  [1,2,3,4,5,6,7,8].forEach(w => {
+    const ph = getPhaseForWeek(w);
+    const completed = ls(`week_done_${w}`, false);
+    const btn = document.createElement('div');
+    btn.className = `week-btn${w === state.currentWeek ? ' active' : ''}${completed ? ' completed' : ''}`;
+    btn.textContent = `W${w}`;
+    btn.title = ph.name;
+    btn.onclick = () => {
+      state.currentWeek = w;
+      state.currentDayIdx = 0;
+      saveState();
+      renderToday();
+      updateHeader();
+    };
+    weekSel.appendChild(btn);
+  });
+
+  // Quick stats
+  const qs = document.getElementById('quick-stats');
+  const bench = get1RM('Bench Press');
+  const squat = get1RM('Squat');
+  const stats = [
+    { label: 'Current Phase', value: phase.name },
+    { label: 'Cluster Scheme', value: phase.scheme },
+    { label: 'Bench 1RM', value: bench ? `${bench} lbs` : 'Not set' },
+    { label: 'Squat 1RM', value: squat ? `${squat} lbs` : 'Not set' },
+  ];
+  qs.innerHTML = stats.map(s => `
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${s.label}</div>
+      <div style="font-size:16px;font-weight:800;">${s.value}</div>
+    </div>
+  `).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+// WORKOUT VIEW
+// ════════════════════════════════════════════════════════════
+function startWorkout() {
+  switchView('workout');
+  renderWorkout();
+}
+
+function renderWorkout() {
+  const phase = getPhaseForWeek(state.currentWeek);
+  const dayData = getCurrentDayData();
+  const wi = getWeekInPhase(state.currentWeek);
+  const container = document.getElementById('workout-content');
+
+  // Group exercises into supersets and singles
+  const groups = groupExercises(dayData.exercises);
+
+  let html = `
+    <div style="margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <span style="background:var(--yellow);color:#000;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;">${phase.name}</span>
+        <span style="font-size:12px;color:var(--text3);">${phase.scheme}</span>
+      </div>
+      <h2 style="font-size:22px;font-weight:800;">${dayData.label} ${dayData.name}</h2>
+      <p style="font-size:13px;color:var(--text2);margin-top:2px;">Week ${state.currentWeek}</p>
+    </div>
+  `;
+
+  // Section labels
+  const sectionLabels = {cns:'CNS Activation', yellow:'Primary Cluster Sets', orange:'Accessory Work', red:'Pump / Finishers'};
+  let lastSection = null;
+
+  groups.forEach(group => {
+    const firstType = group[0].type;
+    if (firstType !== lastSection) {
+      lastSection = firstType;
+      html += `<div class="section-header">${sectionLabels[firstType] || ''}</div>`;
+    }
+
+    if (group.length > 1) {
+      html += `<div class="superset-group">`;
+      group.forEach((ex, gi) => {
+        if (gi > 0) html += `<div class="superset-label">+ SUPERSET</div>`;
+        html += renderExCard(ex, wi);
+      });
+      html += `</div>`;
+    } else {
+      html += renderExCard(group[0], wi);
+    }
+  });
+
+  html += `<button class="complete-workout-btn" onclick="completeWorkout()">Complete Workout ✓</button>`;
+
+  container.innerHTML = html;
+
+  // Bind set circles
+  dayData.exercises.forEach(ex => {
+    const completedSets = getSets(ex.id, state.currentWeek);
+    for (let i = 0; i < ex.sets; i++) {
+      const circle = document.getElementById(`set-${ex.id}-${i}`);
+      if (circle) {
+        if (completedSets.includes(i)) circle.classList.add('done');
+        circle.addEventListener('click', () => handleSetClick(ex, i, dayData.name));
+      }
+    }
+    // Weight input
+    const weightInput = document.getElementById(`weight-${ex.id}`);
+    if (weightInput) {
+      weightInput.value = getWeight(ex.id, state.currentWeek);
+      weightInput.addEventListener('change', () => {
+        setWeight(ex.id, state.currentWeek, weightInput.value);
+      });
+    }
+  });
+}
+
+function renderExCard(ex, weekIdx) {
+  const weekLoad = ex.weekLoads ? (ex.weekLoads[weekIdx] || ex.weekLoads[ex.weekLoads.length-1]) : null;
+  const loadStr = weekLoad || ex.load || '';
+
+  const typeLabels = {cns:'CNS', yellow:'Cluster', orange:'Accessory', red:'Pump'};
+
+  let setsHtml = '';
+  for (let i = 0; i < ex.sets; i++) {
+    setsHtml += `<div class="set-circle" id="set-${ex.id}-${i}">${i+1}</div>`;
+  }
+
+  const weightSection = ex.type !== 'cns' ? `
+    <div class="ex-weight">
+      <label>Weight used:</label>
+      <input type="number" id="weight-${ex.id}" placeholder="lbs" step="2.5" min="0">
+      <span class="weight-unit">lbs</span>
+    </div>` : '';
+
+  const notesSection = ex.notes ? `
+    <div class="ex-notes-toggle" onclick="this.nextElementSibling.classList.toggle('open');this.classList.toggle('open')">
+      ▸ How To
+    </div>
+    <div class="ex-notes-body">${ex.notes}</div>` : '';
+
+  const YT_VIDEOS = {
+    "Med Ball Rotation Pass": "o9BC7lgN1bo",
+    "Med Ball Slam": "cgKqNn90MEo",
+    "DB Bench Press": "SHsUIZiNdeY",
+    "TRX / Barbell Inverted Row": "v4zbFQr4LwA",
+    "DB Shoulder Press": "qEwKCR5JCog",
+    "Push Up": "Zi6c09DRGxk",
+    "DB Curl (Supinated)": "DgTlETfEuEU",
+    "Trap Bar Jump": "rZGkx5PaZSM",
+    "Front Squat": "ezRP5-ick9Q",
+    "DB Step Up": "aKj-6hgiViA",
+    "Barbell Glute Bridge": "ylpfCk3i-0Y",
+    "Back Extension": "gLT-WLH84B4",
+    "Med Ball Scoop Pass": "nudQAuCEpIc",
+    "Med Ball Overhead Throw": "h4SvwqKY-GM",
+    "DB Push-Press": "hYFI6_wDJ2c",
+    "Pull Up": "sIvJTfGxdFo",
+    "DB Alternating Curl (Seated)": "eZAvPxEB5Dw",
+    "DB French Press (Kneeling)": "jO2Jl9eZpXk",
+    "DB Alternating Hammer Curl (Seated)": "GYnj9smVzFE",
+    "Cable Pushdown": "94DXwlcX8Po",
+    "DB Side Delt Raise (Seated)": "3VcKaXpzqRo",
+    "DB Rear Delt Raise (Seated)": "GyhFsjrn7dw",
+    "Resisted Sprints": "1WMwpEFKKS8",
+    "Deadlift": "MBbyAqvTNkU",
+    "Slight Decline DB Bench Press": "KYJgQZPwGS8",
+    "1-Arm DB Row": "gfUg6qWohTk",
+    "DB Forward to Reverse Lunge": "1W0eILYvbM0",
+    "Med Ball Rotation Pass w/ Step": "DttZ5JU-b_U",
+    "Med Ball Rotation Slam": "k67D95cDohc",
+    "Bench Press": "vcBig73ojpE",
+    "Barbell Military Press": "eNFXEEdfQp4",
+    "Bodyweight Dips": "vi1-BOcj3cQ",
+    "DB Hammer Curl": "zC3nLlEvin4",
+    "Approach Box Jump": "if19-Pd_MUk",
+    "High Bar Back Squat": "bs_Ej32IYgo",
+    "DB Reverse Lunge": "MpfeGnBFEo8",
+    "Barbell Hip Thrust": "S_uZP4UH6J0",
+    "Glute Ham Raise": "6XB6f8yk9cU",
+    "Med Ball Overhead Throw off Box": "LVrhmzjnX_k",
+    "Barbell Push-Press": "4qTaJqfriNE",
+    "Chin Up": "p9AzXhVourc",
+    "DB JM Press": "FjkZpK8JhO8",
+    "Barbell Curl": "QZEqB6wUPxQ",
+    "Acceleration Sprints": "9uJaiOPpnWo",
+    "Sumo / Semi-Sumo Deadlift": "fKrujxCPRKI",
+    "DB Step Up to Reverse Lunge": "Q785cNkuHhU",
+    "Med Ball Rotation Pass (Running)": "dgEIggs-yUE",
+    "Landmine 1-Arm Row": "QTVMgZS7bHg",
+    "1-Arm Landmine Press": "Sjb5meztfSE",
+    "Weighted Dips": "JannOlicL4w",
+    "Band Assisted Jump": "48Hl7gsoBiw",
+    "Band Assisted Split Squat Jump": "hpJkPIHGBcM",
+    "Low Bar Back Squat": "BeM2oyJ0W0E",
+    "DB Bulgarian Split Squat": "hiLF_pF3EJM",
+    "Barbell Glute Bridge (Feet Up)": "SSAYjU3sr5k",
+    "Barbell Good Morning": "0Syp9iyINZ4",
+    "Neutral-grip Chin Up": "CcSKoDZU-TE",
+    "DB Skullcrusher": "tj81tVq3wLo",
+    "Cross-Body DB Hammer Curl": "7MrzVaPM0Uw",
+    "Barbell Floor Press": "gacJl2rHwtg",
+    "DB Side Delt Raise (Leaning)": "FGQ07Sb_D5Y",
+    "DB Rear Delt Raise (Incline Bench)": "V0FueWLtMTg",
+    "Flying Sprints": "qF88X_wLGlg",
+    "Trap Bar Deadlift": "5BpuTmfQjro",
+    "Slight Incline DB Bench Press": "KXCmAsx3hFo",
+    "Plate Bulgarian Split Squat": "A_p38ls2sb8",
+    "Med Ball Scoop Pass w/ Step": "nudQAuCEpIc",
+    "Med Ball Scoop Pass (Running)": "nudQAuCEpIc",
+    "Approach Med Ball Overhead Throw": "h4SvwqKY-GM",
+    "DB Hammer Curl (Standing)": "zC3nLlEvin4",
+    "DB Side Delt Raise (Standing)": "3VcKaXpzqRo",
+    "DB Rear Delt Raise (Standing)": "GyhFsjrn7dw",
+    "DB Bench Press": "SHsUIZiNdeY",
+  };
+  const ytId = YT_VIDEOS[ex.name];
+  const ytUrl = ytId
+    ? `https://www.youtube.com/watch?v=${ytId}`
+    : `https://www.youtube.com/results?search_query=${encodeURIComponent(ex.name + ' exercise form')}`;
+
+  const videoSection = ytId ? `
+    <a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;margin:8px 0;text-decoration:none;background:var(--bg3);border-radius:8px;overflow:hidden;padding-right:10px;">
+      <div style="position:relative;flex-shrink:0;width:96px;height:54px;">
+        <img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg" style="width:96px;height:54px;object-fit:cover;display:block;" loading="lazy">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+          <div style="width:28px;height:28px;background:rgba(255,0,0,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="white"><polygon points="3,1 9,5 3,9"/></svg>
+          </div>
+        </div>
+      </div>
+      <span style="font-size:12px;font-weight:600;color:var(--text2);">Watch Demo</span>
+    </a>` : '';
+
+  return `
+    <div class="ex-card ${ex.type}" id="card-${ex.id}">
+      <div class="ex-header">
+        <div class="ex-name">${ex.name}</div>
+        <div class="ex-badge">${typeLabels[ex.type]}</div>
+      </div>
+      <div class="ex-meta">
+        <span><strong>${ex.sets}×${ex.reps}</strong></span>
+        <span>${ex.tempo}</span>
+        ${loadStr ? `<span style="color:${ex.type==='yellow'?'var(--yellow)':ex.type==='orange'?'var(--orange)':ex.type==='red'?'var(--red)':'var(--text2)'}">${loadStr}</span>` : ''}
+      </div>
+      ${videoSection}
+      ${notesSection}
+      <div class="ex-sets">${setsHtml}</div>
+      ${weightSection}
+    </div>
+  `;
+}
+
+function groupExercises(exercises) {
+  const groups = [];
+  const used = new Set();
+  exercises.forEach(ex => {
+    if (used.has(ex.id)) return;
+    if (ex.superset) {
+      const group = exercises.filter(e => e.superset === ex.superset);
+      group.forEach(e => used.add(e.id));
+      groups.push(group);
+    } else {
+      used.add(ex.id);
+      groups.push([ex]);
+    }
+  });
+  return groups;
+}
+
+function handleSetClick(ex, setIdx, dayName) {
+  const completedSets = getSets(ex.id, state.currentWeek);
+  const circle = document.getElementById(`set-${ex.id}-${setIdx}`);
+  if (!circle) return;
+
+  if (completedSets.includes(setIdx)) {
+    // Un-complete
+    const newSets = completedSets.filter(s => s !== setIdx);
+    saveSets(ex.id, state.currentWeek, newSets);
+    circle.classList.remove('done');
+    return;
+  }
+
+  // Complete the set
+  completedSets.push(setIdx);
+  saveSets(ex.id, state.currentWeek, completedSets);
+  circle.classList.add('done');
+  if (navigator.vibrate) navigator.vibrate(50);
+
+  // Determine rest time
+  let restSecs = REST_TIMES.orange;
+  if (ex.type === 'cns') restSecs = REST_TIMES.cns;
+  else if (ex.type === 'yellow') {
+    restSecs = (dayName === 'Lower' || dayName === 'Total') ? REST_TIMES.yellow_lower : REST_TIMES.yellow_upper;
+  } else if (ex.type === 'red') restSecs = REST_TIMES.red;
+
+  // Don't start rest after last set
+  if (setIdx < ex.sets - 1 || ex.type === 'yellow') {
+    const nextSet = setIdx + 1;
+    const nextInfo = nextSet < ex.sets ? `Next: Set ${nextSet + 1} of ${ex.sets}` : 'Last set done!';
+    startRest(restSecs, ex.name, nextInfo);
+  }
+}
+
+function completeWorkout() {
+  const phase = getPhaseForWeek(state.currentWeek);
+  const dayData = getCurrentDayData();
+  const wi = getWeekInPhase(state.currentWeek);
+
+  // Collect weights
+  const weights = {};
+  dayData.exercises.forEach(ex => {
+    const w = getWeight(ex.id, state.currentWeek);
+    if (w) weights[ex.name] = w;
+  });
+
+  const entry = {
+    date: new Date().toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}),
+    dateRaw: Date.now(),
+    phase: phase.name,
+    week: state.currentWeek,
+    day: `${dayData.label} ${dayData.name}`,
+    weights
+  };
+  addHistory(entry);
+
+  // Mark day done
+  lsSet(`wk_done_${state.currentWeek}_${dayData.id}`, true);
+
+  showToast('Workout complete! 💪');
+
+  // Advance to next day
+  if (state.currentDayIdx < phase.days.length - 1) {
+    state.currentDayIdx++;
+  } else {
+    state.currentDayIdx = 0;
+    if (state.currentWeek < 8) {
+      state.currentWeek++;
+      lsSet(`week_done_${state.currentWeek - 1}`, true);
+    }
+  }
+  saveState();
+  switchView('today');
+}
+
+// ════════════════════════════════════════════════════════════
+// PROGRAM VIEW
+// ════════════════════════════════════════════════════════════
+function renderProgram() {
+  let html = '';
+  PROGRAM.phases.forEach(phase => {
+    const weekRange = `Weeks ${phase.weeks[0]}–${phase.weeks[phase.weeks.length-1]}`;
+    html += `
+      <div class="phase-card">
+        <div class="phase-header">
+          <div>
+            <h3>${phase.name}</h3>
+            <div class="phase-scheme">${phase.scheme}</div>
+          </div>
+          <div class="phase-weeks">${weekRange}</div>
+        </div>
+        <div class="phase-days">
+          ${phase.days.map(day => {
+            const totalEx = day.exercises.length;
+            const yellow = day.exercises.filter(e=>e.type==='yellow').length;
+            return `
+              <div class="phase-day-card" onclick="viewProgramDay(${phase.id}, '${day.id}')">
+                <div class="pdc-day">${day.label}</div>
+                <div class="pdc-name">${day.name}</div>
+                <div class="pdc-count">${totalEx} exercises · ${yellow} cluster lifts</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  });
+  document.getElementById('program-content').innerHTML = html;
+}
+
+function viewProgramDay(phaseId, dayId) {
+  const phase = PROGRAM.phases.find(p => p.id === phaseId);
+  const day = phase.days.find(d => d.id === dayId);
+  if (!phase || !day) return;
+
+  // Load this day into workout view
+  const origWeek = state.currentWeek;
+  const origDayIdx = state.currentDayIdx;
+
+  // Temporarily set state
+  state.currentWeek = phase.weeks[0];
+  state.currentDayIdx = phase.days.indexOf(day);
+  saveState();
+  switchView('workout');
+  renderWorkout();
+}
+
+// ════════════════════════════════════════════════════════════
+// HISTORY VIEW
+// ════════════════════════════════════════════════════════════
+function renderHistory() {
+  const history = getHistory();
+  let html = '';
+
+  // Charts for main lifts
+  const mainLifts = ['Bench Press','DB Bench Press','Front Squat','High Bar Back Squat','Low Bar Back Squat','Deadlift','Sumo / Semi-Sumo Deadlift','Trap Bar Deadlift'];
+
+  // Build data sets
+  const liftData = {};
+  history.forEach(session => {
+    Object.entries(session.weights || {}).forEach(([name, weight]) => {
+      const norm = mainLifts.find(l => name.toLowerCase().includes(l.toLowerCase().split(' ')[0]));
+      if (norm) {
+        if (!liftData[norm]) liftData[norm] = [];
+        liftData[norm].push({ date: session.date, weight: parseFloat(weight), dateRaw: session.dateRaw });
+      }
+    });
+  });
+
+  // Compact chart data by top lifts
+  const chartLifts = Object.entries(liftData).filter(([,arr]) => arr.length >= 2).slice(0,3);
+  if (chartLifts.length > 0) {
+    html += `<div class="section-header" style="margin-top:0">Progress Charts</div>`;
+    chartLifts.forEach(([name, data]) => {
+      const sorted = data.sort((a,b) => a.dateRaw - b.dateRaw);
+      html += `<div class="chart-section"><div class="chart-title">${name}</div><div class="chart-wrap">${renderChart(sorted)}</div></div>`;
+    });
+  }
+
+  html += `<div class="section-header">${history.length > 0 ? 'Past Workouts' : ''}</div>`;
+
+  if (history.length === 0) {
+    html += `<div class="history-empty"><div style="font-size:48px;margin-bottom:12px;">🏋️</div><div style="font-size:16px;font-weight:700;color:var(--text2);">No workouts yet</div><div style="font-size:13px;margin-top:8px;">Complete your first session to see history here.</div></div>`;
+  } else {
+    history.forEach(session => {
+      const weights = Object.entries(session.weights || {});
+      html += `
+        <div class="history-item">
+          <div class="hi-header">
+            <div class="hi-date">${session.date}</div>
+            <div class="hi-badge">${session.day} · W${session.week}</div>
+          </div>
+          ${weights.length > 0 ? `<div class="hi-weights">${weights.map(([name,w]) => `<div class="hi-weight-row"><span>${name}</span><strong>${w} lbs</strong></div>`).join('')}</div>` : '<div style="font-size:12px;color:var(--text3);">No weights logged</div>'}
+        </div>
+      `;
+    });
+  }
+
+  document.getElementById('history-content').innerHTML = html;
+}
+
+function renderChart(data) {
+  if (data.length < 2) return '<div style="color:var(--text3);font-size:12px;">Need more data</div>';
+  const W = 300, H = 100, PAD = 20;
+  const weights = data.map(d => d.weight);
+  const minW = Math.min(...weights), maxW = Math.max(...weights);
+  const range = maxW - minW || 1;
+
+  const pts = data.map((d, i) => {
+    const x = PAD + (i / (data.length - 1)) * (W - PAD*2);
+    const y = H - PAD - ((d.weight - minW) / range) * (H - PAD*2);
+    return `${x},${y}`;
+  });
+
+  const pathD = pts.map((p,i) => (i===0?'M':'L') + p).join(' ');
+  const areaD = `${pathD} L${pts[pts.length-1].split(',')[0]},${H-PAD} L${PAD},${H-PAD} Z`;
+
+  return `
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;overflow:visible">
+      <defs>
+        <linearGradient id="grad-${data[0].dateRaw}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--yellow)" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="var(--yellow)" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <path d="${areaD}" fill="url(#grad-${data[0].dateRaw})"/>
+      <path d="${pathD}" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      ${data.map((d,i) => {
+        const [x,y] = pts[i].split(',');
+        return `<circle cx="${x}" cy="${y}" r="4" fill="var(--yellow)"/>`;
+      }).join('')}
+      <text x="${PAD}" y="${H}" fill="var(--text3)" font-size="9">${data[0].date}</text>
+      <text x="${W-PAD}" y="${H}" fill="var(--text3)" font-size="9" text-anchor="end">${data[data.length-1].date}</text>
+      <text x="${PAD}" y="${PAD}" fill="var(--text2)" font-size="10" font-weight="700">${maxW} lbs</text>
+      <text x="${PAD}" y="${H-PAD+4}" fill="var(--text3)" font-size="10">${minW} lbs</text>
+    </svg>
+  `;
+}
+
+// ════════════════════════════════════════════════════════════
+// 1RM VIEW
+// ════════════════════════════════════════════════════════════
+const ORM_EXERCISES = [
+  'Bench Press', 'Squat', 'Deadlift', 'Overhead Press', 'Front Squat', 'Trap Bar Deadlift'
+];
+
+function renderORM() {
+  let html = '';
+  ORM_EXERCISES.forEach(name => {
+    const stored1RM = get1RM(name);
+    const pcts = stored1RM ? calcPcts(parseFloat(stored1RM)) : null;
+    html += `
+      <div class="orm-card">
+        <h3>${name}</h3>
+        <div class="orm-input-row">
+          <label>3RM Weight (lbs)</label>
+          <input class="orm-input" type="number" id="orm-input-${name.replace(/\s/g,'_')}" placeholder="0" min="0" step="2.5" value="">
+          <button class="orm-calc-btn" onclick="calcORM('${name}')">Calc</button>
+        </div>
+        <div class="orm-result ${stored1RM ? 'show' : ''}" id="orm-result-${name.replace(/\s/g,'_')}">
+          <div class="orm-1rm">${stored1RM || 0} <span>lbs estimated 1RM</span></div>
+          <div class="orm-pcts">
+            ${[65,70,75,80,85].map(pct => {
+              const val = stored1RM ? Math.round(parseFloat(stored1RM) * pct / 100 / 2.5) * 2.5 : '—';
+              return `<div class="orm-pct-item"><div class="pct-label">${pct}%</div><div class="pct-val">${val}</div></div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  document.getElementById('orm-cards').innerHTML = html;
+}
+
+function calcPcts(oneRM) {
+  return [65,70,75,80,85].map(pct => Math.round(oneRM * pct / 100 / 2.5) * 2.5);
+}
+
+function calcORM(name) {
+  const key = name.replace(/\s/g,'_');
+  const input = document.getElementById(`orm-input-${key}`);
+  const val = parseFloat(input.value);
+  if (!val || val <= 0) { showToast('Enter a valid weight'); return; }
+  // Epley: 1RM = weight × (1 + 3/30)
+  const estimated = Math.round(val * (1 + 3/30) / 2.5) * 2.5;
+  set1RM(name, estimated);
+
+  const resultDiv = document.getElementById(`orm-result-${key}`);
+  resultDiv.classList.add('show');
+  resultDiv.querySelector('.orm-1rm').innerHTML = `${estimated} <span>lbs estimated 1RM</span>`;
+  const pctDivs = resultDiv.querySelectorAll('.pct-val');
+  [65,70,75,80,85].forEach((pct, i) => {
+    const val = Math.round(estimated * pct / 100 / 2.5) * 2.5;
+    pctDivs[i].textContent = val;
+  });
+
+  showToast(`${name}: ~${estimated} lbs 1RM`);
+}
+
+// ════════════════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════════════════
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+function init() {
+  loadState();
+  renderToday();
+  updateHeader();
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+}
+
+init();
+</script>
+</body>
+</html>
