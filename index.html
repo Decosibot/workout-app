@@ -676,6 +676,8 @@
 
     <div class="section-header">Quick Stats</div>
     <div id="quick-stats" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;"></div>
+
+    <div id="level-nav-row" style="display:flex;gap:8px;margin-bottom:16px;"></div>
   </div>
 
   <!-- WORKOUT VIEW -->
@@ -1833,6 +1835,7 @@ function renderToday() {
 
   renderNutritionCard();
   updateProgressBar();
+  renderLevelNav();
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1909,6 +1912,7 @@ function renderTodayGrowth() {
 
   renderNutritionCard();
   updateProgressBar();
+  renderLevelNav();
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1988,6 +1992,7 @@ function renderTodayMansour() {
 
   renderNutritionCard();
   updateProgressBar();
+  renderLevelNav();
 }
 
 function mansourPrevDay() {
@@ -2664,6 +2669,31 @@ function advanceToNextLevel() {
   } else if (activeMensProgram === 'mansour') {
     selectMensProgram('hc12');
   }
+}
+
+function renderLevelNav() {
+  const row = document.getElementById('level-nav-row');
+  if (!row) return;
+  const levels = ['hc12', 'growth', 'mansour'];
+  const labels = ['L1: Foundation', 'L2: Volume', 'L3: Peak'];
+  const current = levels.indexOf(activeMensProgram);
+  const hasPrev = current > 0;
+  const hasNext = current < levels.length - 1;
+  const prevProg = hasPrev ? levels[current - 1] : '';
+  const nextProg = hasNext ? levels[current + 1] : '';
+  row.innerHTML = `
+    <button onclick="${hasPrev ? `selectMensProgram('${prevProg}')` : ''}"
+      style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:${hasPrev ? 'var(--text2)' : 'var(--text3)'};font-size:12px;font-weight:700;cursor:${hasPrev ? 'pointer' : 'default'};font-family:inherit;opacity:${hasPrev ? '1' : '.35'}">
+      ← ${hasPrev ? labels[current - 1] : 'Back'}
+    </button>
+    <div style="flex:2;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--yellow);text-align:center;padding:0 4px">
+      ${labels[current] || ''}
+    </div>
+    <button onclick="${hasNext ? `selectMensProgram('${nextProg}')` : ''}"
+      style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:${hasNext ? 'var(--text2)' : 'var(--text3)'};font-size:12px;font-weight:700;cursor:${hasNext ? 'pointer' : 'default'};font-family:inherit;opacity:${hasNext ? '1' : '.35'}">
+      ${hasNext ? labels[current + 1] : 'Next'} →
+    </button>
+  `;
 }
 
 function showLevelUpBanner(title, desc, btnText) {
