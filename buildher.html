@@ -224,15 +224,98 @@ svg.progress-chart{width:100%;height:140px;display:block}
 /* SECTION HEAD */
 .section-head{font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px}
 .section-sub{font-size:13px;color:var(--text2);margin-bottom:16px}
+
+/* PROGRAM SELECT SCREEN */
+#program-select{position:fixed;inset:0;background:var(--bg);z-index:300;overflow-y:auto;padding:40px 20px 60px;display:none;flex-direction:column;align-items:center}
+#program-select.show{display:flex}
+.prog-select-title{font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--pink),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin-bottom:6px}
+.prog-select-sub{font-size:14px;color:var(--text2);text-align:center;margin-bottom:32px}
+.prog-card{width:100%;max-width:380px;background:var(--bg2);border:2px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.prog-card:active{transform:scale(.98)}
+.prog-card.selected{border-color:var(--pink);background:rgba(224,102,163,.06)}
+.prog-card-icon{font-size:36px;margin-bottom:12px}
+.prog-card-name{font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px}
+.prog-card-desc{font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px}
+.prog-card-tags{display:flex;flex-wrap:wrap;gap:6px}
+.prog-tag{font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px;background:rgba(255,255,255,.07);color:var(--text2)}
+.prog-tag.pink{background:rgba(224,102,163,.15);color:var(--pink)}
+.prog-tag.teal{background:rgba(20,184,166,.15);color:#14b8a6}
+.prog-switch-row{margin-top:8px;text-align:center}
+.prog-switch-btn{background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;font-family:inherit;text-decoration:underline}
+
+/* SLIM THEME OVERRIDES (when slim program active) */
+body.slim-mode .nav-btn.active{color:#14b8a6}
+body.slim-mode .btn-primary{background:linear-gradient(135deg,#14b8a6,#7c3aed)}
+body.slim-mode .hero{background:linear-gradient(135deg,#0a1a18,#0f0a1a);border-color:#1a3a38}
+body.slim-mode .hero-label{color:#14b8a6}
+body.slim-mode .hero-title{background:linear-gradient(135deg,#14b8a6,#7c3aed);-webkit-background-clip:text;background-clip:text}
+body.slim-mode .pill.pink{background:rgba(20,184,166,.15);color:#14b8a6}
+body.slim-mode .ex-card.type-pink{border-color:rgba(20,184,166,.3)}
+body.slim-mode .type-pink .ex-type-dot{background:#14b8a6}
+body.slim-mode .type-pink .ex-reps-badge{background:rgba(20,184,166,.15);color:#14b8a6}
+body.slim-mode .ex-card.type-purple{border-color:rgba(124,58,237,.25)}
+body.slim-mode .type-purple .ex-type-dot{background:#7c3aed}
+body.slim-mode .type-purple .ex-reps-badge{background:rgba(124,58,237,.15);color:#7c3aed}
+body.slim-mode .ring-fg{stroke:#14b8a6}
+body.slim-mode .how-to-toggle{color:#14b8a6}
+body.slim-mode .weight-input:focus{border-color:#14b8a6}
+
+/* WEIGHT/MEASUREMENT TRACKER */
+.measure-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.measure-input-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.measure-input-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.measure-input{width:100%;background:none;border:none;color:var(--text);font-size:18px;font-weight:700;font-family:inherit;outline:none}
+.log-btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;border-radius:var(--radius);border:none;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;background:var(--bg3);border:1px solid var(--border);color:var(--text2);width:100%}
+.log-entry{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}
+.log-entry:last-child{border-bottom:none}
+.log-date{color:var(--text3)}
+.log-vals{color:var(--text);font-weight:600}
+.log-delta{font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px}
+.log-delta.loss{background:rgba(20,184,166,.15);color:#14b8a6}
+.log-delta.gain{background:rgba(245,66,66,.12);color:var(--red)}
 </style>
 </head>
 <body>
+
+<!-- PROGRAM SELECT OVERLAY -->
+<div id="program-select">
+  <div style="font-size:32px;margin-bottom:12px">💪</div>
+  <div class="prog-select-title">Choose Your Program</div>
+  <div class="prog-select-sub">Pick the goal that matches where you are right now</div>
+
+  <div class="prog-card" id="prog-build" onclick="selectProgram('build')">
+    <div class="prog-card-icon">🍑</div>
+    <div class="prog-card-name">Build Her</div>
+    <div class="prog-card-desc">Grow your glutes and legs. 8-week progressive overload program designed to add real size to your lower body.</div>
+    <div class="prog-card-tags">
+      <span class="prog-tag pink">Size & Strength</span>
+      <span class="prog-tag">8 Weeks</span>
+      <span class="prog-tag">3 Days/Week</span>
+      <span class="prog-tag">Full Gym</span>
+    </div>
+  </div>
+
+  <div class="prog-card" id="prog-slim" onclick="selectProgram('slim')">
+    <div class="prog-card-icon">🌿</div>
+    <div class="prog-card-name">Slim & Strong 50+</div>
+    <div class="prog-card-desc">Low-impact fat loss and toning for women 50+. Joint-friendly movements, full body workouts, and a calorie plan built for sustainable results.</div>
+    <div class="prog-card-tags">
+      <span class="prog-tag teal">Fat Loss & Tone</span>
+      <span class="prog-tag">8 Weeks</span>
+      <span class="prog-tag">3 Days/Week</span>
+      <span class="prog-tag">Low Impact</span>
+    </div>
+  </div>
+</div>
 
 <div id="app">
   <!-- TODAY VIEW -->
   <div id="today-view" class="view active">
     <div class="hero">
-      <div class="hero-label">Build Her</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="hero-label" id="hero-prog-label">Build Her</div>
+        <button onclick="showProgramSelect()" style="background:rgba(255,255,255,.07);border:none;color:var(--text2);font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px;cursor:pointer;font-family:inherit">Switch Program</button>
+      </div>
       <div class="hero-title" id="hero-day-name">Monday</div>
       <div class="hero-sub">Build the body you want.</div>
       <div class="hero-meta">
@@ -302,10 +385,49 @@ svg.progress-chart{width:100%;height:140px;display:block}
     <div id="history-list"></div>
   </div>
 
+  <!-- TRACKER VIEW -->
+  <div id="tracker-view" class="view">
+    <div class="section-head">Progress Tracker</div>
+    <div class="section-sub" id="tracker-sub">Log your weight and measurements</div>
+
+    <div class="card" id="tracker-log-card">
+      <div class="section-title">Log Today</div>
+      <div class="measure-grid">
+        <div class="measure-input-wrap">
+          <div class="measure-input-label">Weight (lbs)</div>
+          <input class="measure-input" type="number" id="t-weight" placeholder="150" min="80" max="400">
+        </div>
+        <div class="measure-input-wrap">
+          <div class="measure-input-label">Waist (in)</div>
+          <input class="measure-input" type="number" id="t-waist" placeholder="30" min="18" max="60">
+        </div>
+        <div class="measure-input-wrap">
+          <div class="measure-input-label">Hips (in)</div>
+          <input class="measure-input" type="number" id="t-hips" placeholder="40" min="25" max="70">
+        </div>
+        <div class="measure-input-wrap">
+          <div class="measure-input-label">Thigh (in)</div>
+          <input class="measure-input" type="number" id="t-thigh" placeholder="22" min="12" max="40">
+        </div>
+      </div>
+      <button class="log-btn" id="save-measurements-btn">Save Today's Measurements</button>
+    </div>
+
+    <div class="chart-wrap" id="weight-chart-wrap">
+      <div class="chart-title">Weight Over Time (lbs)</div>
+      <svg class="progress-chart" id="weight-track-chart" viewBox="0 0 300 120"></svg>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Measurement Log</div>
+      <div id="measurement-log-list"></div>
+    </div>
+  </div>
+
   <!-- NUTRITION VIEW -->
   <div id="nutrition-view" class="view">
     <div class="section-head">Nutrition</div>
-    <div class="section-sub">Mass gain calculator for women</div>
+    <div class="section-sub" id="nutrition-sub">Mass gain calculator for women</div>
 
     <div class="card">
       <div class="section-title">Your Stats</div>
@@ -345,9 +467,13 @@ svg.progress-chart{width:100%;height:140px;display:block}
 
     <div id="nutrition-results" style="display:none">
       <div class="section-title" style="margin-top:4px">Your Surplus Options</div>
-      <div class="surplus-tabs">
+      <div class="surplus-tabs" id="surplus-tabs-build">
         <button class="surplus-tab active" data-surplus="200" id="surplus-lean">Lean Bulk<br><small style="font-weight:400;color:var(--text3)">+200 cal &middot; ~0.4 lb/wk</small></button>
         <button class="surplus-tab" data-surplus="350" id="surplus-mod">Moderate Bulk<br><small style="font-weight:400;color:var(--text3)">+350 cal &middot; ~0.7 lb/wk</small></button>
+      </div>
+      <div class="surplus-tabs" id="surplus-tabs-slim" style="display:none">
+        <button class="surplus-tab active" data-deficit="300" id="deficit-gentle">Gentle Cut<br><small style="font-weight:400;color:var(--text3)">-300 cal &middot; ~0.6 lb/wk</small></button>
+        <button class="surplus-tab" data-deficit="500" id="deficit-mod">Steady Cut<br><small style="font-weight:400;color:var(--text3)">-500 cal &middot; ~1 lb/wk</small></button>
       </div>
 
       <div class="result-card">
@@ -364,7 +490,7 @@ svg.progress-chart{width:100%;height:140px;display:block}
           <span class="result-val pink" id="r-cals">—</span>
         </div>
         <div class="result-row">
-          <span class="result-label">Weight to gain</span>
+          <span class="result-label" id="r-change-label">Weight to gain</span>
           <span class="result-val" id="r-gain">—</span>
         </div>
         <div class="result-row">
@@ -389,7 +515,7 @@ svg.progress-chart{width:100%;height:140px;display:block}
         </div>
       </div>
 
-      <div class="note-box">For women, a smaller surplus (200-350 cal) minimizes fat gain while maximizing muscle growth. Protein is your #1 lever — hit it every day.</div>
+      <div class="note-box" id="nutrition-note-box">For women, a smaller surplus (200-350 cal) minimizes fat gain while maximizing muscle growth. Protein is your #1 lever — hit it every day.</div>
     </div>
   </div>
 </div>
@@ -411,6 +537,10 @@ svg.progress-chart{width:100%;height:140px;display:block}
   <button class="nav-btn" data-view="nutrition">
     <svg viewBox="0 0 24 24"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
     Nutrition
+  </button>
+  <button class="nav-btn" data-view="tracker">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    Tracker
   </button>
 </nav>
 
@@ -448,6 +578,258 @@ function getPhase(week) {
 
 // Exercise types & rest times
 const REST = { cns:30, pink:90, purple:60, red:45 };
+
+// ==================== SLIM PROGRAM DATA ====================
+const SLIM_PHASES = [
+  { name:'Phase 1: Move & Mobilize', short:'Phase 1', weeks:[1,2,3], scheme:'3×15', cls:'p1',
+    goal:'Build the habit. Focus on form and range of motion. These light loads protect joints while waking up muscles that have been dormant.' },
+  { name:'Phase 2: Build the Burn', short:'Phase 2', weeks:[4,5,6], scheme:'3×12', cls:'p2',
+    goal:'Add resistance. Your body is adapting — time to make it work harder. This is where the tone starts to show.' },
+  { name:'Phase 3: Finish Strong', short:'Phase 3', weeks:[7,8], scheme:'4×10', cls:'p3',
+    goal:'Final push. Four sets, controlled intensity, every rep deliberate. You\'ve built the base — now chisel it.' }
+];
+
+function getSlimPhase(week) {
+  return SLIM_PHASES.find(p => p.weeks.includes(week)) || SLIM_PHASES[0];
+}
+
+const SLIM_WORKOUTS = {
+  mon: {
+    name: 'Full Body A — Lower Focus',
+    sub: 'Legs, glutes & core',
+    phases: [
+      // Phase 1
+      [
+        { id:'sm_cns1', type:'cns', name:'Seated March', sets:2, reps:'20 steps', notes:'Sit tall in a chair, lift each knee alternately. Warms up hips and core gently. No strain on knees.' },
+        { id:'sm_cns2', type:'cns', name:'Ankle Circles + Calf Raises', sets:2, reps:'10 each', notes:'Stand at a wall for support. Rotate ankles both ways, then rise up on toes. Improves circulation and balance.' },
+        { id:'sm_p1', type:'pink', name:'Goblet Squat (Light)', sets:3, reps:'15', notes:'Hold a light dumbbell (5-15 lbs) at chest. Feet shoulder-width, toes out slightly. Squat to a comfortable depth — even half-way counts. Drive through heels. No impact on knees if done slowly.' },
+        { id:'sm_p2', type:'pink', name:'Step Ups (Low Box)', sets:3, reps:'12/side', notes:'Use a sturdy low step (6-8 inches). Step up one foot at a time, drive through the heel. Hold dumbbells for extra resistance. Excellent for glutes and balance without jumping.' },
+        { id:'sm_a1', type:'purple', name:'Seated Leg Extension (Machine)', sets:3, reps:'15', notes:'Light weight, full range. Strengthens the quad above the knee — critical for knee health and stability as we age.' },
+        { id:'sm_a2', type:'purple', name:'Standing Hip Abduction (Cable or Band)', sets:3, reps:'15/side', notes:'Stand at cable or use resistance band around ankles. Lift leg out to the side, squeeze outer hip. Great for hip stability and outer thigh toning.' },
+        { id:'sm_f1', type:'red', name:'Dead Bug (Core)', sets:3, reps:'8/side', notes:'Lie on back, arms up, knees at 90°. Lower opposite arm and leg to hover above floor. Breathe out as you lower. Rebuilds deep core without straining the lower back.' }
+      ],
+      // Phase 2
+      [
+        { id:'sm_cns1', type:'cns', name:'Seated March', sets:2, reps:'20 steps', notes:'Sit tall in a chair, lift each knee alternately. Warms up hips and core gently.' },
+        { id:'sm_cns2', type:'cns', name:'Ankle Circles + Calf Raises', sets:2, reps:'10 each', notes:'Stand at a wall for support. Rotate ankles both ways, then rise up on toes.' },
+        { id:'sm_p1', type:'pink', name:'Dumbbell Goblet Squat', sets:3, reps:'12', notes:'Same form as Phase 1 but heavier dumbbell (15-25 lbs). Go to parallel or deeper. Control the descent for 2 counts.' },
+        { id:'sm_p2', type:'pink', name:'Step Ups (Higher Box or Heavier DB)', sets:3, reps:'10/side', notes:'Increase box height or add more weight. Same controlled form. Each rep should feel like real work.' },
+        { id:'sm_a1', type:'purple', name:'Seated Leg Extension (Machine)', sets:3, reps:'12', notes:'Add a plate. Hold the contraction at the top for 1 second before lowering. This extra tension builds quad definition.' },
+        { id:'sm_a2', type:'purple', name:'Standing Hip Abduction', sets:3, reps:'12/side', notes:'More resistance this phase. Slow and steady — don\'t swing the leg.' },
+        { id:'sm_a3', type:'purple', name:'Leg Press (Light-Moderate)', sets:3, reps:'12', notes:'Feet high and wide. Full range. This is one of the safest ways to load the lower body for older women.' },
+        { id:'sm_f1', type:'red', name:'Dead Bug (Core)', sets:3, reps:'10/side', notes:'Full extension now — arm and leg hover as close to the floor as possible. Breathe. Control.' }
+      ],
+      // Phase 3
+      [
+        { id:'sm_cns1', type:'cns', name:'Seated March', sets:2, reps:'20 steps', notes:'Warm up the hips and core gently before loading.' },
+        { id:'sm_cns2', type:'cns', name:'Ankle Circles + Calf Raises', sets:2, reps:'12 each', notes:'Full range on the calf raises. Feel the stretch at the bottom.' },
+        { id:'sm_p1', type:'pink', name:'Dumbbell Goblet Squat', sets:4, reps:'10', notes:'4 sets this phase. Heaviest weight yet. Full depth. Pause at the bottom for 1 second. This is peak quad and glute stimulus.' },
+        { id:'sm_p2', type:'pink', name:'Step Ups (Weighted)', sets:4, reps:'8/side', notes:'4 sets, controlled weight. Single-leg strength is the best predictor of longevity and balance.' },
+        { id:'sm_a1', type:'purple', name:'Leg Press', sets:4, reps:'10', notes:'4 sets now. Load it up to a challenging weight. Full range of motion every rep.' },
+        { id:'sm_a2', type:'purple', name:'Standing Hip Abduction', sets:3, reps:'12/side', notes:'Max resistance for this movement. Own the full range.' },
+        { id:'sm_f1', type:'red', name:'Plank (Knees or Full)', sets:3, reps:'20-30 sec', notes:'Knees down is perfectly fine. Core tight, hips level. Breathe. Build to full plank over time.' }
+      ]
+    ]
+  },
+  wed: {
+    name: 'Full Body B — Upper & Core',
+    sub: 'Arms, back & stability',
+    phases: [
+      // Phase 1
+      [
+        { id:'sw_cns1', type:'cns', name:'Shoulder Rolls + Neck Circles', sets:2, reps:'10 each', notes:'Slow and gentle. Loosen up the upper back and neck before any pressing or pulling.' },
+        { id:'sw_cns2', type:'cns', name:'Band Pull-Apart', sets:2, reps:'15', notes:'Hold a light resistance band at chest height with arms straight. Pull apart until band touches chest. Activates rear delts and opens the chest.' },
+        { id:'sw_p1', type:'pink', name:'Seated Dumbbell Press', sets:3, reps:'15', notes:'Sit tall on a bench or chair. Light dumbbells (5-12 lbs). Press overhead without arching your lower back. Safe on shoulders when done with light weight and control.' },
+        { id:'sw_p2', type:'pink', name:'Lat Pulldown (Machine)', sets:3, reps:'15', notes:'Pull the bar to upper chest, elbows drive down. Light weight. This builds the upper back and improves posture — crucial for women over 50.' },
+        { id:'sw_a1', type:'purple', name:'Dumbbell Bent-Over Row', sets:3, reps:'15', notes:'Hinge forward, back flat, one hand on bench for support. Pull dumbbell to hip. Strong back = healthy spine.' },
+        { id:'sw_a2', type:'purple', name:'Dumbbell Bicep Curl', sets:3, reps:'15', notes:'Light dumbbells. Full range. Squeeze at the top. Good for arm tone and bone density in the forearms.' },
+        { id:'sw_f1', type:'red', name:'Bird Dog', sets:3, reps:'8/side', notes:'On hands and knees. Extend opposite arm and leg simultaneously, hold 2 seconds. Excellent for lower back rehab and core stability.' }
+      ],
+      // Phase 2
+      [
+        { id:'sw_cns1', type:'cns', name:'Shoulder Rolls + Neck Circles', sets:2, reps:'10 each', notes:'Loosen the upper back before pressing or pulling.' },
+        { id:'sw_cns2', type:'cns', name:'Band Pull-Apart', sets:2, reps:'15', notes:'Slightly more resistance this phase. Control the entire arc.' },
+        { id:'sw_p1', type:'pink', name:'Seated Dumbbell Press', sets:3, reps:'12', notes:'Go heavier. Brace your core and press deliberately. Feel the shoulder and tricep working.' },
+        { id:'sw_p2', type:'pink', name:'Lat Pulldown (Machine)', sets:3, reps:'12', notes:'Add a plate. Full stretch at the top, squeeze at the bottom. Building that wide, strong back.' },
+        { id:'sw_a1', type:'purple', name:'Seated Cable Row', sets:3, reps:'12', notes:'Sit upright, pull handles to lower chest. Squeeze shoulder blades together. Great posture builder.' },
+        { id:'sw_a2', type:'purple', name:'Dumbbell Bicep Curl', sets:3, reps:'12', notes:'Increase weight slightly. Slow down the lowering phase (2-3 counts). More time under tension = more tone.' },
+        { id:'sw_a3', type:'purple', name:'Tricep Pushdown (Cable)', sets:3, reps:'12', notes:'Lock elbows at sides, push down. Squeeze at the bottom. Targets the back of the arms — a common concern area.' },
+        { id:'sw_f1', type:'red', name:'Bird Dog', sets:3, reps:'10/side', notes:'Full extension, hold 3 seconds. Add a mini-crunch at the end for extra challenge.' }
+      ],
+      // Phase 3
+      [
+        { id:'sw_cns1', type:'cns', name:'Shoulder Rolls + Neck Circles', sets:2, reps:'10 each', notes:'Full upper body warmup before peak loads.' },
+        { id:'sw_cns2', type:'cns', name:'Band Pull-Apart', sets:2, reps:'15', notes:'Max resistance band. Full arc, full squeeze.' },
+        { id:'sw_p1', type:'pink', name:'Seated Dumbbell Press', sets:4, reps:'10', notes:'4 sets, heaviest weight yet. Controlled form — no back arch, no momentum. This is real shoulder strength.' },
+        { id:'sw_p2', type:'pink', name:'Lat Pulldown', sets:4, reps:'10', notes:'4 sets. Full range. You should feel a full stretch and a full squeeze every rep. Peak back loading.' },
+        { id:'sw_a1', type:'purple', name:'Seated Cable Row', sets:3, reps:'10', notes:'Heavier load. Slow controlled pulls. Strong back, upright posture.' },
+        { id:'sw_a2', type:'purple', name:'Dumbbell Bicep Curl', sets:3, reps:'10', notes:'Add weight. 3-count lowering. Arms should be fatigued by rep 8.' },
+        { id:'sw_f1', type:'red', name:'Side Plank (Knee or Full)', sets:3, reps:'15-20 sec/side', notes:'Oblique and hip stability. Knee version is great. Keep hips stacked.' }
+      ]
+    ]
+  },
+  fri: {
+    name: 'Full Body C — Cardio & Tone',
+    sub: 'Burn calories, build endurance',
+    phases: [
+      // Phase 1
+      [
+        { id:'sf_cns1', type:'cns', name:'March in Place', sets:2, reps:'30 sec', notes:'Swing arms, lift knees. Gets the heart rate up gently. This is your low-impact cardio warm-up.' },
+        { id:'sf_cns2', type:'cns', name:'Hip Flexor Stretch (Standing)', sets:2, reps:'20 sec/side', notes:'Lunge position, back knee down. Shift hips forward gently. Opens up the hip flexors that get tight from sitting.' },
+        { id:'sf_p1', type:'pink', name:'Stationary Bike (Light)', sets:1, reps:'10 min', notes:'Level 3-5. Comfortable pace, conversational effort. This is aerobic base — burns fat directly and is 100% joint-friendly.' },
+        { id:'sf_p2', type:'pink', name:'Banded Glute Bridge', sets:3, reps:'20', notes:'Band above knees. Feet flat, push knees out against the band. Drive hips up, squeeze hard at the top for 2 seconds. Best low-back-safe glute exercise.' },
+        { id:'sf_a1', type:'purple', name:'Dumbbell Romanian Deadlift', sets:3, reps:'15', notes:'Light dumbbells. Hinge at hips, push them back. Feel the hamstring stretch. Drive hips forward to return. Builds the back of the legs and is safe on the lower back when done correctly.' },
+        { id:'sf_a2', type:'purple', name:'Seated Calf Raise', sets:3, reps:'20', notes:'Sit on a bench, weight on knees, rise up on toes. Full range. Prevents ankle weakness and supports knee health.' },
+        { id:'sf_f1', type:'red', name:'Standing Side Bend (Stretch)', sets:2, reps:'30 sec/side', notes:'Hold one arm overhead and lean to the opposite side. Gentle stretch for the obliques and spine. Cool down.' }
+      ],
+      // Phase 2
+      [
+        { id:'sf_cns1', type:'cns', name:'March in Place', sets:2, reps:'30 sec', notes:'Swing arms, lift knees. Gentle cardio warm-up.' },
+        { id:'sf_cns2', type:'cns', name:'Hip Flexor Stretch', sets:2, reps:'20 sec/side', notes:'Hold slightly longer than Phase 1. Deeper hip opening.' },
+        { id:'sf_p1', type:'pink', name:'Stationary Bike or Elliptical', sets:1, reps:'12 min', notes:'Increase to level 5-7. Push the effort — you should be slightly breathless but able to talk. This zone burns the most fat.' },
+        { id:'sf_p2', type:'pink', name:'Banded Glute Bridge', sets:3, reps:'20', notes:'Same form, heavier band or more focus on the squeeze. Pause 2 seconds at the top.' },
+        { id:'sf_a1', type:'purple', name:'Dumbbell Romanian Deadlift', sets:3, reps:'12', notes:'Go heavier this phase. Slow the lowering phase to 3 counts. You\'ll feel it more in the hamstrings.' },
+        { id:'sf_a2', type:'purple', name:'Walking Lunges (Bodyweight or Light DB)', sets:3, reps:'10/side', notes:'Slow lunges — step wide, control the descent. These burn calories and build real functional leg strength.' },
+        { id:'sf_a3', type:'purple', name:'Seated Calf Raise', sets:3, reps:'20', notes:'Full range, pause at the top. Calves respond to high reps.' },
+        { id:'sf_f1', type:'red', name:'Foam Roll (Quads/Hamstrings/IT Band)', sets:1, reps:'2 min', notes:'Slow rolling, hold on tight spots. This recovery work improves long-term mobility and reduces injury risk.' }
+      ],
+      // Phase 3
+      [
+        { id:'sf_cns1', type:'cns', name:'March in Place', sets:2, reps:'30 sec', notes:'Heart rate up, joints ready.' },
+        { id:'sf_cns2', type:'cns', name:'Hip Flexor Stretch', sets:2, reps:'25 sec/side', notes:'Deepest stretch of the program. You have the flexibility now to go further.' },
+        { id:'sf_p1', type:'pink', name:'Stationary Bike or Elliptical', sets:1, reps:'15 min', notes:'Level 6-8. Your best cardio effort of the program. Push the resistance up and hold that pace. This is where the last layer of fat comes off.' },
+        { id:'sf_p2', type:'pink', name:'Banded Glute Bridge', sets:4, reps:'20', notes:'4 sets at peak intensity. Band tension maxed, full squeeze, 2 second hold. These should burn.' },
+        { id:'sf_a1', type:'purple', name:'Dumbbell Romanian Deadlift', sets:4, reps:'10', notes:'4 sets with your heaviest weight. Perfect hinge, controlled lowering, powerful drive up.' },
+        { id:'sf_a2', type:'purple', name:'Walking Lunges (Weighted)', sets:3, reps:'10/side', notes:'Dumbbells now. Lunge with intention. Balance, strength, and calorie burn all in one.' },
+        { id:'sf_f1', type:'red', name:'Full Body Stretch Sequence', sets:1, reps:'5 min', notes:'Hip flexors, hamstrings, quads, chest, shoulders. You\'ve completed 8 weeks — take 5 minutes to honor the work.' }
+      ]
+    ]
+  }
+};
+
+// ==================== PROGRAM MANAGEMENT ====================
+let activeProgram = localStorage.getItem('bh_program') || null;
+
+function selectProgram(prog) {
+  activeProgram = prog;
+  localStorage.setItem('bh_program', prog);
+  document.getElementById('program-select').classList.remove('show');
+  applyProgramTheme(prog);
+  renderToday();
+}
+
+function showProgramSelect() {
+  const ps = document.getElementById('program-select');
+  ps.classList.add('show');
+  document.getElementById('prog-build').classList.toggle('selected', activeProgram === 'build');
+  document.getElementById('prog-slim').classList.toggle('selected', activeProgram === 'slim');
+}
+
+function applyProgramTheme(prog) {
+  const isSlim = prog === 'slim';
+  document.body.classList.toggle('slim-mode', isSlim);
+  document.getElementById('hero-prog-label').textContent = isSlim ? 'Slim & Strong 50+' : 'Build Her';
+  document.getElementById('nutrition-sub').textContent = isSlim ? 'Fat loss calculator' : 'Mass gain calculator for women';
+  document.getElementById('tracker-sub').textContent = isSlim ? 'Track weight loss & measurements' : 'Track weight & measurements';
+  document.getElementById('surplus-tabs-build').style.display = isSlim ? 'none' : 'flex';
+  document.getElementById('surplus-tabs-slim').style.display = isSlim ? 'flex' : 'none';
+  document.getElementById('r-change-label').textContent = isSlim ? 'Weight to lose' : 'Weight to gain';
+  document.getElementById('nutrition-note-box').textContent = isSlim
+    ? 'For women 50+, a modest deficit (300-500 cal) preserves muscle while losing fat. Protein is critical — aim for 0.8g per lb of bodyweight. Never go below 1,200 calories.'
+    : 'For women, a smaller surplus (200-350 cal) minimizes fat gain while maximizing muscle growth. Protein is your #1 lever — hit it every day.';
+}
+
+function getCurrentWorkouts() {
+  return activeProgram === 'slim' ? SLIM_WORKOUTS : WORKOUTS;
+}
+
+function getCurrentPhases() {
+  return activeProgram === 'slim' ? SLIM_PHASES : PHASES;
+}
+
+function getCurrentGetPhase(week) {
+  return activeProgram === 'slim' ? getSlimPhase(week) : getPhase(week);
+}
+
+// ==================== MEASUREMENT TRACKER ====================
+function getMeasurements() { return JSON.parse(localStorage.getItem('bh_measurements') || '[]'); }
+function saveMeasurementLog(arr) { localStorage.setItem('bh_measurements', JSON.stringify(arr)); }
+
+function logMeasurement() {
+  const w = parseFloat(document.getElementById('t-weight').value);
+  const waist = parseFloat(document.getElementById('t-waist').value);
+  const hips = parseFloat(document.getElementById('t-hips').value);
+  const thigh = parseFloat(document.getElementById('t-thigh').value);
+  if (!w) { showToast('Enter at least your weight'); return; }
+  const logs = getMeasurements();
+  logs.unshift({ date: new Date().toLocaleDateString(), weight: w, waist: waist||null, hips: hips||null, thigh: thigh||null });
+  if (logs.length > 52) logs.pop();
+  saveMeasurementLog(logs);
+  document.getElementById('t-weight').value = '';
+  document.getElementById('t-waist').value = '';
+  document.getElementById('t-hips').value = '';
+  document.getElementById('t-thigh').value = '';
+  renderTracker();
+  showToast('Logged!');
+}
+
+function renderTracker() {
+  const logs = getMeasurements();
+  const list = document.getElementById('measurement-log-list');
+  if (logs.length === 0) {
+    list.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px 0">No entries yet — log your first measurement above.</div>';
+  } else {
+    list.innerHTML = logs.map((e, i) => {
+      const prev = logs[i + 1];
+      let deltaHtml = '';
+      if (prev && prev.weight && e.weight) {
+        const diff = (e.weight - prev.weight).toFixed(1);
+        const cls = parseFloat(diff) < 0 ? 'loss' : 'gain';
+        const sign = parseFloat(diff) > 0 ? '+' : '';
+        deltaHtml = `<span class="log-delta ${cls}">${sign}${diff} lbs</span>`;
+      }
+      const parts = [e.weight ? `${e.weight} lbs` : ''];
+      if (e.waist) parts.push(`W: ${e.waist}"`);
+      if (e.hips) parts.push(`H: ${e.hips}"`);
+      if (e.thigh) parts.push(`T: ${e.thigh}"`);
+      return `<div class="log-entry">
+        <div>
+          <div class="log-date">${e.date}</div>
+          <div class="log-vals">${parts.join(' · ')}</div>
+        </div>
+        ${deltaHtml}
+      </div>`;
+    }).join('');
+  }
+  // Draw weight chart
+  drawWeightChart();
+}
+
+function drawWeightChart() {
+  const svg = document.getElementById('weight-track-chart');
+  if (!svg) return;
+  const logs = getMeasurements().filter(e => e.weight).slice(0, 20).reverse();
+  if (logs.length < 2) {
+    svg.innerHTML = `<text x="150" y="65" text-anchor="middle" fill="#555" font-size="13" font-family="system-ui">Log measurements to see your trend</text>`;
+    return;
+  }
+  const vals = logs.map(e => e.weight);
+  const maxV = Math.max(...vals), minV = Math.min(...vals);
+  const pad = 20, W = 300, H = 120;
+  const chartW = W - pad * 2, chartH = H - pad * 2;
+  const range = maxV - minV || 1;
+  const pts = vals.map((v, i) => [pad + (i / (vals.length - 1)) * chartW, pad + chartH - ((v - minV) / range) * chartH]);
+  const color = activeProgram === 'slim' ? '#14b8a6' : '#e066a3';
+  const pathD = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p[0] + ',' + p[1]).join(' ');
+  const fillPts = [...pts, [pts[pts.length-1][0], H-pad], [pts[0][0], H-pad]];
+  const fillD = fillPts.map((p, i) => (i === 0 ? 'M' : 'L') + p[0] + ',' + p[1]).join(' ') + 'Z';
+  const dots = pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="${color}"/>`).join('');
+  const labels = vals.map((v, i) => `<text x="${pts[i][0]}" y="${pts[i][1]-8}" text-anchor="middle" fill="#aaa" font-size="10" font-family="system-ui">${v}</text>`).join('');
+  svg.innerHTML = `<defs><linearGradient id="wgrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity=".3"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
+    <path d="${fillD}" fill="url(#wgrad)"/>
+    <path d="${pathD}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    ${dots}${labels}`;
+}
 
 // Full workout data keyed by phase index (0/1/2) and day (mon/wed/fri)
 const WORKOUTS = {
@@ -669,7 +1051,7 @@ document.getElementById('rest-skip').addEventListener('click', () => {
 });
 
 // ==================== NAVIGATION ====================
-const VIEWS = ['today', 'workout', 'history', 'nutrition'];
+const VIEWS = ['today', 'workout', 'history', 'nutrition', 'tracker'];
 
 function showView(name) {
   VIEWS.forEach(v => {
@@ -681,6 +1063,7 @@ function showView(name) {
   if (name === 'history') renderHistory();
   if (name === 'nutrition') loadNutritionInputs();
   if (name === 'today') renderToday();
+  if (name === 'tracker') renderTracker();
 }
 
 document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -719,11 +1102,11 @@ function getDayOfWeek() {
 }
 
 function renderToday() {
-  const phase = getPhase(state.week);
+  const phase = getCurrentGetPhase(state.week);
   const dow = getDayOfWeek();
   const isWorkoutDay = ['mon','wed','fri'].includes(dow);
   const displayDay = state.day;
-  const wkData = WORKOUTS[displayDay];
+  const wkData = getCurrentWorkouts()[displayDay];
 
   document.getElementById('hero-day-name').textContent = wkData.name;
   document.getElementById('hero-phase').textContent = phase.short;
@@ -797,9 +1180,9 @@ function getPhaseIdx(week) {
 function launchWorkout(week, day) {
   currentWorkoutDay = day;
   currentWorkoutWeek = week;
-  const phase = getPhase(week);
+  const phase = getCurrentGetPhase(week);
   const pIdx = getPhaseIdx(week);
-  const wkData = WORKOUTS[day];
+  const wkData = getCurrentWorkouts()[day];
   const exercises = wkData.phases[pIdx];
 
   document.getElementById('workout-title').textContent = wkData.name + ' — Week ' + week;
@@ -965,7 +1348,7 @@ function buildSetsHtml(ex, week, completedSets) {
 
 function checkWorkoutComplete() {
   const pIdx = getPhaseIdx(currentWorkoutWeek);
-  const exercises = WORKOUTS[currentWorkoutDay].phases[pIdx];
+  const exercises = getCurrentWorkouts()[currentWorkoutDay].phases[pIdx];
   let allDone = true;
   exercises.forEach(ex => {
     if (isSkipped(ex.id, currentWorkoutWeek)) return;
@@ -987,15 +1370,16 @@ document.getElementById('complete-workout-btn').addEventListener('click', () => 
   }
   setDone(currentWorkoutWeek, currentWorkoutDay);
   const pIdx = getPhaseIdx(currentWorkoutWeek);
-  const exercises = WORKOUTS[currentWorkoutDay].phases[pIdx];
+  const wkData = getCurrentWorkouts()[currentWorkoutDay];
+  const exercises = wkData.phases[pIdx];
   const totalSets = exercises.reduce((acc, ex) => acc + getSets(ex.id, currentWorkoutWeek).length, 0);
   addHistory({
     week: currentWorkoutWeek,
     day: currentWorkoutDay,
-    name: WORKOUTS[currentWorkoutDay].name,
+    name: wkData.name,
     date: new Date().toLocaleDateString(),
     sets: totalSets,
-    phase: getPhase(currentWorkoutWeek).short
+    phase: getCurrentGetPhase(currentWorkoutWeek).short
   });
   showToast('Workout complete! Great work!');
   renderToday();
@@ -1095,16 +1479,20 @@ function loadNutritionInputs() {
   if (n.activity) document.getElementById('n-activity').value = n.activity;
 }
 
+function getCalcInputs() {
+  return {
+    ft: parseFloat(document.getElementById('n-height-ft').value) || 0,
+    ins: parseFloat(document.getElementById('n-height-in').value) || 0,
+    weightLbs: parseFloat(document.getElementById('n-weight').value) || 0,
+    goalLbs: parseFloat(document.getElementById('n-goal-weight').value) || 0,
+    age: parseFloat(document.getElementById('n-age').value) || 0,
+    activity: parseFloat(document.getElementById('n-activity').value) || 1.55
+  };
+}
+
 document.getElementById('calc-btn').addEventListener('click', () => {
-  const ft = parseFloat(document.getElementById('n-height-ft').value) || 0;
-  const ins = parseFloat(document.getElementById('n-height-in').value) || 0;
-  const weightLbs = parseFloat(document.getElementById('n-weight').value) || 0;
-  const goalLbs = parseFloat(document.getElementById('n-goal-weight').value) || 0;
-  const age = parseFloat(document.getElementById('n-age').value) || 0;
-  const activity = parseFloat(document.getElementById('n-activity').value) || 1.55;
-
+  const { ft, ins, weightLbs, goalLbs, age, activity } = getCalcInputs();
   if (!ft || !weightLbs || !age) { showToast('Fill in all fields first'); return; }
-
   saveNutrition({ heightFt: ft, heightIn: ins, weight: weightLbs, goalWeight: goalLbs, age, activity });
 
   const heightCm = (ft * 12 + ins) * 2.54;
@@ -1112,23 +1500,29 @@ document.getElementById('calc-btn').addEventListener('click', () => {
   const bmr = Math.round(10 * weightKg + 6.25 * heightCm - 5 * age - 161);
   const tdee = Math.round(bmr * activity);
 
-  currentSurplus = 200;
-  document.getElementById('surplus-lean').classList.add('active');
-  document.getElementById('surplus-mod').classList.remove('active');
+  if (activeProgram === 'slim') {
+    currentSurplus = -300;
+    document.getElementById('deficit-gentle').classList.add('active');
+    document.getElementById('deficit-mod').classList.remove('active');
+  } else {
+    currentSurplus = 200;
+    document.getElementById('surplus-lean').classList.add('active');
+    document.getElementById('surplus-mod').classList.remove('active');
+  }
 
   showNutritionResults(bmr, tdee, weightLbs, goalLbs, currentSurplus);
   document.getElementById('nutrition-results').style.display = 'block';
 });
 
-function showNutritionResults(bmr, tdee, weightLbs, goalLbs, surplus) {
-  const cals = tdee + surplus;
-  const gainLbs = goalLbs - weightLbs;
-  const weekRate = surplus === 200 ? 0.4 : 0.7;
-  const weeks = gainLbs > 0 ? Math.ceil(gainLbs / weekRate) : 0;
+function showNutritionResults(bmr, tdee, weightLbs, goalLbs, adjustment) {
+  const isSlim = activeProgram === 'slim';
+  const cals = tdee + adjustment;
+  const diffLbs = isSlim ? (weightLbs - goalLbs) : (goalLbs - weightLbs);
+  const absAdj = Math.abs(adjustment);
+  const weekRate = absAdj <= 300 ? (isSlim ? 0.6 : 0.4) : (isSlim ? 1.0 : 0.7);
+  const weeks = diffLbs > 0 ? Math.ceil(diffLbs / weekRate) : 0;
 
-  const goalKg = goalLbs / 2.205;
-  const protein = Math.round(goalKg * 0.9 * 2.205); // g, based on goal weight in lbs effectively
-  const proteinG = Math.round(goalLbs * 0.9);
+  const proteinG = Math.round(weightLbs * (isSlim ? 0.8 : 0.9));
   const fatCals = cals * 0.25;
   const fatG = Math.round(fatCals / 9);
   const proteinCals = proteinG * 4;
@@ -1137,8 +1531,12 @@ function showNutritionResults(bmr, tdee, weightLbs, goalLbs, surplus) {
   document.getElementById('r-bmr').textContent = bmr + ' cal';
   document.getElementById('r-tdee').textContent = tdee + ' cal';
   document.getElementById('r-cals').textContent = cals + ' cal';
-  document.getElementById('r-gain').textContent = gainLbs > 0 ? `+${gainLbs} lbs to goal` : 'At or above goal';
-  document.getElementById('r-time').textContent = gainLbs > 0 ? `~${weeks} weeks` : '—';
+  if (isSlim) {
+    document.getElementById('r-gain').textContent = diffLbs > 0 ? `-${diffLbs} lbs to goal` : 'At or below goal';
+  } else {
+    document.getElementById('r-gain').textContent = diffLbs > 0 ? `+${diffLbs} lbs to goal` : 'At or above goal';
+  }
+  document.getElementById('r-time').textContent = diffLbs > 0 ? `~${weeks} weeks` : '—';
   document.getElementById('r-protein').textContent = proteinG;
   document.getElementById('r-carbs').textContent = carbG > 0 ? carbG : '—';
   document.getElementById('r-fat').textContent = fatG;
@@ -1146,18 +1544,14 @@ function showNutritionResults(bmr, tdee, weightLbs, goalLbs, surplus) {
 
 document.querySelectorAll('.surplus-tab').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.surplus-tab').forEach(b => b.classList.remove('active'));
+    const parentTabs = btn.closest('.surplus-tabs');
+    parentTabs.querySelectorAll('.surplus-tab').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    currentSurplus = parseInt(btn.dataset.surplus);
+    if (btn.dataset.surplus) currentSurplus = parseInt(btn.dataset.surplus);
+    if (btn.dataset.deficit) currentSurplus = -parseInt(btn.dataset.deficit);
 
-    const ft = parseFloat(document.getElementById('n-height-ft').value) || 0;
-    const ins = parseFloat(document.getElementById('n-height-in').value) || 0;
-    const weightLbs = parseFloat(document.getElementById('n-weight').value) || 0;
-    const goalLbs = parseFloat(document.getElementById('n-goal-weight').value) || 0;
-    const age = parseFloat(document.getElementById('n-age').value) || 0;
-    const activity = parseFloat(document.getElementById('n-activity').value) || 1.55;
+    const { ft, ins, weightLbs, goalLbs, age, activity } = getCalcInputs();
     if (!ft || !weightLbs || !age) return;
-
     const heightCm = (ft * 12 + ins) * 2.54;
     const weightKg = weightLbs / 2.205;
     const bmr = Math.round(10 * weightKg + 6.25 * heightCm - 5 * age - 161);
@@ -1166,7 +1560,15 @@ document.querySelectorAll('.surplus-tab').forEach(btn => {
   });
 });
 
+// ==================== TRACKER EVENTS ====================
+document.getElementById('save-measurements-btn').addEventListener('click', logMeasurement);
+
 // ==================== INIT ====================
+if (!activeProgram) {
+  showProgramSelect();
+} else {
+  applyProgramTheme(activeProgram);
+}
 renderToday();
 </script>
 </body>
