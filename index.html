@@ -6,10 +6,10 @@
 <meta name="theme-color" content="#0f0f0f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="HC 1.2">
+<meta name="apple-mobile-web-app-title" content="12-Week Growth">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
-<title>Hypertrophy Clusters 1.2</title>
+<title>12-Week Growth System</title>
 <style>
   :root {
     --bg: #0f0f0f;
@@ -568,7 +568,7 @@
 
 <header id="app-header">
   <div>
-    <div id="header-title">HC 1.2</div>
+    <div id="header-title">12-Week Growth</div>
     <div id="header-phase">Loading...</div>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
@@ -576,39 +576,43 @@
       <div id="header-week" style="font-size:13px;font-weight:700;"></div>
       <div id="header-day" style="font-size:11px;color:var(--text3);margin-top:1px;"></div>
     </div>
-    <button id="switch-prog-btn" onclick="showProgSelect()" style="background:none;border:none;color:var(--text3);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.5px;text-transform:uppercase">Switch</button>
+    <button id="switch-prog-btn" onclick="showProgSelect()" style="background:none;border:none;color:var(--text3);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.5px;text-transform:uppercase">Levels</button>
     <button id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">☀️</button>
   </div>
 </header>
 
 <div id="prog-select-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:400;overflow-y:auto;padding:40px 20px 60px;flex-direction:column;align-items:center">
-  <div style="font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--yellow);margin-bottom:8px;text-align:center">Choose Your Program</div>
-  <div style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px;text-align:center">What's Your Goal?</div>
+  <div style="font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--yellow);margin-bottom:8px;text-align:center">12-Week Growth System</div>
+  <div style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px;text-align:center">Three levels. One program. Built to get results.</div>
   <div style="font-size:13px;color:var(--text2);text-align:center;margin-bottom:28px">Pick where you are now — you can switch anytime</div>
   <div class="prog-sel-card" onclick="selectMensProgram('hc12')" id="psc-hc12">
     <div style="font-size:28px;margin-bottom:10px">⚡</div>
-    <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">HC 1.2</div>
-    <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">Hypertrophy Clusters. 8-week progressive overload, cluster-style training. Heavy compounds, 4 days/week. The foundation program.</div>
+    <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">Level 1 — Foundation</div>
+    <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Weeks 1–4</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">Hypertrophy Clusters. Heavy compound movements, cluster-style loading, 4 days/week. Build the base everything else is built on.</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px">
-      <span class="prog-tag-y">Strength + Size</span><span class="prog-tag">8 Weeks</span><span class="prog-tag">4 Days/Week</span>
+      <span class="prog-tag-y">Strength + Size</span><span class="prog-tag">Weeks 1–4</span><span class="prog-tag">4 Days/Week</span>
     </div>
   </div>
   <div class="prog-sel-card" onclick="selectMensProgram('growth')" id="psc-growth">
     <div style="font-size:28px;margin-bottom:10px">🔥</div>
-    <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">Workout Growth Plan</div>
-    <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">4-week high volume muscle shock. 5-6 days/week, every muscle from every angle. Run this after HC 1.2 to break plateaus.</div>
+    <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">Level 2 — Volume Shock</div>
+    <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Weeks 5–8</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">High volume muscle overload. 5–6 days/week, every muscle from every angle. Run this when Level 1 is done to break through plateaus.</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px">
-      <span class="prog-tag-o">High Volume</span><span class="prog-tag">4 Weeks</span><span class="prog-tag">5-6 Days/Week</span>
+      <span class="prog-tag-o">High Volume</span><span class="prog-tag">Weeks 5–8</span><span class="prog-tag">5-6 Days/Week</span>
     </div>
   </div>
   <div class="prog-sel-card" onclick="selectMensProgram('mansour')" id="psc-mansour">
     <div style="font-size:28px;margin-bottom:10px">🏆</div>
-    <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">Mansour Method</div>
-    <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">Advanced 8-day split. Alternating strength and hypertrophy phases, superset pairs, forearm maintenance on rest days. For experienced lifters.</div>
+    <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">Level 3 — Peak Performance</div>
+    <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Weeks 9–12</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">Advanced periodization. Alternating strength and hypertrophy days, superset pairs, forearm maintenance on off days. The hardest block.</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px">
-      <span class="prog-tag-b">Advanced</span><span class="prog-tag">8-Day Cycle</span><span class="prog-tag">Periodized</span>
+      <span class="prog-tag-b">Advanced</span><span class="prog-tag">Weeks 9–12</span><span class="prog-tag">Periodized</span>
     </div>
   </div>
+  <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:8px">Complete each level in order for best results — or jump to where you are now.</div>
 </div>
 
 <main id="app-main">
@@ -616,6 +620,19 @@
   <div id="view-today" class="view active">
     <!-- Hero card (workout day) -->
     <div class="today-hero" id="today-hero-card">
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">12-Week Progress</span>
+          <span style="font-size:12px;font-weight:700;color:var(--yellow)" id="progress-week-label">Week 1 of 12</span>
+        </div>
+        <div style="height:6px;background:var(--bg3);border-radius:3px;overflow:hidden">
+          <div id="progress-bar-fill" style="height:100%;background:linear-gradient(90deg,var(--yellow),var(--orange));border-radius:3px;transition:width .4s ease;width:0%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px">
+          <span style="font-size:10px;color:var(--text3)" id="prog-level-label">Level 1</span>
+          <span style="font-size:10px;color:var(--text3)">12 Weeks Total</span>
+        </div>
+      </div>
       <div class="phase-badge" id="hero-phase">Phase 1</div>
       <h2 id="hero-day">Monday Upper</h2>
       <div class="subtitle" id="hero-sub">Week 1 · 8×5 Cluster</div>
@@ -743,6 +760,15 @@
     <div class="bw-list" id="bw-list"></div>
   </div>
 </main>
+
+<!-- LEVEL UP BANNER -->
+<div id="level-up-banner" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:600;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center">
+  <div style="font-size:48px;margin-bottom:16px">🏆</div>
+  <div style="font-size:22px;font-weight:800;color:var(--yellow);margin-bottom:8px" id="level-up-title">Level 1 Complete!</div>
+  <div style="font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:24px;max-width:300px" id="level-up-desc">You've finished 4 weeks of foundation training. Time to level up.</div>
+  <button onclick="advanceToNextLevel()" style="background:var(--yellow);color:#000;border:none;border-radius:12px;font-size:16px;font-weight:800;padding:16px 32px;cursor:pointer;width:100%;max-width:300px;margin-bottom:12px" id="level-up-btn">Start Level 2 →</button>
+  <button onclick="document.getElementById('level-up-banner').style.display='none'" style="background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer">Stay on current level</button>
+</div>
 
 <!-- REST TIMER OVERLAY -->
 <div id="rest-overlay">
@@ -1524,9 +1550,33 @@ function showProgSelect() {
 }
 
 function updateProgHeader() {
-  const names = { hc12: 'HC 1.2', growth: 'Growth Plan', mansour: 'Mansour Method' };
+  const names = { hc12: 'Level 1 — Foundation', growth: 'Level 2 — Volume Shock', mansour: 'Level 3 — Peak' };
   const el = document.getElementById('header-title');
-  if (el && activeMensProgram) el.textContent = names[activeMensProgram] || 'HC 1.2';
+  if (el) el.textContent = activeMensProgram ? (names[activeMensProgram] || '12-Week Growth') : '12-Week Growth';
+}
+
+function updateProgressBar() {
+  let overallWeek = 1;
+  let levelLabel = 'Level 1 · Foundation';
+  if (!activeMensProgram || activeMensProgram === 'hc12') {
+    overallWeek = state.currentWeek;
+    levelLabel = 'Level 1 · Foundation';
+  } else if (activeMensProgram === 'growth') {
+    const gs = getGrowthState();
+    overallWeek = 4 + gs.week;
+    levelLabel = 'Level 2 · Volume Shock';
+  } else if (activeMensProgram === 'mansour') {
+    const md = getMansourDay();
+    const mansourWeek = Math.ceil(md / 4);
+    overallWeek = 8 + mansourWeek;
+    levelLabel = 'Level 3 · Peak';
+  }
+  const weekLabel = document.getElementById('progress-week-label');
+  const barFill = document.getElementById('progress-bar-fill');
+  const levelEl = document.getElementById('prog-level-label');
+  if (weekLabel) weekLabel.textContent = `Week ${overallWeek} of 12`;
+  if (barFill) barFill.style.width = `${(overallWeek / 12) * 100}%`;
+  if (levelEl) levelEl.textContent = levelLabel;
 }
 
 // Growth Plan state helpers
@@ -1661,7 +1711,7 @@ function updateHeader() {
   if (activeMensProgram === 'growth') {
     const gs = getGrowthState();
     const dayData = GROWTH_PLAN.days[gs.day];
-    document.getElementById('header-title').textContent = 'Growth Plan';
+    document.getElementById('header-title').textContent = 'Level 2 — Volume Shock';
     document.getElementById('header-phase').textContent = `Week ${gs.week} · High Volume`;
     document.getElementById('header-week').textContent = `Week ${gs.week}`;
     document.getElementById('header-day').textContent = dayData ? dayData.name : '';
@@ -1670,7 +1720,7 @@ function updateHeader() {
   if (activeMensProgram === 'mansour') {
     const d = getMansourDay();
     const dayData = getMansourDayData(d);
-    document.getElementById('header-title').textContent = 'Mansour Method';
+    document.getElementById('header-title').textContent = 'Level 3 — Peak';
     document.getElementById('header-phase').textContent = `Day ${d} · ${d % 2 === 0 ? 'Off Day' : (dayData.phase || '')}`;
     document.getElementById('header-week').textContent = `Day ${d}/15`;
     document.getElementById('header-day').textContent = dayData ? dayData.name : '';
@@ -1678,7 +1728,7 @@ function updateHeader() {
   }
   const phase = getPhaseForWeek(state.currentWeek);
   const dayData = getCurrentDayData();
-  document.getElementById('header-title').textContent = 'HC 1.2';
+  document.getElementById('header-title').textContent = activeMensProgram ? 'Level 1 — Foundation' : '12-Week Growth';
   document.getElementById('header-phase').textContent = `${phase.name} · ${phase.scheme}`;
   document.getElementById('header-week').textContent = `Week ${state.currentWeek}`;
   document.getElementById('header-day').textContent = dayData ? `${dayData.label} ${dayData.name}` : '';
@@ -1721,7 +1771,7 @@ function renderToday() {
   } else {
     heroCard.style.display = '';
     restCard.style.display = 'none';
-    document.getElementById('hero-phase').textContent = `${phase.name}`;
+    document.getElementById('hero-phase').textContent = `LEVEL 1 · WEEK ${state.currentWeek} OF 4`;
     document.getElementById('hero-day').textContent = `${dayData.label} ${dayData.name}`;
     document.getElementById('hero-sub').textContent = `Week ${state.currentWeek} · ${phase.scheme} Cluster`;
     document.getElementById('streak-display').innerHTML = buildStreakHTML();
@@ -1782,6 +1832,7 @@ function renderToday() {
   `).join('');
 
   renderNutritionCard();
+  updateProgressBar();
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1830,7 +1881,7 @@ function renderTodayGrowth() {
 
   // Update hero card
   const currentDay = GROWTH_PLAN.days[gs.day];
-  document.getElementById('hero-phase').textContent = 'Growth Plan';
+  document.getElementById('hero-phase').textContent = `LEVEL 2 · WEEK ${gs.week} OF 4`;
   document.getElementById('hero-day').textContent = currentDay ? currentDay.name : '';
   document.getElementById('hero-sub').textContent = currentDay ? `Week ${gs.week} · ${currentDay.label}` : '';
   document.getElementById('streak-display').innerHTML = '';
@@ -1857,6 +1908,7 @@ function renderTodayGrowth() {
   `;
 
   renderNutritionCard();
+  updateProgressBar();
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1868,10 +1920,11 @@ function renderTodayMansour() {
   const currentMansourDay = getMansourDay();
   const isOffDay = currentMansourDay % 2 === 0;
 
+  const mansourWeek = Math.ceil(currentMansourDay / 4);
   if (isOffDay) {
     heroCard.style.display = '';
     restCard.style.display = 'none';
-    document.getElementById('hero-phase').textContent = 'Mansour Method';
+    document.getElementById('hero-phase').textContent = `LEVEL 3 · WEEK ${mansourWeek} OF 4`;
     document.getElementById('hero-day').textContent = 'Active Recovery Day';
     document.getElementById('hero-sub').textContent = `Cycle Day ${currentMansourDay} · Chest & Forearm Maintenance`;
     document.getElementById('streak-display').innerHTML = '';
@@ -1879,7 +1932,7 @@ function renderTodayMansour() {
     heroCard.style.display = '';
     restCard.style.display = 'none';
     const dayData = getMansourDayData(currentMansourDay);
-    document.getElementById('hero-phase').textContent = `Mansour Method · ${dayData.phase === 'strength' ? 'Strength' : 'Hypertrophy'} Phase`;
+    document.getElementById('hero-phase').textContent = `LEVEL 3 · WEEK ${mansourWeek} OF 4`;
     document.getElementById('hero-day').textContent = dayData.name;
     document.getElementById('hero-sub').textContent = `Cycle Day ${currentMansourDay} · ${dayData.label}`;
     document.getElementById('streak-display').innerHTML = '';
@@ -1934,6 +1987,7 @@ function renderTodayMansour() {
   `;
 
   renderNutritionCard();
+  updateProgressBar();
 }
 
 function mansourPrevDay() {
@@ -2152,6 +2206,7 @@ function completeWorkoutGrowth() {
     day: dayData ? dayData.name : gs.day,
     weights
   });
+  const wasLastDay = (gs.week === 4 && gs.day === 'w4_d6');
   // Advance day
   const nextDay = gs.day.replace(/d(\d)$/, (m, n) => `d${parseInt(n)+1}`);
   if (GROWTH_PLAN.days[nextDay]) {
@@ -2162,6 +2217,13 @@ function completeWorkoutGrowth() {
   }
   showToast('Workout complete!');
   switchView('today');
+  if (wasLastDay) {
+    showLevelUpBanner(
+      'Level 2 Complete!',
+      "8 weeks done. You've built serious volume. Now it's time for advanced periodization.",
+      'Start Level 3 →'
+    );
+  }
 }
 
 // ════════════════════════════════════════════════════════════
@@ -2246,11 +2308,19 @@ function completeWorkoutMansour() {
     day: dayData.name,
     weights
   });
+  const wasLastDay = (currentDay === 15);
   // Advance to next day (cycles 1-15)
   const nextDay = currentDay >= 15 ? 1 : currentDay + 1;
   saveMansourDay(nextDay);
   showToast('Workout complete!');
   switchView('today');
+  if (wasLastDay) {
+    showLevelUpBanner(
+      '12 Weeks Complete! 🎉',
+      "You finished the entire 12-Week Growth System. That's elite. Start over at Level 1 with heavier weights, or stay at Level 3.",
+      'Restart from Level 1'
+    );
+  }
 }
 
 // ════════════════════════════════════════════════════════════
@@ -2585,6 +2655,63 @@ function handleSetClick(ex, setIdx, dayName) {
   }
 }
 
+function advanceToNextLevel() {
+  document.getElementById('level-up-banner').style.display = 'none';
+  if (activeMensProgram === 'hc12') {
+    selectMensProgram('growth');
+  } else if (activeMensProgram === 'growth') {
+    selectMensProgram('mansour');
+  } else if (activeMensProgram === 'mansour') {
+    selectMensProgram('hc12');
+  }
+}
+
+function showLevelUpBanner(title, desc, btnText) {
+  document.getElementById('level-up-title').textContent = title;
+  document.getElementById('level-up-desc').textContent = desc;
+  document.getElementById('level-up-btn').textContent = btnText;
+  document.getElementById('level-up-banner').style.display = 'flex';
+}
+
+function checkLevelComplete() {
+  if (activeMensProgram === 'hc12') {
+    const days = ['mon', 'tue', 'thu', 'fri'];
+    let allDone = true;
+    for (let w = 1; w <= 4; w++) {
+      for (const d of days) {
+        if (!ls(`wk_done_${w}_${d}`, false)) { allDone = false; break; }
+      }
+      if (!allDone) break;
+    }
+    if (allDone) {
+      showLevelUpBanner(
+        'Level 1 Complete!',
+        "You've finished 4 weeks of foundation training. Time to level up.",
+        'Start Level 2 →'
+      );
+    }
+  } else if (activeMensProgram === 'growth') {
+    const gs = getGrowthState();
+    // After completing w4_d6 the state will have advanced, so check if we just completed it
+    if (gs.day === 'w4_d6' || !GROWTH_PLAN.days[gs.day]) {
+      showLevelUpBanner(
+        'Level 2 Complete!',
+        "8 weeks done. You've built serious volume. Now it's time for advanced periodization.",
+        'Start Level 3 →'
+      );
+    }
+  } else if (activeMensProgram === 'mansour') {
+    const md = getMansourDay();
+    if (md === 15) {
+      showLevelUpBanner(
+        '12 Weeks Complete! 🎉',
+        "You finished the entire 12-Week Growth System. That's elite. Start over at Level 1 with heavier weights, or stay at Level 3.",
+        'Restart from Level 1'
+      );
+    }
+  }
+}
+
 function completeWorkout() {
   const phase = getPhaseForWeek(state.currentWeek);
   const dayData = getCurrentDayData();
@@ -2630,6 +2757,7 @@ function completeWorkout() {
   }
   saveState();
   switchView('today');
+  checkLevelComplete();
 }
 
 // ════════════════════════════════════════════════════════════
