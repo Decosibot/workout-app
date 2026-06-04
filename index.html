@@ -550,6 +550,18 @@
     background: var(--bg3); border-radius: 6px; padding: 8px 10px;
     margin-top: 8px; line-height: 1.5; border-left: 3px solid var(--border);
   }
+
+  /* ── PROGRAM SELECTOR ── */
+  .prog-sel-card{width:100%;max-width:400px;background:var(--bg2);border:2px solid var(--border);border-radius:16px;padding:20px;margin-bottom:14px;cursor:pointer;transition:all .2s}
+  .prog-sel-card:active{transform:scale(.98)}
+  .prog-sel-card.selected{border-color:var(--yellow)}
+  .prog-tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:rgba(255,255,255,.07);color:var(--text2)}
+  .prog-tag-y{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:rgba(245,200,66,.15);color:var(--yellow)}
+  .prog-tag-o{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:rgba(245,146,42,.15);color:var(--orange)}
+  .prog-tag-b{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:rgba(74,158,255,.15);color:var(--blue)}
+
+  /* ── SUPERSET BADGE ── */
+  .superset-badge{font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:rgba(74,158,255,.15);color:var(--blue);margin-left:6px}
 </style>
 </head>
 <body>
@@ -564,9 +576,40 @@
       <div id="header-week" style="font-size:13px;font-weight:700;"></div>
       <div id="header-day" style="font-size:11px;color:var(--text3);margin-top:1px;"></div>
     </div>
+    <button id="switch-prog-btn" onclick="showProgSelect()" style="background:none;border:none;color:var(--text3);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.5px;text-transform:uppercase">Switch</button>
     <button id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">☀️</button>
   </div>
 </header>
+
+<div id="prog-select-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:400;overflow-y:auto;padding:40px 20px 60px;flex-direction:column;align-items:center">
+  <div style="font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--yellow);margin-bottom:8px;text-align:center">Choose Your Program</div>
+  <div style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px;text-align:center">What's Your Goal?</div>
+  <div style="font-size:13px;color:var(--text2);text-align:center;margin-bottom:28px">Pick where you are now — you can switch anytime</div>
+  <div class="prog-sel-card" onclick="selectMensProgram('hc12')" id="psc-hc12">
+    <div style="font-size:28px;margin-bottom:10px">⚡</div>
+    <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">HC 1.2</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">Hypertrophy Clusters. 8-week progressive overload, cluster-style training. Heavy compounds, 4 days/week. The foundation program.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <span class="prog-tag-y">Strength + Size</span><span class="prog-tag">8 Weeks</span><span class="prog-tag">4 Days/Week</span>
+    </div>
+  </div>
+  <div class="prog-sel-card" onclick="selectMensProgram('growth')" id="psc-growth">
+    <div style="font-size:28px;margin-bottom:10px">🔥</div>
+    <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">Workout Growth Plan</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">4-week high volume muscle shock. 5-6 days/week, every muscle from every angle. Run this after HC 1.2 to break plateaus.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <span class="prog-tag-o">High Volume</span><span class="prog-tag">4 Weeks</span><span class="prog-tag">5-6 Days/Week</span>
+    </div>
+  </div>
+  <div class="prog-sel-card" onclick="selectMensProgram('mansour')" id="psc-mansour">
+    <div style="font-size:28px;margin-bottom:10px">🏆</div>
+    <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">Mansour Method</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">Advanced 8-day split. Alternating strength and hypertrophy phases, superset pairs, forearm maintenance on rest days. For experienced lifters.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <span class="prog-tag-b">Advanced</span><span class="prog-tag">8-Day Cycle</span><span class="prog-tag">Periodized</span>
+    </div>
+  </div>
+</div>
 
 <main id="app-main">
   <!-- TODAY VIEW -->
@@ -931,6 +974,501 @@ const PROGRAM = {
   ]
 };
 
+// ════════════════════════════════════════════════════════════
+// WORKOUT GROWTH PLAN DATA
+// ════════════════════════════════════════════════════════════
+const GROWTH_PLAN = {
+  weeks: [1, 2, 3, 4],
+  days: {
+    // WEEK 1
+    'w1_d1': {
+      week: 1, day: 1, name: 'Chest', label: 'Day 1',
+      exercises: [
+        { id:'gp_w1d1_1', type:'yellow', name:'Incline Bench Press', sets:4, reps:'6-7', notes:'Lead with your chest, not your shoulders. Control the descent. Drive up through the center of your chest.' },
+        { id:'gp_w1d1_2', type:'yellow', name:'Flat Bench Press', sets:5, reps:'6-7', notes:'Arch slightly, feet flat, elbows at 45-75°. Lower to lower chest. Full range of motion every rep.' },
+        { id:'gp_w1d1_3', type:'orange', name:'Dumbbell Press', sets:4, reps:'6', notes:'Slight decline in wrists at top. Full stretch at bottom. Controls better than barbell for chest activation.' },
+        { id:'gp_w1d1_4', type:'orange', name:'Incline Dumbbell Press', sets:3, reps:'5', notes:'45° incline. Keep your elbows from flaring too wide. Feel the upper chest stretch at the bottom.' },
+        { id:'gp_w1d1_5', type:'orange', name:'Decline Push-Ups + Svend Press', sets:4, reps:'12', superset:true, notes:'Superset: Decline push-ups (feet elevated) immediately into Svend press (squeeze two plates together and press out). Zero rest between exercises.' },
+        { id:'gp_w1d1_6', type:'red', name:'Incline Lateral Chest Press', sets:4, reps:'7', notes:'Cable or machine. Press at an angle to hit upper chest from the side. Squeeze the contraction.' }
+      ]
+    },
+    'w1_d2': {
+      week: 1, day: 2, name: 'Back', label: 'Day 2',
+      exercises: [
+        { id:'gp_w1d2_1', type:'yellow', name:'T-Bar Rows (Wide Grip)', sets:3, reps:'7', notes:'Chest on pad, elbows flare out wide. Pull to chest. Wide grip hits more upper back and rear delts.' },
+        { id:'gp_w1d2_2', type:'yellow', name:'Seated Rows', sets:4, reps:'12', notes:'Sit tall. Pull to your belly button. Squeeze your shoulder blades together at the peak contraction.' },
+        { id:'gp_w1d2_3', type:'orange', name:'Hyperextension Lower Back', sets:4, reps:'10', notes:'Hold a dumbbell. Hip hinge — don\'t round the back. Squeeze glutes at the top. Builds the erectors for a thicker, stronger back.' },
+        { id:'gp_w1d2_4', type:'orange', name:'Hammer Strength ISO Lateral Rows', sets:4, reps:'6', notes:'Single arm or both. Drive your elbow back, not just your hand. Squeeze at the peak.' },
+        { id:'gp_w1d2_5', type:'orange', name:'Straight Arm Lat Pulldown', sets:4, reps:'6', notes:'Arms straight throughout. Drive them down and back like you\'re putting something in your back pockets. Best lat isolation movement.' },
+        { id:'gp_w1d2_6', type:'red', name:'Pull-Ups', sets:3, reps:'10', notes:'Full hang to chin over bar. Don\'t kip. Dead hang at the bottom, full contraction at the top.' }
+      ]
+    },
+    'w1_d3': {
+      week: 1, day: 3, name: 'Shoulders', label: 'Day 3',
+      exercises: [
+        { id:'gp_w1d3_1', type:'yellow', name:'Bent Over Rear Delt Flys', sets:3, reps:'7', notes:'Hinge forward 45°, slight bend in elbows. Raise out to the side. Feel your rear delts, not your traps.' },
+        { id:'gp_w1d3_2', type:'yellow', name:'Dumbbell Press', sets:4, reps:'6', notes:'Seated or standing. Press straight up or slightly in. Don\'t let the dumbbells touch at the top — keep tension.' },
+        { id:'gp_w1d3_3', type:'orange', name:'Lateral Raises', sets:3, reps:'6', notes:'Slight forward lean, slight bend in elbows. Lead with your pinky finger up. No trap shrugging.' },
+        { id:'gp_w1d3_4', type:'orange', name:'Upright Rows', sets:3, reps:'8', notes:'Shoulder-width grip. Pull to chin level. Elbows drive up and out. Great for side delts and traps together.' },
+        { id:'gp_w1d3_5', type:'orange', name:'Dumbbell Shrugs', sets:4, reps:'6', notes:'Hold at the top for 1 second. Don\'t roll your shoulders — straight up and down. Heavy weight.' },
+        { id:'gp_w1d3_6', type:'red', name:'Seated Smith Machine Press', sets:3, reps:'6', notes:'Behind or in front of neck. Full range of motion. The Smith keeps you honest on form when you\'re fatigued.' }
+      ]
+    },
+    'w1_d4': {
+      week: 1, day: 4, name: 'Legs', label: 'Day 4',
+      exercises: [
+        { id:'gp_w1d4_1', type:'yellow', name:'Leg Extension', sets:4, reps:'8', notes:'Full extension at the top, squeeze. Lower slowly. Pre-exhaust the quads before squatting.' },
+        { id:'gp_w1d4_2', type:'yellow', name:'Leg Press', sets:4, reps:'8', notes:'Feet shoulder-width, mid-platform. Full range without letting hips come off the pad. Load it heavy.' },
+        { id:'gp_w1d4_3', type:'yellow', name:'Dumbbell Deadlift (RDL)', sets:4, reps:'7', notes:'Hinge at the hips. Push them back. Feel the hamstring stretch. Drive through the hips to stand.' },
+        { id:'gp_w1d4_4', type:'orange', name:'Lying Hamstring Curls', sets:3, reps:'7', notes:'Full range. Flex your toes toward your shins. Squeeze hamstrings at the top. Slow on the way down.' },
+        { id:'gp_w1d4_5', type:'red', name:'Barbell Squats', sets:4, reps:'7', notes:'Brace core, controlled descent. Break parallel. Drive knees out. This is your main compound leg movement — save it for later in the session when you\'re warmed up.' }
+      ]
+    },
+    'w1_d5': {
+      week: 1, day: 5, name: 'Arms & Chest', label: 'Day 5',
+      exercises: [
+        { id:'gp_w1d5_1', type:'yellow', name:'Tricep Extensions (rope)', sets:4, reps:'8', notes:'Elbows pinned to sides. Split rope at the bottom, squeeze triceps fully. Full range of motion.' },
+        { id:'gp_w1d5_2', type:'yellow', name:'Tricep Extensions (straight bar)', sets:3, reps:'8', notes:'Elbows forward, not flared. Keep wrists neutral. Control the movement.' },
+        { id:'gp_w1d5_3', type:'orange', name:'Bent Over Tricep Extensions (straight bar)', sets:3, reps:'8', notes:'Hinge forward. Upper arms parallel to floor. Extend fully. Targets the long head.' },
+        { id:'gp_w1d5_4', type:'orange', name:'Tricep Extension Reverse Grip (straight bar)', sets:3, reps:'7', notes:'Palms up. Hits the lateral and medial head differently. Don\'t let wrists break.' },
+        { id:'gp_w1d5_5', type:'orange', name:'Tricep Press (dumbbell)', sets:4, reps:'8', notes:'One dumbbell overhead, both hands. Lower behind head slowly. Full stretch, full extension.' },
+        { id:'gp_w1d5_6', type:'yellow', name:'Barbell Curls (wide grip)', sets:3, reps:'6', notes:'Wide grip hits the short head (inner bicep). Full range. Don\'t swing.' },
+        { id:'gp_w1d5_7', type:'yellow', name:'Dumbbell Curls', sets:3, reps:'6', notes:'Supinate at the top (rotate pinky out). Full stretch at the bottom.' },
+        { id:'gp_w1d5_8', type:'orange', name:'Dumbbell Iso Curls', sets:3, reps:'7', notes:'One arm at a time. Other arm holds the contracted position. Builds peak.' },
+        { id:'gp_w1d5_9', type:'orange', name:'Half to Full Press Curls', sets:3, reps:'8', notes:'Half rep from bottom to 90°, then full curl. Two movements per rep. Burns the whole bicep.' },
+        { id:'gp_w1d5_10', type:'orange', name:'Hammer Curls', sets:4, reps:'8', notes:'Neutral grip. Targets brachialis and forearms. Great for arm thickness.' },
+        { id:'gp_w1d5_11', type:'orange', name:'Standing Straight Bar Curls', sets:4, reps:'6', notes:'Shoulder-width grip. Full range. Strict form — no swinging.' },
+        { id:'gp_w1d5_12', type:'red', name:'Incline Bench Press', sets:4, reps:'6-7', notes:'End the session with chest work. Your triceps are warm, now focus on the chest.' },
+        { id:'gp_w1d5_13', type:'red', name:'Flat Bench Press', sets:5, reps:'6-7', notes:'Final chest finisher. Lower the weight if needed — form over ego.' },
+        { id:'gp_w1d5_14', type:'red', name:'Dumbbell Press', sets:4, reps:'6', notes:'Chest focus — full stretch and squeeze.' },
+        { id:'gp_w1d5_15', type:'red', name:'Incline Dumbbell Press', sets:3, reps:'5', notes:'Upper chest finisher.' },
+        { id:'gp_w1d5_16', type:'red', name:'Lateral Decline Chest Press', sets:4, reps:'7', notes:'Machine or cable. Lower chest isolation.' }
+      ]
+    },
+    'w1_d6': {
+      week: 1, day: 6, name: 'Back & Shoulders', label: 'Day 6',
+      exercises: [
+        { id:'gp_w1d6_1', type:'yellow', name:'Lat Pulldown', sets:4, reps:'7', notes:'Lean back slightly. Drive elbows to your hips. Squeeze lats at the bottom.' },
+        { id:'gp_w1d6_2', type:'yellow', name:'Close Grip Lat Pulldown', sets:3, reps:'6', notes:'Neutral grip handle. Elbows track down and in. Hits lower lats more.' },
+        { id:'gp_w1d6_3', type:'orange', name:'Seated Rows', sets:3, reps:'7', notes:'Pull to belly button. Sit tall. Squeeze shoulder blades.' },
+        { id:'gp_w1d6_4', type:'orange', name:'Wide Grip Seated Rows Reverse Grip', sets:3, reps:'6', notes:'Underhand wide grip on seated row. Hits lower traps and lats differently.' },
+        { id:'gp_w1d6_5', type:'orange', name:'Hammer Strength ISO Rows', sets:3, reps:'6', notes:'Unilateral focus. Really squeeze each side.' },
+        { id:'gp_w1d6_6', type:'orange', name:'Dumbbell Rows', sets:3, reps:'10', notes:'One hand on bench. Drive elbow to hip. Don\'t rotate.' },
+        { id:'gp_w1d6_7', type:'orange', name:'Straight Arm Lat Pulldown', sets:3, reps:'7', notes:'Arms straight, isolate the lats.' },
+        { id:'gp_w1d6_8', type:'red', name:'Face Pulls', sets:3, reps:'7', notes:'Rope to face, elbows high. Rear delts and rotator cuff health.' },
+        { id:'gp_w1d6_9', type:'red', name:'Standing Lateral Raises', sets:3, reps:'6', notes:'Side delts. Lead with elbows.' },
+        { id:'gp_w1d6_10', type:'red', name:'Front Lateral Raises', sets:3, reps:'8', notes:'Front delts. Don\'t swing.' },
+        { id:'gp_w1d6_11', type:'red', name:'Seated Dumbbell Press', sets:3, reps:'5', notes:'Shoulder finisher. Full range.' },
+        { id:'gp_w1d6_12', type:'red', name:'Bent Over Rear Delt Flys', sets:3, reps:'7', notes:'Rear delt finisher. Feel the contraction.' }
+      ]
+    },
+    // WEEK 2
+    'w2_d1': {
+      week: 2, day: 1, name: 'Legs', label: 'Week 2 — Day 1',
+      exercises: [
+        { id:'gp_w2d1_1', type:'yellow', name:'Barbell Squats', sets:4, reps:'6', notes:'Full depth. Drive through heels. Brace hard.' },
+        { id:'gp_w2d1_2', type:'yellow', name:'Sumo Barbell Squats', sets:4, reps:'6', notes:'Wide stance, toes out. Targets inner thighs and glutes more. Keep chest up.' },
+        { id:'gp_w2d1_3', type:'yellow', name:'Front Dumbbell Squats', sets:3, reps:'7', notes:'Goblet position. Upright torso. Great for quad sweep.' },
+        { id:'gp_w2d1_4', type:'orange', name:'Leg Extensions', sets:3, reps:'6', notes:'Full extension, 1 sec squeeze at top.' },
+        { id:'gp_w2d1_5', type:'orange', name:'Leg Press', sets:3, reps:'8', notes:'Full range. Don\'t lock knees.' },
+        { id:'gp_w2d1_6', type:'orange', name:'Hip Thrust', sets:3, reps:'8', notes:'Machine or barbell. Drive hips up, squeeze glutes at top. 1 second hold.' },
+        { id:'gp_w2d1_7', type:'orange', name:'Dumbbell Deadlift (RDL)', sets:4, reps:'7', notes:'Hinge, feel the hamstring stretch.' },
+        { id:'gp_w2d1_8', type:'red', name:'Lying Hamstring Curls', sets:3, reps:'7', notes:'Full range, slow eccentric.' },
+        { id:'gp_w2d1_9', type:'red', name:'Seated Hamstring Curls', sets:3, reps:'8', notes:'Different angle on the hamstrings. Full range.' }
+      ]
+    },
+    'w2_d2': {
+      week: 2, day: 2, name: 'Chest & Shoulders', label: 'Week 2 — Day 2',
+      exercises: [
+        { id:'gp_w2d2_1', type:'yellow', name:'Incline Bench Press', sets:4, reps:'6', notes:'Upper chest focus. Control the weight.' },
+        { id:'gp_w2d2_2', type:'yellow', name:'Flat Bench', sets:4, reps:'7', notes:'Main chest builder. Full range.' },
+        { id:'gp_w2d2_3', type:'yellow', name:'Incline Dumbbell Press', sets:4, reps:'6', notes:'Upper chest. Full stretch at bottom.' },
+        { id:'gp_w2d2_4', type:'orange', name:'Dumbbell Flys', sets:3, reps:'7', notes:'Wide arc. Feel the chest stretch. Slight bend in elbows.' },
+        { id:'gp_w2d2_5', type:'orange', name:'Standing Lateral Raises', sets:4, reps:'7', notes:'Side delts. Lead with elbows.' },
+        { id:'gp_w2d2_6', type:'orange', name:'Front Lateral Raises', sets:3, reps:'8', notes:'Front delts. Controlled.' },
+        { id:'gp_w2d2_7', type:'orange', name:'Seated Lateral Raises Reverse Grip', sets:3, reps:'7', notes:'Palms facing back. Rear delt focus.' },
+        { id:'gp_w2d2_8', type:'orange', name:'Seated Dumbbell Press', sets:3, reps:'7', notes:'Overhead compound movement.' },
+        { id:'gp_w2d2_9', type:'red', name:'Bent Over Rear Delt Flys', sets:4, reps:'7', notes:'Rear delt finisher.' },
+        { id:'gp_w2d2_10', type:'red', name:'Upright Rows', sets:3, reps:'12', notes:'Traps and side delts.' },
+        { id:'gp_w2d2_11', type:'red', name:'Cable Laterals', sets:4, reps:'7', notes:'Cable keeps constant tension through the full range.' }
+      ]
+    },
+    'w2_d3': {
+      week: 2, day: 3, name: 'Back & Biceps', label: 'Week 2 — Day 3',
+      exercises: [
+        { id:'gp_w2d3_1', type:'yellow', name:'Pull-Ups', sets:4, reps:'8', notes:'Full hang. Dead stop at bottom. Pull chin over bar.' },
+        { id:'gp_w2d3_2', type:'yellow', name:'Lat Pulldown', sets:4, reps:'7', notes:'Wide grip. Drive elbows to hips.' },
+        { id:'gp_w2d3_3', type:'yellow', name:'Close Grip Lat Pulldown', sets:3, reps:'7', notes:'Neutral grip. Lower lats.' },
+        { id:'gp_w2d3_4', type:'orange', name:'Seated Rows', sets:3, reps:'7', notes:'Squeeze at peak contraction.' },
+        { id:'gp_w2d3_5', type:'orange', name:'Wide Grip Seated Rows Reverse Grip', sets:3, reps:'6', notes:'Underhand wide grip. Different lat angle.' },
+        { id:'gp_w2d3_6', type:'orange', name:'Hammer Strength ISO Rows', sets:3, reps:'6', notes:'Unilateral. Feel each side.' },
+        { id:'gp_w2d3_7', type:'orange', name:'Dumbbell Rows', sets:3, reps:'6', notes:'Heavy. Elbow to hip.' },
+        { id:'gp_w2d3_8', type:'orange', name:'Straight Arm Lat Pulldown', sets:4, reps:'6', notes:'Lat isolation. Arms straight.' },
+        { id:'gp_w2d3_9', type:'orange', name:'Hyperextension Lower Back', sets:3, reps:'7', notes:'Hold a weight. Erector builder.' },
+        { id:'gp_w2d3_10', type:'yellow', name:'Cable Curls (straight arm handle)', sets:4, reps:'7', notes:'Constant cable tension through the curl. Great for the peak.' },
+        { id:'gp_w2d3_11', type:'yellow', name:'EZ Bar Curls', sets:4, reps:'8', notes:'Shoulder-width grip. Full range. EZ bar is easier on the wrists.' },
+        { id:'gp_w2d3_12', type:'orange', name:'EZ Bar Close Grip Curls', sets:4, reps:'7', notes:'Narrower grip hits outer head.' },
+        { id:'gp_w2d3_13', type:'orange', name:'Half to Full Press Curls', sets:4, reps:'6', notes:'Half + full = double the stimulus.' },
+        { id:'gp_w2d3_14', type:'orange', name:'Dumbbell Curls', sets:4, reps:'7', notes:'Supinate at top for peak contraction.' },
+        { id:'gp_w2d3_15', type:'orange', name:'Hammer Curls', sets:4, reps:'8', notes:'Forearm and brachialis builder.' },
+        { id:'gp_w2d3_16', type:'red', name:'Reverse Curls (EZ bar)', sets:3, reps:'8', notes:'Overhand grip. Hits brachialis and forearms.' },
+        { id:'gp_w2d3_17', type:'red', name:'Seated Row Curls (straight bar)', sets:3, reps:'10', notes:'Seated on row machine, straight bar, curl it. Different angle.' }
+      ]
+    },
+    'w2_d4': {
+      week: 2, day: 4, name: 'Legs', label: 'Week 2 — Day 4',
+      exercises: [
+        { id:'gp_w2d4_1', type:'yellow', name:'Barbell Squats', sets:4, reps:'6' },
+        { id:'gp_w2d4_2', type:'yellow', name:'Sumo Barbell Squats', sets:4, reps:'8' },
+        { id:'gp_w2d4_3', type:'yellow', name:'Front Dumbbell Squats', sets:3, reps:'8' },
+        { id:'gp_w2d4_4', type:'orange', name:'Leg Extensions', sets:3, reps:'6' },
+        { id:'gp_w2d4_5', type:'orange', name:'Leg Press', sets:3, reps:'8' },
+        { id:'gp_w2d4_6', type:'orange', name:'Hip Thrust', sets:3, reps:'8' },
+        { id:'gp_w2d4_7', type:'orange', name:'Dumbbell Deadlift (RDL)', sets:4, reps:'7' },
+        { id:'gp_w2d4_8', type:'red', name:'Lying Hamstring Curls', sets:3, reps:'7' }
+      ]
+    },
+    'w2_d5': {
+      week: 2, day: 5, name: 'Shoulders', label: 'Week 2 — Day 5',
+      exercises: [
+        { id:'gp_w2d5_1', type:'yellow', name:'Bent Over Rear Delt Flys', sets:3, reps:'7' },
+        { id:'gp_w2d5_2', type:'yellow', name:'Dumbbell Press', sets:4, reps:'6' },
+        { id:'gp_w2d5_3', type:'orange', name:'Lateral Raises', sets:3, reps:'6' },
+        { id:'gp_w2d5_4', type:'orange', name:'Front Lateral Raises', sets:3, reps:'7' },
+        { id:'gp_w2d5_5', type:'orange', name:'Upright Rows', sets:3, reps:'8' },
+        { id:'gp_w2d5_6', type:'red', name:'Side Lateral Raises', sets:3, reps:'6' }
+      ]
+    },
+    'w2_d6': {
+      week: 2, day: 6, name: 'Chest & Arms', label: 'Week 2 — Day 6',
+      exercises: [
+        { id:'gp_w2d6_1', type:'yellow', name:'Fly Machine', sets:4, reps:'7', notes:'Full range. Squeeze at peak.' },
+        { id:'gp_w2d6_2', type:'yellow', name:'Dumbbell Flys', sets:4, reps:'7' },
+        { id:'gp_w2d6_3', type:'yellow', name:'Dumbbell Press', sets:4, reps:'8' },
+        { id:'gp_w2d6_4', type:'yellow', name:'Incline Bench Press', sets:4, reps:'6-7' },
+        { id:'gp_w2d6_5', type:'yellow', name:'Flat Bench Press', sets:5, reps:'6-7' },
+        { id:'gp_w2d6_6', type:'orange', name:'Lateral Decline Chest Press', sets:4, reps:'7' },
+        { id:'gp_w2d6_7', type:'orange', name:'Lateral Incline Chest Press', sets:4, reps:'7' },
+        { id:'gp_w2d6_8', type:'orange', name:'Tricep Extensions (rope)', sets:4, reps:'8' },
+        { id:'gp_w2d6_9', type:'orange', name:'Tricep Extension (straight bar)', sets:3, reps:'8' },
+        { id:'gp_w2d6_10', type:'orange', name:'Bent Over Tricep Extensions', sets:3, reps:'8' },
+        { id:'gp_w2d6_11', type:'orange', name:'Tricep Extension Reverse Grip', sets:3, reps:'7' },
+        { id:'gp_w2d6_12', type:'orange', name:'Tricep Press (dumbbell)', sets:4, reps:'8' },
+        { id:'gp_w2d6_13', type:'red', name:'Cable Curls (straight arm handle)', sets:3, reps:'7' },
+        { id:'gp_w2d6_14', type:'red', name:'EZ Bar Curls', sets:3, reps:'7' },
+        { id:'gp_w2d6_15', type:'red', name:'EZ Bar Close Grip Curls', sets:4, reps:'8' },
+        { id:'gp_w2d6_16', type:'red', name:'Dumbbell Curls', sets:4, reps:'8' },
+        { id:'gp_w2d6_17', type:'red', name:'Hammer Curls', sets:3, reps:'8' },
+        { id:'gp_w2d6_18', type:'red', name:'Reverse Curls (EZ bar)', sets:3, reps:'8' }
+      ]
+    },
+    // WEEK 3
+    'w3_d1': {
+      week: 3, day: 1, name: 'Legs', label: 'Week 3 — Day 1',
+      exercises: [
+        { id:'gp_w3d1_1', type:'yellow', name:'Barbell Squats', sets:4, reps:'6' },
+        { id:'gp_w3d1_2', type:'yellow', name:'Sumo Barbell Squats', sets:4, reps:'8' },
+        { id:'gp_w3d1_3', type:'yellow', name:'Front Dumbbell Squats', sets:3, reps:'8' },
+        { id:'gp_w3d1_4', type:'orange', name:'Leg Extensions + Bodyweight Squats (Superset)', sets:4, reps:'10', superset:true, notes:'Superset: Leg extensions immediately into bodyweight squats. Burns the quads completely.' },
+        { id:'gp_w3d1_5', type:'red', name:'Walking Lunges', sets:4, reps:'12', notes:'Long strides. Front knee tracks toes. Dumbbells for resistance.' }
+      ]
+    },
+    'w3_d2': {
+      week: 3, day: 2, name: 'Chest & Shoulders', label: 'Week 3 — Day 2',
+      exercises: [
+        { id:'gp_w3d2_1', type:'yellow', name:'Incline Bench Press', sets:5, reps:'8', notes:'More volume this week. Stay controlled.' },
+        { id:'gp_w3d2_2', type:'yellow', name:'Flat Bench', sets:4, reps:'8' },
+        { id:'gp_w3d2_3', type:'yellow', name:'Incline Dumbbell Press', sets:4, reps:'8', notes:'1 min rest between sets.' },
+        { id:'gp_w3d2_4', type:'orange', name:'Dumbbell Flys', sets:4, reps:'8' },
+        { id:'gp_w3d2_5', type:'orange', name:'Standing Lateral Raises', sets:4, reps:'8' },
+        { id:'gp_w3d2_6', type:'orange', name:'Front Lateral Raises', sets:4, reps:'8' },
+        { id:'gp_w3d2_7', type:'orange', name:'Seated Lateral Raises Reverse Grip', sets:3, reps:'8' },
+        { id:'gp_w3d2_8', type:'orange', name:'Seated Dumbbell Press', sets:4, reps:'6' },
+        { id:'gp_w3d2_9', type:'red', name:'Bent Over Rear Delt Flys', sets:4, reps:'8' },
+        { id:'gp_w3d2_10', type:'red', name:'Upright Rows', sets:4, reps:'6' },
+        { id:'gp_w3d2_11', type:'red', name:'Cable Laterals', sets:4, reps:'8' }
+      ]
+    },
+    'w3_d3': {
+      week: 3, day: 3, name: 'Back & Biceps', label: 'Week 3 — Day 3',
+      exercises: [
+        { id:'gp_w3d3_1', type:'yellow', name:'Pull-Ups', sets:3, reps:'10' },
+        { id:'gp_w3d3_2', type:'yellow', name:'Lat Pulldown', sets:4, reps:'8' },
+        { id:'gp_w3d3_3', type:'yellow', name:'Close Grip Lat Pulldown', sets:3, reps:'8' },
+        { id:'gp_w3d3_4', type:'orange', name:'Seated Rows', sets:4, reps:'8' },
+        { id:'gp_w3d3_5', type:'orange', name:'Wide Grip Seated Rows Reverse Grip', sets:4, reps:'6' },
+        { id:'gp_w3d3_6', type:'orange', name:'Hammer Strength ISO Rows', sets:4, reps:'6' },
+        { id:'gp_w3d3_7', type:'orange', name:'Dumbbell Rows', sets:3, reps:'8' },
+        { id:'gp_w3d3_8', type:'orange', name:'Straight Arm Lat Pulldown', sets:4, reps:'6' },
+        { id:'gp_w3d3_9', type:'orange', name:'Hyperextension Lower Back', sets:4, reps:'6' },
+        { id:'gp_w3d3_10', type:'yellow', name:'Cable Curls (straight arm handle)', sets:4, reps:'8' },
+        { id:'gp_w3d3_11', type:'yellow', name:'EZ Bar Curls', sets:4, reps:'8' },
+        { id:'gp_w3d3_12', type:'orange', name:'EZ Bar Close Grip Curls', sets:4, reps:'8' },
+        { id:'gp_w3d3_13', type:'orange', name:'Half to Full Press Curls', sets:4, reps:'8' },
+        { id:'gp_w3d3_14', type:'orange', name:'Dumbbell Curls', sets:4, reps:'8' },
+        { id:'gp_w3d3_15', type:'orange', name:'Hammer Curls', sets:3, reps:'10' },
+        { id:'gp_w3d3_16', type:'red', name:'Reverse Curls (EZ bar)', sets:3, reps:'8' },
+        { id:'gp_w3d3_17', type:'red', name:'Seated Row Curls', sets:3, reps:'8' }
+      ]
+    },
+    'w3_d4': {
+      week: 3, day: 4, name: 'Legs (Hamstring Focus)', label: 'Week 3 — Day 4',
+      exercises: [
+        { id:'gp_w3d4_1', type:'yellow', name:'Dumbbell Deadlifts (RDL)', sets:5, reps:'5', notes:'5 heavy sets. Pure posterior chain.' },
+        { id:'gp_w3d4_2', type:'yellow', name:'Lying Hamstring Curls', sets:4, reps:'8' },
+        { id:'gp_w3d4_3', type:'yellow', name:'Seated Hamstring Curls', sets:4, reps:'8' },
+        { id:'gp_w3d4_4', type:'orange', name:'Good Mornings', sets:4, reps:'8', notes:'Barbell on traps. Hinge forward. Feel the hamstrings and lower back load.' },
+        { id:'gp_w3d4_5', type:'orange', name:'Leg Press (Feet High)', sets:4, reps:'8', notes:'Feet placed at the top of the platform — targets hamstrings and glutes more.' }
+      ]
+    },
+    'w3_d5': {
+      week: 3, day: 5, name: 'Shoulders', label: 'Week 3 — Day 5',
+      exercises: [
+        { id:'gp_w3d5_1', type:'yellow', name:'Bent Over Rear Delt Flys', sets:3, reps:'7' },
+        { id:'gp_w3d5_2', type:'yellow', name:'Dumbbell Press', sets:4, reps:'6' },
+        { id:'gp_w3d5_3', type:'orange', name:'Lateral Raises', sets:3, reps:'6' },
+        { id:'gp_w3d5_4', type:'orange', name:'Front Lateral Raises', sets:3, reps:'7' },
+        { id:'gp_w3d5_5', type:'orange', name:'Upright Rows', sets:3, reps:'8' },
+        { id:'gp_w3d5_6', type:'orange', name:'Side Lateral Raises', sets:3, reps:'6' },
+        { id:'gp_w3d5_7', type:'red', name:'Cable Laterals', sets:3, reps:'8' }
+      ]
+    },
+    'w3_d6': {
+      week: 3, day: 6, name: 'Arms & Chest', label: 'Week 3 — Day 6',
+      exercises: [
+        { id:'gp_w3d6_1', type:'yellow', name:'Fly Machine', sets:4, reps:'8' },
+        { id:'gp_w3d6_2', type:'yellow', name:'Dumbbell Flys', sets:5, reps:'8' },
+        { id:'gp_w3d6_3', type:'yellow', name:'Dumbbell Press + Pushups (Superset)', sets:5, reps:'8', superset:true },
+        { id:'gp_w3d6_4', type:'orange', name:'Lateral Decline Chest Press', sets:3, reps:'6', notes:'Progressive overload each set — add weight every set.' },
+        { id:'gp_w3d6_5', type:'orange', name:'Lateral Incline Chest Press', sets:4, reps:'8' },
+        { id:'gp_w3d6_6', type:'yellow', name:'Cable Curls (straight arm handle)', sets:3, reps:'10' },
+        { id:'gp_w3d6_7', type:'yellow', name:'EZ Bar Curls', sets:3, reps:'10' },
+        { id:'gp_w3d6_8', type:'orange', name:'EZ Bar Close Grip Curls', sets:4, reps:'12' },
+        { id:'gp_w3d6_9', type:'orange', name:'Dumbbell Curls', sets:4, reps:'15' },
+        { id:'gp_w3d6_10', type:'orange', name:'Hammer Curls', sets:3, reps:'15' },
+        { id:'gp_w3d6_11', type:'orange', name:'Reverse Curls (EZ bar)', sets:3, reps:'12' },
+        { id:'gp_w3d6_12', type:'red', name:'Tricep Extensions (rope)', sets:4, reps:'8' },
+        { id:'gp_w3d6_13', type:'red', name:'Tricep Extension (straight bar)', sets:3, reps:'8' },
+        { id:'gp_w3d6_14', type:'red', name:'Bent Over Tricep Extensions', sets:3, reps:'8' },
+        { id:'gp_w3d6_15', type:'red', name:'Tricep Extension Reverse Grip', sets:3, reps:'7' },
+        { id:'gp_w3d6_16', type:'red', name:'Tricep Press (dumbbell)', sets:4, reps:'8' }
+      ]
+    },
+    // WEEK 4
+    'w4_d1': {
+      week: 4, day: 1, name: 'Chest & Shoulders', label: 'Week 4 — Day 1',
+      exercises: [
+        { id:'gp_w4d1_1', type:'yellow', name:'Incline Bench Press', sets:5, reps:'10', notes:'Higher reps this week — metabolic stress phase.' },
+        { id:'gp_w4d1_2', type:'yellow', name:'Incline Dumbbell Press', sets:4, reps:'10', notes:'1 min rest between sets.' },
+        { id:'gp_w4d1_3', type:'orange', name:'Svend Press', sets:4, reps:'15', notes:'Squeeze two plates together and press out. Constant chest tension.' },
+        { id:'gp_w4d1_4', type:'orange', name:'Dips + Pushups (Superset)', sets:4, reps:'15', superset:true, notes:'Weighted dips immediately into bodyweight pushups to failure.' },
+        { id:'gp_w4d1_5', type:'orange', name:'Standing Lateral Raises', sets:3, reps:'10' },
+        { id:'gp_w4d1_6', type:'orange', name:'Front Lateral Raises', sets:3, reps:'10' },
+        { id:'gp_w4d1_7', type:'orange', name:'Seated Lateral Raises (reverse grip)', sets:3, reps:'8' },
+        { id:'gp_w4d1_8', type:'red', name:'Seated Dumbbell Press', sets:4, reps:'6' },
+        { id:'gp_w4d1_9', type:'red', name:'Upright Rows', sets:4, reps:'10' }
+      ]
+    },
+    'w4_d2': {
+      week: 4, day: 2, name: 'Legs', label: 'Week 4 — Day 2',
+      exercises: [
+        { id:'gp_w4d2_1', type:'yellow', name:'Leg Extension', sets:5, reps:'12', notes:'30 second rest between sets. Metabolic leg destroyer.' },
+        { id:'gp_w4d2_2', type:'yellow', name:'Leg Press', sets:4, reps:'15', notes:'45 second rest. Keep it moving.' },
+        { id:'gp_w4d2_3', type:'yellow', name:'Dumbbell Deadlift', sets:4, reps:'10', notes:'60 second rest.' },
+        { id:'gp_w4d2_4', type:'orange', name:'Lying Hamstring Curls', sets:4, reps:'12', notes:'45 second rest.' },
+        { id:'gp_w4d2_5', type:'red', name:'Lunges', sets:4, reps:'12', notes:'45 sec rest. Forward or walking lunges.' }
+      ]
+    },
+    'w4_d3': {
+      week: 4, day: 3, name: 'Back & Biceps', label: 'Week 4 — Day 3',
+      exercises: [
+        { id:'gp_w4d3_1', type:'yellow', name:'Pull-Ups — 100 REPS', sets:1, reps:'100 total', notes:'Get 100 pull-up reps any way you can. Break it into sets of whatever you can do. 1 minute rest only between sets. This is a benchmark test.' },
+        { id:'gp_w4d3_2', type:'yellow', name:'Lat Pulldown', sets:4, reps:'12' },
+        { id:'gp_w4d3_3', type:'orange', name:'Seated Rows', sets:3, reps:'10' },
+        { id:'gp_w4d3_4', type:'orange', name:'Wide Grip Seated Rows Reverse Grip', sets:3, reps:'8' },
+        { id:'gp_w4d3_5', type:'orange', name:'Hammer Strength ISO Rows', sets:4, reps:'10' },
+        { id:'gp_w4d3_6', type:'orange', name:'Straight Arm Lat Pulldown', sets:4, reps:'10' },
+        { id:'gp_w4d3_7', type:'orange', name:'Hyperextension Lower Back', sets:4, reps:'10' },
+        { id:'gp_w4d3_8', type:'red', name:'Cable Curls (straight arm handle)', sets:3, reps:'10' },
+        { id:'gp_w4d3_9', type:'red', name:'EZ Bar Curls', sets:3, reps:'10' },
+        { id:'gp_w4d3_10', type:'red', name:'EZ Bar Close Grip Curls', sets:4, reps:'8' },
+        { id:'gp_w4d3_11', type:'red', name:'Dumbbell Curls', sets:4, reps:'8' },
+        { id:'gp_w4d3_12', type:'red', name:'Hammer Curls', sets:3, reps:'8' },
+        { id:'gp_w4d3_13', type:'red', name:'Reverse Curls (EZ bar)', sets:3, reps:'7' }
+      ]
+    },
+    'w4_d4': {
+      week: 4, day: 4, name: 'Chest & Shoulders', label: 'Week 4 — Day 4',
+      exercises: [
+        { id:'gp_w4d4_1', type:'yellow', name:'Flat Bench', sets:4, reps:'10' },
+        { id:'gp_w4d4_2', type:'yellow', name:'Incline Dumbbell Press', sets:4, reps:'12' },
+        { id:'gp_w4d4_3', type:'orange', name:'Standing Lateral Raises', sets:4, reps:'8' },
+        { id:'gp_w4d4_4', type:'orange', name:'Front Lateral Raises', sets:4, reps:'8' },
+        { id:'gp_w4d4_5', type:'orange', name:'Seated Dumbbell Press', sets:3, reps:'10' },
+        { id:'gp_w4d4_6', type:'red', name:'Bent Over Rear Delt Flys', sets:4, reps:'10' },
+        { id:'gp_w4d4_7', type:'red', name:'Upright Rows', sets:4, reps:'10' },
+        { id:'gp_w4d4_8', type:'red', name:'Cable Laterals', sets:4, reps:'10' }
+      ]
+    },
+    'w4_d5': {
+      week: 4, day: 5, name: 'Arms', label: 'Week 4 — Day 5',
+      exercises: [
+        { id:'gp_w4d5_1', type:'yellow', name:'Tricep Extensions (rope)', sets:4, reps:'8' },
+        { id:'gp_w4d5_2', type:'yellow', name:'Tricep Extension (straight bar)', sets:3, reps:'8' },
+        { id:'gp_w4d5_3', type:'orange', name:'Bent Over Tricep Extensions', sets:3, reps:'8' },
+        { id:'gp_w4d5_4', type:'orange', name:'Tricep Extension Reverse Grip', sets:3, reps:'7' },
+        { id:'gp_w4d5_5', type:'orange', name:'Tricep Press (dumbbell)', sets:4, reps:'8' },
+        { id:'gp_w4d5_6', type:'yellow', name:'Barbell Curls (wide grip)', sets:3, reps:'6' },
+        { id:'gp_w4d5_7', type:'yellow', name:'Dumbbell Curls', sets:4, reps:'6' },
+        { id:'gp_w4d5_8', type:'orange', name:'Dumbbell Iso Curls', sets:3, reps:'7' },
+        { id:'gp_w4d5_9', type:'orange', name:'Hammer Curls', sets:4, reps:'8' },
+        { id:'gp_w4d5_10', type:'orange', name:'Standing Straight Bar Curls', sets:4, reps:'6' },
+        { id:'gp_w4d5_11', type:'red', name:'Seated Row Curls', sets:4, reps:'8' }
+      ]
+    },
+    'w4_d6': {
+      week: 4, day: 6, name: 'Legs', label: 'Week 4 — Day 6',
+      exercises: [
+        { id:'gp_w4d6_1', type:'yellow', name:'Barbell Squats', sets:3, reps:'10' },
+        { id:'gp_w4d6_2', type:'yellow', name:'Sumo Barbell Squats', sets:3, reps:'10' },
+        { id:'gp_w4d6_3', type:'yellow', name:'Front Dumbbell Squats', sets:4, reps:'10' },
+        { id:'gp_w4d6_4', type:'orange', name:'Leg Extensions + Bodyweight Squats (Superset)', sets:5, reps:'15', superset:true },
+        { id:'gp_w4d6_5', type:'red', name:'Walking Lunges', sets:3, reps:'1 min', notes:'Continuous walking lunges for 1 minute per set.' }
+      ]
+    }
+  }
+};
+
+// ════════════════════════════════════════════════════════════
+// MANSOUR METHOD DATA
+// ════════════════════════════════════════════════════════════
+const MANSOUR_METHOD = {
+  days: {
+    1: {
+      name: 'Legs — Strength', label: 'Day 1 (Monday)', phase: 'strength',
+      exercises: [
+        { id:'mm_d1_1', type:'cns', name:'Adductors', sets:3, reps:'12-20', superset:true, notes:'A1 superset with Abductors. Machine or cable. Full range, slow squeeze.' },
+        { id:'mm_d1_2', type:'cns', name:'Abductors', sets:3, reps:'12-20', superset:true, notes:'A2. Outer hip. Full range.' },
+        { id:'mm_d1_3', type:'yellow', name:'Barbell Squats (Warmup)', sets:3, reps:'8-12', superset:true, notes:'B1 superset with Calf Raises. Light-moderate weight. Grease the movement pattern.' },
+        { id:'mm_d1_4', type:'yellow', name:'Calf Raises', sets:4, reps:'10 full / 10 top half / 10s hold', superset:true, notes:'B2. Full rep, half rep at top, then hold 10 seconds. Triple technique.' },
+        { id:'mm_d1_5', type:'yellow', name:'Barbell Squats (Working Sets)', sets:3, reps:'1-6', superset:true, notes:'C1 superset with Pause Squats. HEAVY. These are your strength sets. Push to near max on the rep range.' },
+        { id:'mm_d1_6', type:'yellow', name:'Pause Squats', sets:3, reps:'3-5', superset:true, notes:'C2. 2-3 second pause at the bottom. Builds the hole strength and neurological drive.' },
+        { id:'mm_d1_7', type:'orange', name:'Romanian Deadlifts', sets:3, reps:'6-8', notes:'D. Standard RDL. Hinge and feel the hamstrings stretch.' },
+        { id:'mm_d1_8', type:'orange', name:'Bulgarian Split Squats', sets:3, reps:'6-8/leg', notes:'E. Rear foot elevated. Control the descent. Drive through heel.' },
+        { id:'mm_d1_9', type:'red', name:'Quad Extensions', sets:4, reps:'8-10', notes:'F. Leg extension machine. Full extension, squeeze at top.' }
+      ]
+    },
+    3: {
+      name: 'Chest — Strength', label: 'Day 3 (Wednesday)', phase: 'strength',
+      exercises: [
+        { id:'mm_d3_1', type:'cns', name:'Bench Press (Warmup)', sets:3, reps:'8-12', superset:true, notes:'A1 superset with Push-Ups. Build to working weight.' },
+        { id:'mm_d3_2', type:'cns', name:'Push-Ups', sets:3, reps:'12 max', superset:true, notes:'A2. Max reps. Rest, then go into working bench sets.' },
+        { id:'mm_d3_3', type:'yellow', name:'Bench Press (Working Sets)', sets:3, reps:'1-6', superset:true, notes:'B1. HEAVY. These are your strength sets. Spot up.' },
+        { id:'mm_d3_4', type:'yellow', name:'Incline DB Flies', sets:3, reps:'6-8', superset:true, notes:'B2. Wide arc. Feel the upper chest stretch.' },
+        { id:'mm_d3_5', type:'yellow', name:'Barbell Incline Press (Wide Grip)', sets:6, reps:'12/6/1+/1+/6/12', notes:'C1. Wave loading: 12 reps, 6 reps, 1+ rep (max), 1+ rep (max), 6 reps, 12 reps. Adjust weight each set.' },
+        { id:'mm_d3_6', type:'orange', name:'Dumbbell Flat Press', sets:3, reps:'6-8', superset:true, notes:'C2 superset with wave sets. Full range.' },
+        { id:'mm_d3_7', type:'orange', name:'Weighted Dips', sets:3, reps:'1+', notes:'D. Add weight via belt or dumbbell between knees. Max reps each set.' },
+        { id:'mm_d3_8', type:'red', name:'Cable Flies', sets:3, reps:'6-8', notes:'E. Cross-body cable. Full stretch, squeeze in center.' }
+      ]
+    },
+    5: {
+      name: 'Back & Biceps — Strength', label: 'Day 5 (Friday)', phase: 'strength',
+      exercises: [
+        { id:'mm_d5_1', type:'cns', name:'Standard Grip Pull-Ups', sets:3, reps:'12 max', superset:true, notes:'A1. Max reps. Full hang.' },
+        { id:'mm_d5_2', type:'cns', name:'Underhand Pull-Ups', sets:3, reps:'12 max', superset:true, notes:'A2. Supinated grip. Hits biceps more.' },
+        { id:'mm_d5_3', type:'yellow', name:'Deadlifts / Rack Pulls', sets:3, reps:'1-6', notes:'B. HEAVY. Deadlift from floor or rack. This is your main strength indicator.' },
+        { id:'mm_d5_4', type:'yellow', name:'Wide Grip Bent Over Barbell Rows', sets:3, reps:'3-6', notes:'C. Chest to bar. Drive elbows back and up.' },
+        { id:'mm_d5_5', type:'orange', name:'Single Arm DB Rows', sets:3, reps:'6-8/arm', notes:'D. Heavy. Elbow to hip. Full range.' },
+        { id:'mm_d5_6', type:'orange', name:'Hammer Curls', sets:3, reps:'6-8', superset:true, notes:'E1 superset with Reverse Curls.' },
+        { id:'mm_d5_7', type:'orange', name:'Reverse Curls', sets:3, reps:'6-8', superset:true, notes:'E2. Overhand grip. Forearm and brachialis builder.' },
+        { id:'mm_d5_8', type:'red', name:'Standing EZ Bar Curls', sets:3, reps:'6-8', superset:true, notes:'F1 superset with Wrist Curls.' },
+        { id:'mm_d5_9', type:'red', name:'Wrist Curls', sets:3, reps:'12-15', superset:true, notes:'F2. Forearm builder. Palms up, full range.' }
+      ]
+    },
+    7: {
+      name: 'Shoulders & Triceps — Strength', label: 'Day 7 (Sunday)', phase: 'strength',
+      exercises: [
+        { id:'mm_d7_1', type:'cns', name:'Military Press (Warmup)', sets:3, reps:'8-12', notes:'A. Build to working weight. Strict form.' },
+        { id:'mm_d7_2', type:'yellow', name:'Military Press (Working Sets)', sets:3, reps:'1-6', notes:'B. HEAVY. Standing or seated. Full range overhead.' },
+        { id:'mm_d7_3', type:'yellow', name:'Behind the Neck Barbell Press', sets:3, reps:'1-6', notes:'C. Use if you have the shoulder mobility. Lower to ears. Heavy compound.' },
+        { id:'mm_d7_4', type:'orange', name:'Barbell Shrugs', sets:3, reps:'8-12', superset:true, notes:'D1 superset with Reverse Wrist Curls. Hold 1 second at top.' },
+        { id:'mm_d7_5', type:'orange', name:'Reverse Wrist Curls', sets:3, reps:'12-15', superset:true, notes:'D2. Palms down. Forearm extensor work.' },
+        { id:'mm_d7_6', type:'orange', name:'Lateral DB Raise', sets:3, reps:'6-10', superset:true, notes:'E1 superset with Rear Delt Flies.' },
+        { id:'mm_d7_7', type:'orange', name:'Bent Over DB Rear Delt Flies', sets:3, reps:'6-10', superset:true, notes:'E2. Hinge forward. Rear delts only.' },
+        { id:'mm_d7_8', type:'red', name:'Close Grip Bench Press', sets:3, reps:'4-8', notes:'F. Tricep strength builder. Elbows in tight.' },
+        { id:'mm_d7_9', type:'red', name:'Cable Tricep Pushdowns', sets:3, reps:'6-8', notes:'G. Elbows pinned. Full extension.' }
+      ]
+    },
+    9: {
+      name: 'Legs — Hypertrophy', label: 'Day 9 (Tuesday)', phase: 'hypertrophy',
+      exercises: [
+        { id:'mm_d9_1', type:'cns', name:'Adductors / Abductors', sets:3, reps:'12-20', superset:true, notes:'A1 superset. Machine. Full range.' },
+        { id:'mm_d9_2', type:'cns', name:'B-Stance Hip Thrusts', sets:3, reps:'12', superset:true, notes:'A2. One leg loaded more than the other. Drive through the working glute.' },
+        { id:'mm_d9_3', type:'yellow', name:'Deficit Step-Back Lunge', sets:3, reps:'12/leg', superset:true, notes:'B1 superset with Hip Thrusts. Stand on a small step, lunge back. Greater range of motion.' },
+        { id:'mm_d9_4', type:'yellow', name:'Double Leg Hip Thrusts', sets:3, reps:'12 max', superset:true, notes:'B2. Barbell or machine. Squeeze at top.' },
+        { id:'mm_d9_5', type:'yellow', name:'Hack Squat (Wide Stance)', sets:3, reps:'12-15', superset:true, notes:'C1 superset with Hamstring Curl. Wide feet target glutes and inner quads.' },
+        { id:'mm_d9_6', type:'yellow', name:'Hamstring Curl', sets:3, reps:'15', superset:true, notes:'C2. Lying or seated. Full range.' },
+        { id:'mm_d9_7', type:'red', name:'Calf Raises', sets:4, reps:'10 full / 10 top half / 10s hold', notes:'D. Same triple technique as Day 1.' }
+      ]
+    },
+    11: {
+      name: 'Chest — Hypertrophy', label: 'Day 11 (Thursday)', phase: 'hypertrophy',
+      exercises: [
+        { id:'mm_d11_1', type:'cns', name:'Chest Press', sets:3, reps:'12-15', superset:true, notes:'A1 triple superset.' },
+        { id:'mm_d11_2', type:'cns', name:'DB Flies', sets:3, reps:'12-15', superset:true, notes:'A2 triple superset.' },
+        { id:'mm_d11_3', type:'cns', name:'End of Bench Push-Up', sets:3, reps:'12 max', superset:true, notes:'A3. Hands on end of bench. Wide push-up. Triple superset finisher.' },
+        { id:'mm_d11_4', type:'yellow', name:'Wide Incline Barbell Bench', sets:3, reps:'12-15', superset:true, notes:'B1 superset. Wide grip upper chest volume.' },
+        { id:'mm_d11_5', type:'yellow', name:'Incline DB Low-to-High Chest Fly', sets:3, reps:'12-15', superset:true, notes:'B2. Start low, sweep up and in. Hits the upper chest at a different angle.' },
+        { id:'mm_d11_6', type:'orange', name:'Upper Chest Pec Deck', sets:3, reps:'10-12', notes:'C. Machine. Arms straight. Focus on the upper chest squeeze.' },
+        { id:'mm_d11_7', type:'orange', name:'Side Seated Chest Press', sets:3, reps:'12/side', notes:'D. Unilateral. One side at a time. Full contraction.' },
+        { id:'mm_d11_8', type:'red', name:'Incline DB Flies', sets:3, reps:'12 max', superset:true, notes:'E1 superset.' },
+        { id:'mm_d11_9', type:'red', name:'Close Grip Incline DB Press', sets:3, reps:'12 max', superset:true, notes:'E2. Dumbbells touching or close. Triceps and inner chest finisher.' }
+      ]
+    },
+    13: {
+      name: 'Back & Biceps — Hypertrophy', label: 'Day 13 (Saturday)', phase: 'hypertrophy',
+      exercises: [
+        { id:'mm_d13_1', type:'cns', name:'Pull-Ups', sets:3, reps:'12 max', superset:true, notes:'A1 superset.' },
+        { id:'mm_d13_2', type:'cns', name:'Lateral Grip Pull-Ups', sets:3, reps:'12 max', superset:true, notes:'A2. Parallel grip. Hits lats from different angle.' },
+        { id:'mm_d13_3', type:'yellow', name:'Wide Grip Bent Over Barbell Rows', sets:3, reps:'12-15', notes:'B. Moderate weight. Full range.' },
+        { id:'mm_d13_4', type:'yellow', name:'Underhand Grip Deficit Barbell Rows', sets:3, reps:'10-12', notes:'C. Supinated grip, slightly elevated feet. Greater stretch.' },
+        { id:'mm_d13_5', type:'orange', name:'Lat Pulldown', sets:3, reps:'12-15', superset:true, notes:'D1 superset with Rope Pulldowns.' },
+        { id:'mm_d13_6', type:'orange', name:'Rope Cable Pulldowns', sets:3, reps:'12-15', superset:true, notes:'D2. Rope attachment. Pull down and split at the bottom.' },
+        { id:'mm_d13_7', type:'orange', name:'DB Single Arm Twisting Curl', sets:3, reps:'12-15/arm', superset:true, notes:'E1 superset. Twist wrist as you curl for maximum bicep peak.' },
+        { id:'mm_d13_8', type:'orange', name:'Plate Curls', sets:3, reps:'10-12', superset:true, notes:'E2. Hold a weight plate. Unique load angle. Burns differently.' },
+        { id:'mm_d13_9', type:'red', name:'Reverse Wrist Curls', sets:3, reps:'12-15', superset:true, notes:'F1 superset.' },
+        { id:'mm_d13_10', type:'red', name:'Wrist Curls', sets:3, reps:'12-15', superset:true, notes:'F2. Forearm volume finisher.' }
+      ]
+    },
+    15: {
+      name: 'Shoulders & Triceps — Hypertrophy', label: 'Day 15 (Monday)', phase: 'hypertrophy',
+      exercises: [
+        { id:'mm_d15_1', type:'yellow', name:'Landmine Press', sets:3, reps:'12/arm', superset:true, notes:'A1 superset. Angled press from floor-anchored barbell. Shoulder-friendly.' },
+        { id:'mm_d15_2', type:'yellow', name:'Around-the-World Raises', sets:3, reps:'12', superset:true, notes:'A2. Dumbbell circles from front to side to rear. Full shoulder sweep.' },
+        { id:'mm_d15_3', type:'yellow', name:'DB Shoulder Front Raise', sets:3, reps:'12', superset:true, notes:'B1 superset with Plate T-Raise.' },
+        { id:'mm_d15_4', type:'yellow', name:'Weight Plate T-Raise', sets:3, reps:'12', superset:true, notes:'B2. Hold plate, raise forward and out to T-shape.' },
+        { id:'mm_d15_5', type:'orange', name:'Lateral DB Raise', sets:4, reps:'12', notes:'C. Side delts. Lead with elbows.' },
+        { id:'mm_d15_6', type:'orange', name:'Shrugs (Machine or Decline Hammer)', sets:3, reps:'12-20', notes:'D. Trap volume.' },
+        { id:'mm_d15_7', type:'red', name:'Seated Tricep Skullcrusher', sets:3, reps:'8-12', superset:true, notes:'E1 superset with Bench Dips.' },
+        { id:'mm_d15_8', type:'red', name:'Bench Dips', sets:3, reps:'12 max', superset:true, notes:'E2. Bodyweight or add a plate on your lap.' },
+        { id:'mm_d15_9', type:'red', name:'Rope Single Arm Tricep Extension', sets:3, reps:'12/arm', superset:true, notes:'F1 superset.' },
+        { id:'mm_d15_10', type:'red', name:'Reverse Wrist Curls', sets:3, reps:'12-15', superset:true, notes:'F2. Forearm finisher.' }
+      ]
+    },
+    'off': {
+      name: 'Chest & Forearms (Off Day)', label: 'Off Day — Maintenance',
+      exercises: [
+        { id:'mm_off_1', type:'cns', name:'Push-Ups', sets:3, reps:'12 max', notes:'Max reps each set. No need to go to failure. Maintain chest stimulus.' },
+        { id:'mm_off_2', type:'orange', name:'Cable Flies', sets:3, reps:'12-15', notes:'Light weight. Pump focus. Keep chest active.' },
+        { id:'mm_off_3', type:'orange', name:'Incline DB Press', sets:3, reps:'10-12', notes:'Moderate weight. Upper chest maintenance.' },
+        { id:'mm_off_4', type:'red', name:'Wrist Curls', sets:3, reps:'15-20', notes:'Forearm work. Palms up. Full range.' },
+        { id:'mm_off_5', type:'red', name:'Reverse Wrist Curls', sets:3, reps:'15-20', notes:'Palms down. Extensor work.' },
+        { id:'mm_off_6', type:'red', name:'Plate Pinches', sets:3, reps:'30 sec hold', notes:'Pinch two plates together with fingertips. Grip and forearm finisher.' }
+      ]
+    }
+  }
+};
+
 // Rest times in seconds by type
 const REST_TIMES = {
   cns: 60,
@@ -958,6 +1496,61 @@ function getWeekInPhase(w) {
   if (w <= 3) return w - 1;
   if (w <= 6) return w - 4;
   return w - 7;
+}
+
+// ════════════════════════════════════════════════════════════
+// PROGRAM MANAGEMENT
+// ════════════════════════════════════════════════════════════
+let activeMensProgram = localStorage.getItem('mens_program') || null;
+
+function selectMensProgram(prog) {
+  activeMensProgram = prog;
+  localStorage.setItem('mens_program', prog);
+  const overlay = document.getElementById('prog-select-overlay');
+  overlay.style.display = 'none';
+  document.getElementById('psc-hc12').classList.toggle('selected', prog === 'hc12');
+  document.getElementById('psc-growth').classList.toggle('selected', prog === 'growth');
+  document.getElementById('psc-mansour').classList.toggle('selected', prog === 'mansour');
+  updateProgHeader();
+  renderToday();
+}
+
+function showProgSelect() {
+  const overlay = document.getElementById('prog-select-overlay');
+  overlay.style.display = 'flex';
+  document.getElementById('psc-hc12').classList.toggle('selected', activeMensProgram === 'hc12');
+  document.getElementById('psc-growth').classList.toggle('selected', activeMensProgram === 'growth');
+  document.getElementById('psc-mansour').classList.toggle('selected', activeMensProgram === 'mansour');
+}
+
+function updateProgHeader() {
+  const names = { hc12: 'HC 1.2', growth: 'Growth Plan', mansour: 'Mansour Method' };
+  const el = document.getElementById('header-title');
+  if (el && activeMensProgram) el.textContent = names[activeMensProgram] || 'HC 1.2';
+}
+
+// Growth Plan state helpers
+function getGrowthState() {
+  const saved = localStorage.getItem('growth_state');
+  if (saved) { try { return JSON.parse(saved); } catch(e) {} }
+  return { week: 1, day: 'w1_d1' };
+}
+function saveGrowthState(obj) {
+  localStorage.setItem('growth_state', JSON.stringify(obj));
+}
+
+// Mansour Method day helpers (1-15, cycles)
+function getMansourDay() {
+  const d = parseInt(localStorage.getItem('mansour_day') || '1', 10);
+  return (d >= 1 && d <= 15) ? d : 1;
+}
+function saveMansourDay(d) {
+  localStorage.setItem('mansour_day', String(d));
+}
+function getMansourDayData(dayNum) {
+  // Even days are off days
+  if (dayNum % 2 === 0) return MANSOUR_METHOD.days['off'];
+  return MANSOUR_METHOD.days[dayNum] || MANSOUR_METHOD.days['off'];
 }
 
 // ── localStorage helpers ──
@@ -1065,8 +1658,27 @@ function switchView(viewName) {
 }
 
 function updateHeader() {
+  if (activeMensProgram === 'growth') {
+    const gs = getGrowthState();
+    const dayData = GROWTH_PLAN.days[gs.day];
+    document.getElementById('header-title').textContent = 'Growth Plan';
+    document.getElementById('header-phase').textContent = `Week ${gs.week} · High Volume`;
+    document.getElementById('header-week').textContent = `Week ${gs.week}`;
+    document.getElementById('header-day').textContent = dayData ? dayData.name : '';
+    return;
+  }
+  if (activeMensProgram === 'mansour') {
+    const d = getMansourDay();
+    const dayData = getMansourDayData(d);
+    document.getElementById('header-title').textContent = 'Mansour Method';
+    document.getElementById('header-phase').textContent = `Day ${d} · ${d % 2 === 0 ? 'Off Day' : (dayData.phase || '')}`;
+    document.getElementById('header-week').textContent = `Day ${d}/15`;
+    document.getElementById('header-day').textContent = dayData ? dayData.name : '';
+    return;
+  }
   const phase = getPhaseForWeek(state.currentWeek);
   const dayData = getCurrentDayData();
+  document.getElementById('header-title').textContent = 'HC 1.2';
   document.getElementById('header-phase').textContent = `${phase.name} · ${phase.scheme}`;
   document.getElementById('header-week').textContent = `Week ${state.currentWeek}`;
   document.getElementById('header-day').textContent = dayData ? `${dayData.label} ${dayData.name}` : '';
@@ -1081,6 +1693,9 @@ function getCurrentDayData() {
 }
 
 function renderToday() {
+  if (activeMensProgram === 'growth') { renderTodayGrowth(); return; }
+  if (activeMensProgram === 'mansour') { renderTodayMansour(); return; }
+
   const phase = getPhaseForWeek(state.currentWeek);
   const dayData = getCurrentDayData();
   const wi = getWeekInPhase(state.currentWeek);
@@ -1170,10 +1785,180 @@ function renderToday() {
 }
 
 // ════════════════════════════════════════════════════════════
+// GROWTH PLAN TODAY VIEW
+// ════════════════════════════════════════════════════════════
+function renderTodayGrowth() {
+  // Show the hero card, hide rest day card
+  const heroCard = document.getElementById('today-hero-card');
+  const restCard = document.getElementById('rest-day-card');
+  heroCard.style.display = '';
+  restCard.style.display = 'none';
+
+  const gs = getGrowthState();
+
+  // Week selector
+  const weekSel = document.getElementById('week-selector');
+  weekSel.innerHTML = '';
+  [1,2,3,4].forEach(w => {
+    const btn = document.createElement('div');
+    btn.className = `week-btn${gs.week === w ? ' active' : ''}`;
+    btn.textContent = `W${w}`;
+    btn.onclick = () => {
+      const newState = { week: w, day: `w${w}_d1` };
+      saveGrowthState(newState);
+      renderTodayGrowth();
+    };
+    weekSel.appendChild(btn);
+  });
+
+  // Day selector — 6 days
+  const daySel = document.getElementById('day-selector');
+  daySel.innerHTML = '';
+  for (let d = 1; d <= 6; d++) {
+    const key = `w${gs.week}_d${d}`;
+    const dayInfo = GROWTH_PLAN.days[key];
+    if (!dayInfo) continue;
+    const btn = document.createElement('div');
+    btn.className = `day-btn${gs.day === key ? ' active' : ''}`;
+    btn.innerHTML = `<div class="day-label">D${d}</div><div class="day-name">${dayInfo.name}</div>`;
+    btn.onclick = () => {
+      saveGrowthState({ week: gs.week, day: key });
+      renderTodayGrowth();
+    };
+    daySel.appendChild(btn);
+  }
+
+  // Update hero card
+  const currentDay = GROWTH_PLAN.days[gs.day];
+  document.getElementById('hero-phase').textContent = 'Growth Plan';
+  document.getElementById('hero-day').textContent = currentDay ? currentDay.name : '';
+  document.getElementById('hero-sub').textContent = currentDay ? `Week ${gs.week} · ${currentDay.label}` : '';
+  document.getElementById('streak-display').innerHTML = '';
+
+  // Quick stats
+  const qs = document.getElementById('quick-stats');
+  qs.innerHTML = `
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Program</div>
+      <div style="font-size:16px;font-weight:800;">Workout Growth Plan</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Duration</div>
+      <div style="font-size:16px;font-weight:800;">4 Weeks</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Current Week</div>
+      <div style="font-size:16px;font-weight:800;">Week ${gs.week}</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Focus</div>
+      <div style="font-size:16px;font-weight:800;">High Volume</div>
+    </div>
+  `;
+
+  renderNutritionCard();
+}
+
+// ════════════════════════════════════════════════════════════
+// MANSOUR METHOD TODAY VIEW
+// ════════════════════════════════════════════════════════════
+function renderTodayMansour() {
+  const heroCard = document.getElementById('today-hero-card');
+  const restCard = document.getElementById('rest-day-card');
+  const currentMansourDay = getMansourDay();
+  const isOffDay = currentMansourDay % 2 === 0;
+
+  if (isOffDay) {
+    heroCard.style.display = '';
+    restCard.style.display = 'none';
+    document.getElementById('hero-phase').textContent = 'Mansour Method';
+    document.getElementById('hero-day').textContent = 'Active Recovery Day';
+    document.getElementById('hero-sub').textContent = `Cycle Day ${currentMansourDay} · Chest & Forearm Maintenance`;
+    document.getElementById('streak-display').innerHTML = '';
+  } else {
+    heroCard.style.display = '';
+    restCard.style.display = 'none';
+    const dayData = getMansourDayData(currentMansourDay);
+    document.getElementById('hero-phase').textContent = `Mansour Method · ${dayData.phase === 'strength' ? 'Strength' : 'Hypertrophy'} Phase`;
+    document.getElementById('hero-day').textContent = dayData.name;
+    document.getElementById('hero-sub').textContent = `Cycle Day ${currentMansourDay} · ${dayData.label}`;
+    document.getElementById('streak-display').innerHTML = '';
+  }
+
+  // Day selector — prev/next for Mansour
+  const daySel = document.getElementById('day-selector');
+  daySel.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;grid-column:1/-1;">
+      <button onclick="mansourPrevDay()" style="background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;">← Prev</button>
+      <div style="text-align:center;">
+        <div style="font-size:18px;font-weight:800;color:var(--yellow);">Day ${currentMansourDay}</div>
+        <div style="font-size:11px;color:var(--text3);">of 15-day cycle</div>
+      </div>
+      <button onclick="mansourNextDay()" style="background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;">Next →</button>
+    </div>
+  `;
+
+  // Week selector — show cycle overview
+  const weekSel = document.getElementById('week-selector');
+  weekSel.innerHTML = '';
+  for (let d = 1; d <= 15; d++) {
+    const btn = document.createElement('div');
+    const isOff = d % 2 === 0;
+    btn.className = `week-btn${d === currentMansourDay ? ' active' : ''}`;
+    btn.textContent = isOff ? `D${d}🔵` : `D${d}`;
+    btn.title = isOff ? 'Off Day (Maintenance)' : (MANSOUR_METHOD.days[d] ? MANSOUR_METHOD.days[d].name : '');
+    btn.onclick = () => { saveMansourDay(d); renderTodayMansour(); updateHeader(); };
+    weekSel.appendChild(btn);
+  }
+
+  // Quick stats
+  const qs = document.getElementById('quick-stats');
+  const dayInfo = getMansourDayData(currentMansourDay);
+  qs.innerHTML = `
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Program</div>
+      <div style="font-size:16px;font-weight:800;">Mansour Method</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Cycle Day</div>
+      <div style="font-size:16px;font-weight:800;">${currentMansourDay} / 15</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Phase</div>
+      <div style="font-size:16px;font-weight:800;">${isOffDay ? 'Recovery' : (dayInfo.phase === 'strength' ? 'Strength' : 'Hypertrophy')}</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Structure</div>
+      <div style="font-size:16px;font-weight:800;">8-Day Split</div>
+    </div>
+  `;
+
+  renderNutritionCard();
+}
+
+function mansourPrevDay() {
+  let d = getMansourDay();
+  d = d <= 1 ? 15 : d - 1;
+  saveMansourDay(d);
+  renderTodayMansour();
+  updateHeader();
+}
+
+function mansourNextDay() {
+  let d = getMansourDay();
+  d = d >= 15 ? 1 : d + 1;
+  saveMansourDay(d);
+  renderTodayMansour();
+  updateHeader();
+}
+
+// ════════════════════════════════════════════════════════════
 // WORKOUT VIEW
 // ════════════════════════════════════════════════════════════
 function startWorkout() {
   switchView('workout');
+  if (activeMensProgram === 'growth') { renderWorkoutGrowth(); return; }
+  if (activeMensProgram === 'mansour') { renderWorkoutMansour(); return; }
   renderWorkout();
 }
 
@@ -1286,6 +2071,300 @@ function renderWorkout() {
       notesDebounce = setTimeout(() => {
         lsSet(`notes_week${state.currentWeek}_${dayData.id}`, notesArea.value);
       }, 500);
+    });
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// GROWTH PLAN WORKOUT RENDERER
+// ════════════════════════════════════════════════════════════
+function renderWorkoutGrowth() {
+  const gs = getGrowthState();
+  const dayData = GROWTH_PLAN.days[gs.day];
+  if (!dayData) return;
+  const container = document.getElementById('workout-content');
+
+  const groups = groupExercisesNew(dayData.exercises);
+
+  let html = `
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <span style="background:var(--orange);color:#000;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;">Growth Plan</span>
+        <span style="font-size:12px;color:var(--text3);">High Volume</span>
+      </div>
+      <h2 style="font-size:22px;font-weight:800;">${dayData.name}</h2>
+      <p style="font-size:13px;color:var(--text2);margin-top:2px;">${dayData.label} — Week ${gs.week}</p>
+    </div>
+  `;
+
+  const sectionLabels = {cns:'Activation', yellow:'Primary Lifts', orange:'Accessory Work', red:'Pump / Finishers'};
+  let lastSection = null;
+  groups.forEach(group => {
+    const firstType = group[0].type;
+    if (firstType !== lastSection) {
+      lastSection = firstType;
+      html += `<div class="section-header">${sectionLabels[firstType] || ''}</div>`;
+    }
+    if (group.length > 1) {
+      html += `<div class="superset-group">`;
+      group.forEach((ex, gi) => {
+        if (gi > 0) html += `<div class="superset-label">+ SUPERSET</div>`;
+        html += renderExCardSimple(ex);
+      });
+      html += `</div>`;
+    } else {
+      html += renderExCardSimple(group[0]);
+    }
+  });
+
+  const noteKey = `notes_growth_${gs.day}`;
+  const savedNote = ls(noteKey, '');
+  html += `
+    <div class="workout-notes-wrap">
+      <label>Session Notes</label>
+      <textarea id="workout-notes-area" placeholder="How did this feel?">${savedNote}</textarea>
+    </div>
+  `;
+  html += `<button class="complete-workout-btn" onclick="completeWorkoutGrowth()">Complete Workout ✓</button>`;
+
+  container.innerHTML = html;
+  bindExerciseCards(dayData.exercises, noteKey);
+}
+
+function completeWorkoutGrowth() {
+  const gs = getGrowthState();
+  const dayData = GROWTH_PLAN.days[gs.day];
+  const weights = {};
+  if (dayData) {
+    dayData.exercises.forEach(ex => {
+      const w = getWeight(ex.id, gs.week);
+      if (w) weights[ex.name] = w;
+    });
+  }
+  const notesArea = document.getElementById('workout-notes-area');
+  if (notesArea && notesArea.value) lsSet(`notes_growth_${gs.day}`, notesArea.value);
+  addHistory({
+    date: new Date().toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}),
+    dateRaw: Date.now(),
+    phase: 'Growth Plan',
+    week: gs.week,
+    dayId: gs.day,
+    day: dayData ? dayData.name : gs.day,
+    weights
+  });
+  // Advance day
+  const nextDay = gs.day.replace(/d(\d)$/, (m, n) => `d${parseInt(n)+1}`);
+  if (GROWTH_PLAN.days[nextDay]) {
+    saveGrowthState({ week: gs.week, day: nextDay });
+  } else if (gs.week < 4) {
+    const nextWeek = gs.week + 1;
+    saveGrowthState({ week: nextWeek, day: `w${nextWeek}_d1` });
+  }
+  showToast('Workout complete!');
+  switchView('today');
+}
+
+// ════════════════════════════════════════════════════════════
+// MANSOUR METHOD WORKOUT RENDERER
+// ════════════════════════════════════════════════════════════
+function renderWorkoutMansour() {
+  const currentDay = getMansourDay();
+  const dayData = getMansourDayData(currentDay);
+  const isOffDay = currentDay % 2 === 0;
+  const container = document.getElementById('workout-content');
+
+  const groups = groupExercisesNew(dayData.exercises);
+
+  let html = `
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <span style="background:var(--blue);color:#000;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;">Mansour Method</span>
+        <span style="font-size:12px;color:var(--text3);">${isOffDay ? 'Active Recovery' : (dayData.phase === 'strength' ? 'Strength Phase' : 'Hypertrophy Phase')}</span>
+      </div>
+      <h2 style="font-size:22px;font-weight:800;">${dayData.name}</h2>
+      <p style="font-size:13px;color:var(--text2);margin-top:2px;">Cycle Day ${currentDay} · ${dayData.label}</p>
+    </div>
+  `;
+
+  if (isOffDay) {
+    html += `<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:8px;padding:12px 14px;margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Active Recovery Day</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.55;">Keep it light. The goal is to maintain chest activation and build forearm strength/endurance without taxing the CNS. Recovery is part of the program.</div>
+    </div>`;
+  }
+
+  const sectionLabels = {cns:'Activation / Warmup', yellow:'Main Work', orange:'Accessory Work', red:'Finishers / Forearms'};
+  let lastSection = null;
+  groups.forEach(group => {
+    const firstType = group[0].type;
+    if (firstType !== lastSection) {
+      lastSection = firstType;
+      html += `<div class="section-header">${sectionLabels[firstType] || ''}</div>`;
+    }
+    if (group.length > 1) {
+      html += `<div class="superset-group">`;
+      group.forEach((ex, gi) => {
+        if (gi > 0) html += `<div class="superset-label">+ SUPERSET</div>`;
+        html += renderExCardSimple(ex);
+      });
+      html += `</div>`;
+    } else {
+      html += renderExCardSimple(group[0]);
+    }
+  });
+
+  const noteKey = `notes_mansour_d${currentDay}`;
+  const savedNote = ls(noteKey, '');
+  html += `
+    <div class="workout-notes-wrap">
+      <label>Session Notes</label>
+      <textarea id="workout-notes-area" placeholder="How did this feel?">${savedNote}</textarea>
+    </div>
+  `;
+  html += `<button class="complete-workout-btn" onclick="completeWorkoutMansour()">Complete Workout ✓</button>`;
+
+  container.innerHTML = html;
+  bindExerciseCards(dayData.exercises, noteKey);
+}
+
+function completeWorkoutMansour() {
+  const currentDay = getMansourDay();
+  const dayData = getMansourDayData(currentDay);
+  const weights = {};
+  dayData.exercises.forEach(ex => {
+    const w = getWeight(ex.id, currentDay);
+    if (w) weights[ex.name] = w;
+  });
+  const notesArea = document.getElementById('workout-notes-area');
+  if (notesArea && notesArea.value) lsSet(`notes_mansour_d${currentDay}`, notesArea.value);
+  addHistory({
+    date: new Date().toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}),
+    dateRaw: Date.now(),
+    phase: 'Mansour Method',
+    week: currentDay,
+    dayId: `mansour_d${currentDay}`,
+    day: dayData.name,
+    weights
+  });
+  // Advance to next day (cycles 1-15)
+  const nextDay = currentDay >= 15 ? 1 : currentDay + 1;
+  saveMansourDay(nextDay);
+  showToast('Workout complete!');
+  switchView('today');
+}
+
+// ════════════════════════════════════════════════════════════
+// SHARED HELPERS FOR NEW PROGRAMS
+// ════════════════════════════════════════════════════════════
+function groupExercisesNew(exercises) {
+  // Groups exercises where superset:true together (adjacent ones)
+  const groups = [];
+  let i = 0;
+  while (i < exercises.length) {
+    const ex = exercises[i];
+    if (ex.superset) {
+      // Collect a run of superset:true exercises
+      const group = [ex];
+      let j = i + 1;
+      while (j < exercises.length && exercises[j].superset) {
+        group.push(exercises[j]);
+        j++;
+      }
+      groups.push(group);
+      i = j;
+    } else {
+      groups.push([ex]);
+      i++;
+    }
+  }
+  return groups;
+}
+
+function renderExCardSimple(ex) {
+  const typeLabels = {cns:'Activation', yellow:'Main', orange:'Accessory', red:'Finisher'};
+  const colorMap = {cns:'var(--text3)', yellow:'var(--yellow)', orange:'var(--orange)', red:'var(--red)'};
+
+  let setsHtml = '';
+  for (let i = 0; i < ex.sets; i++) {
+    setsHtml += `<div class="set-circle" id="set-${ex.id}-${i}">${i+1}</div>`;
+  }
+
+  const supersetBadge = ex.superset ? `<span class="superset-badge">Superset</span>` : '';
+
+  const notesSection = ex.notes ? `
+    <div class="ex-notes-toggle" onclick="this.nextElementSibling.classList.toggle('open');this.classList.toggle('open')">
+      ▸ How To
+    </div>
+    <div class="ex-notes-body">${ex.notes}</div>` : '';
+
+  const weightSection = ex.type !== 'cns' ? `
+    <div class="ex-weight">
+      <label>Weight used:</label>
+      <input type="number" id="weight-${ex.id}" placeholder="lbs" step="2.5" min="0">
+      <span class="weight-unit">lbs</span>
+    </div>` : '';
+
+  return `
+    <div class="ex-card ${ex.type}" id="card-${ex.id}">
+      <div class="ex-header">
+        <div class="ex-name">${ex.name}${supersetBadge}</div>
+        <div class="ex-badge">${typeLabels[ex.type] || ex.type}</div>
+      </div>
+      <div class="ex-meta">
+        <span><strong>${ex.sets}×${ex.reps}</strong></span>
+      </div>
+      ${notesSection}
+      <div class="ex-sets">${setsHtml}</div>
+      ${weightSection}
+      <button class="skip-btn" id="skip-${ex.id}" onclick="skipExercise('${ex.id}')">Skip Exercise</button>
+    </div>
+  `;
+}
+
+function bindExerciseCards(exercises, noteKey) {
+  const weekKey = activeMensProgram === 'mansour' ? getMansourDay() : getGrowthState().week;
+  exercises.forEach(ex => {
+    const completedSets = getSets(ex.id, weekKey);
+    for (let i = 0; i < ex.sets; i++) {
+      const circle = document.getElementById(`set-${ex.id}-${i}`);
+      if (circle) {
+        if (completedSets.includes(i)) circle.classList.add('done');
+        circle.addEventListener('click', () => {
+          const done = getSets(ex.id, weekKey);
+          const c = document.getElementById(`set-${ex.id}-${i}`);
+          if (!c) return;
+          if (done.includes(i)) {
+            saveSets(ex.id, weekKey, done.filter(s => s !== i));
+            c.classList.remove('done');
+          } else {
+            done.push(i);
+            saveSets(ex.id, weekKey, done);
+            c.classList.add('done');
+            if (navigator.vibrate) navigator.vibrate(50);
+            let restSecs = REST_TIMES.orange;
+            if (ex.type === 'cns') restSecs = REST_TIMES.cns;
+            else if (ex.type === 'yellow') restSecs = REST_TIMES.yellow_upper;
+            else if (ex.type === 'red') restSecs = REST_TIMES.red;
+            if (i < ex.sets - 1) {
+              startRest(restSecs, ex.name, `Next: Set ${i+2} of ${ex.sets}`);
+            }
+          }
+        });
+      }
+    }
+    const weightInput = document.getElementById(`weight-${ex.id}`);
+    if (weightInput) {
+      weightInput.value = getWeight(ex.id, weekKey);
+      weightInput.addEventListener('change', () => setWeight(ex.id, weekKey, weightInput.value));
+    }
+  });
+
+  let notesDebounce = null;
+  const notesArea = document.getElementById('workout-notes-area');
+  if (notesArea) {
+    notesArea.addEventListener('input', () => {
+      clearTimeout(notesDebounce);
+      notesDebounce = setTimeout(() => lsSet(noteKey, notesArea.value), 500);
     });
   }
 }
@@ -2192,13 +3271,22 @@ function loadMassInputs() {
 function init() {
   loadState();
   applyTheme(ls('theme', 'dark'));
-  renderToday();
-  updateHeader();
+  // Show program selector on first launch (no program saved)
+  if (!activeMensProgram) {
+    showProgSelect();
+  } else {
+    updateProgHeader();
+    renderToday();
+    updateHeader();
+  }
   loadMassInputs();
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
 }
+
+// Call updateHeader + renderToday after init (always needed for non-first-launch)
+// (both are called inside init already)
 
 init();
 </script>
