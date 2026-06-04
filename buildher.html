@@ -216,6 +216,11 @@ svg.progress-chart{width:100%;height:140px;display:block}
 /* COMPLETE BADGE */
 .complete-badge{display:flex;align-items:center;justify-content:center;gap:8px;padding:16px;background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.3);border-radius:var(--radius);margin-bottom:12px;font-weight:700;color:var(--green)}
 
+/* ENV TOGGLE */
+.env-toggle{display:flex;background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:3px;gap:2px;margin-left:auto}
+.env-btn{flex:1;padding:6px 14px;border-radius:100px;border:none;font-size:12px;font-weight:600;cursor:pointer;background:none;color:var(--text3);font-family:inherit;transition:all .2s;white-space:nowrap}
+.env-btn.active{background:var(--bg2);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.4)}
+
 /* SCROLLBAR */
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -357,6 +362,10 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
         <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <div class="wk-title" id="workout-title">Monday — Week 1</div>
+      <div class="env-toggle" id="env-toggle">
+        <button class="env-btn" data-env="gym" id="env-btn-gym">🏋️ Gym</button>
+        <button class="env-btn" data-env="home" id="env-btn-home">🏠 Home</button>
+      </div>
     </div>
     <div class="phase-banner p1" id="phase-banner">
       <div class="phase-name" id="phase-name-text">Phase 1: Foundation</div>
@@ -593,7 +602,7 @@ function getSlimPhase(week) {
   return SLIM_PHASES.find(p => p.weeks.includes(week)) || SLIM_PHASES[0];
 }
 
-const SLIM_WORKOUTS = {
+const SLIM_GYM = {
   mon: {
     name: 'Full Body A — Lower Focus',
     sub: 'Legs, glutes & core',
@@ -602,7 +611,7 @@ const SLIM_WORKOUTS = {
       [
         { id:'sm_cns1', type:'cns', name:'Seated March', sets:2, reps:'20 steps', notes:'Sit tall in a chair, lift each knee alternately. Warms up hips and core gently. No strain on knees.' },
         { id:'sm_cns2', type:'cns', name:'Ankle Circles + Calf Raises', sets:2, reps:'10 each', notes:'Stand at a wall for support. Rotate ankles both ways, then rise up on toes. Improves circulation and balance.' },
-        { id:'sm_p1', type:'pink', name:'Goblet Squat (Light)', sets:3, reps:'15', notes:'Hold a light dumbbell (5-15 lbs) at chest. Feet shoulder-width, toes out slightly. Squat to a comfortable depth — even half-way counts. Drive through heels. No impact on knees if done slowly.' },
+        { id:'sm_p1', type:'pink', name:'Goblet Squat (Light)', sets:3, reps:'15', ytId:'MeIiIdhvXT4', notes:'Hold a light dumbbell (5-15 lbs) at chest. Feet shoulder-width, toes out slightly. Squat to a comfortable depth — even half-way counts. Drive through heels. No impact on knees if done slowly.' },
         { id:'sm_p2', type:'pink', name:'Step Ups (Low Box)', sets:3, reps:'12/side', notes:'Use a sturdy low step (6-8 inches). Step up one foot at a time, drive through the heel. Hold dumbbells for extra resistance. Excellent for glutes and balance without jumping.' },
         { id:'sm_a1', type:'purple', name:'Seated Leg Extension (Machine)', sets:3, reps:'15', notes:'Light weight, full range. Strengthens the quad above the knee — critical for knee health and stability as we age.' },
         { id:'sm_a2', type:'purple', name:'Standing Hip Abduction (Cable or Band)', sets:3, reps:'15/side', notes:'Stand at cable or use resistance band around ankles. Lift leg out to the side, squeeze outer hip. Great for hip stability and outer thigh toning.' },
@@ -612,20 +621,20 @@ const SLIM_WORKOUTS = {
       [
         { id:'sm_cns1', type:'cns', name:'Seated March', sets:2, reps:'20 steps', notes:'Sit tall in a chair, lift each knee alternately. Warms up hips and core gently.' },
         { id:'sm_cns2', type:'cns', name:'Ankle Circles + Calf Raises', sets:2, reps:'10 each', notes:'Stand at a wall for support. Rotate ankles both ways, then rise up on toes.' },
-        { id:'sm_p1', type:'pink', name:'Dumbbell Goblet Squat', sets:3, reps:'12', notes:'Same form as Phase 1 but heavier dumbbell (15-25 lbs). Go to parallel or deeper. Control the descent for 2 counts.' },
+        { id:'sm_p1', type:'pink', name:'Dumbbell Goblet Squat', sets:3, reps:'12', ytId:'MeIiIdhvXT4', notes:'Same form as Phase 1 but heavier dumbbell (15-25 lbs). Go to parallel or deeper. Control the descent for 2 counts.' },
         { id:'sm_p2', type:'pink', name:'Step Ups (Higher Box or Heavier DB)', sets:3, reps:'10/side', notes:'Increase box height or add more weight. Same controlled form. Each rep should feel like real work.' },
         { id:'sm_a1', type:'purple', name:'Seated Leg Extension (Machine)', sets:3, reps:'12', notes:'Add a plate. Hold the contraction at the top for 1 second before lowering. This extra tension builds quad definition.' },
         { id:'sm_a2', type:'purple', name:'Standing Hip Abduction', sets:3, reps:'12/side', notes:'More resistance this phase. Slow and steady — don\'t swing the leg.' },
-        { id:'sm_a3', type:'purple', name:'Leg Press (Light-Moderate)', sets:3, reps:'12', notes:'Feet high and wide. Full range. This is one of the safest ways to load the lower body for older women.' },
+        { id:'sm_a3', type:'purple', name:'Leg Press (Light-Moderate)', sets:3, reps:'12', ytId:'IZxyjW7MPJQ', notes:'Feet high and wide. Full range. This is one of the safest ways to load the lower body for older women.' },
         { id:'sm_f1', type:'red', name:'Dead Bug (Core)', sets:3, reps:'10/side', notes:'Full extension now — arm and leg hover as close to the floor as possible. Breathe. Control.' }
       ],
       // Phase 3
       [
         { id:'sm_cns1', type:'cns', name:'Seated March', sets:2, reps:'20 steps', notes:'Warm up the hips and core gently before loading.' },
         { id:'sm_cns2', type:'cns', name:'Ankle Circles + Calf Raises', sets:2, reps:'12 each', notes:'Full range on the calf raises. Feel the stretch at the bottom.' },
-        { id:'sm_p1', type:'pink', name:'Dumbbell Goblet Squat', sets:4, reps:'10', notes:'4 sets this phase. Heaviest weight yet. Full depth. Pause at the bottom for 1 second. This is peak quad and glute stimulus.' },
+        { id:'sm_p1', type:'pink', name:'Dumbbell Goblet Squat', sets:4, reps:'10', ytId:'MeIiIdhvXT4', notes:'4 sets this phase. Heaviest weight yet. Full depth. Pause at the bottom for 1 second. This is peak quad and glute stimulus.' },
         { id:'sm_p2', type:'pink', name:'Step Ups (Weighted)', sets:4, reps:'8/side', notes:'4 sets, controlled weight. Single-leg strength is the best predictor of longevity and balance.' },
-        { id:'sm_a1', type:'purple', name:'Leg Press', sets:4, reps:'10', notes:'4 sets now. Load it up to a challenging weight. Full range of motion every rep.' },
+        { id:'sm_a1', type:'purple', name:'Leg Press', sets:4, reps:'10', ytId:'IZxyjW7MPJQ', notes:'4 sets now. Load it up to a challenging weight. Full range of motion every rep.' },
         { id:'sm_a2', type:'purple', name:'Standing Hip Abduction', sets:3, reps:'12/side', notes:'Max resistance for this movement. Own the full range.' },
         { id:'sm_f1', type:'red', name:'Plank (Knees or Full)', sets:3, reps:'20-30 sec', notes:'Knees down is perfectly fine. Core tight, hips level. Breathe. Build to full plank over time.' }
       ]
@@ -639,20 +648,20 @@ const SLIM_WORKOUTS = {
       [
         { id:'sw_cns1', type:'cns', name:'Shoulder Rolls + Neck Circles', sets:2, reps:'10 each', notes:'Slow and gentle. Loosen up the upper back and neck before any pressing or pulling.' },
         { id:'sw_cns2', type:'cns', name:'Band Pull-Apart', sets:2, reps:'15', notes:'Hold a light resistance band at chest height with arms straight. Pull apart until band touches chest. Activates rear delts and opens the chest.' },
-        { id:'sw_p1', type:'pink', name:'Seated Dumbbell Press', sets:3, reps:'15', notes:'Sit tall on a bench or chair. Light dumbbells (5-12 lbs). Press overhead without arching your lower back. Safe on shoulders when done with light weight and control.' },
-        { id:'sw_p2', type:'pink', name:'Lat Pulldown (Machine)', sets:3, reps:'15', notes:'Pull the bar to upper chest, elbows drive down. Light weight. This builds the upper back and improves posture — crucial for women over 50.' },
-        { id:'sw_a1', type:'purple', name:'Dumbbell Bent-Over Row', sets:3, reps:'15', notes:'Hinge forward, back flat, one hand on bench for support. Pull dumbbell to hip. Strong back = healthy spine.' },
-        { id:'sw_a2', type:'purple', name:'Dumbbell Bicep Curl', sets:3, reps:'15', notes:'Light dumbbells. Full range. Squeeze at the top. Good for arm tone and bone density in the forearms.' },
+        { id:'sw_p1', type:'pink', name:'Seated Dumbbell Press', sets:3, reps:'15', ytId:'B-aVuyhvLHU', notes:'Sit tall on a bench or chair. Light dumbbells (5-12 lbs). Press overhead without arching your lower back. Safe on shoulders when done with light weight and control.' },
+        { id:'sw_p2', type:'pink', name:'Lat Pulldown (Machine)', sets:3, reps:'15', ytId:'CAwf7n6Luuc', notes:'Pull the bar to upper chest, elbows drive down. Light weight. This builds the upper back and improves posture — crucial for women over 50.' },
+        { id:'sw_a1', type:'purple', name:'Dumbbell Bent-Over Row', sets:3, reps:'15', ytId:'roCP2zo2TBk', notes:'Hinge forward, back flat, one hand on bench for support. Pull dumbbell to hip. Strong back = healthy spine.' },
+        { id:'sw_a2', type:'purple', name:'Dumbbell Bicep Curl', sets:3, reps:'15', ytId:'ykJmrZ5v0Oo', notes:'Light dumbbells. Full range. Squeeze at the top. Good for arm tone and bone density in the forearms.' },
         { id:'sw_f1', type:'red', name:'Bird Dog', sets:3, reps:'8/side', notes:'On hands and knees. Extend opposite arm and leg simultaneously, hold 2 seconds. Excellent for lower back rehab and core stability.' }
       ],
       // Phase 2
       [
         { id:'sw_cns1', type:'cns', name:'Shoulder Rolls + Neck Circles', sets:2, reps:'10 each', notes:'Loosen the upper back before pressing or pulling.' },
         { id:'sw_cns2', type:'cns', name:'Band Pull-Apart', sets:2, reps:'15', notes:'Slightly more resistance this phase. Control the entire arc.' },
-        { id:'sw_p1', type:'pink', name:'Seated Dumbbell Press', sets:3, reps:'12', notes:'Go heavier. Brace your core and press deliberately. Feel the shoulder and tricep working.' },
-        { id:'sw_p2', type:'pink', name:'Lat Pulldown (Machine)', sets:3, reps:'12', notes:'Add a plate. Full stretch at the top, squeeze at the bottom. Building that wide, strong back.' },
+        { id:'sw_p1', type:'pink', name:'Seated Dumbbell Press', sets:3, reps:'12', ytId:'B-aVuyhvLHU', notes:'Go heavier. Brace your core and press deliberately. Feel the shoulder and tricep working.' },
+        { id:'sw_p2', type:'pink', name:'Lat Pulldown (Machine)', sets:3, reps:'12', ytId:'CAwf7n6Luuc', notes:'Add a plate. Full stretch at the top, squeeze at the bottom. Building that wide, strong back.' },
         { id:'sw_a1', type:'purple', name:'Seated Cable Row', sets:3, reps:'12', notes:'Sit upright, pull handles to lower chest. Squeeze shoulder blades together. Great posture builder.' },
-        { id:'sw_a2', type:'purple', name:'Dumbbell Bicep Curl', sets:3, reps:'12', notes:'Increase weight slightly. Slow down the lowering phase (2-3 counts). More time under tension = more tone.' },
+        { id:'sw_a2', type:'purple', name:'Dumbbell Bicep Curl', sets:3, reps:'12', ytId:'ykJmrZ5v0Oo', notes:'Increase weight slightly. Slow down the lowering phase (2-3 counts). More time under tension = more tone.' },
         { id:'sw_a3', type:'purple', name:'Tricep Pushdown (Cable)', sets:3, reps:'12', notes:'Lock elbows at sides, push down. Squeeze at the bottom. Targets the back of the arms — a common concern area.' },
         { id:'sw_f1', type:'red', name:'Bird Dog', sets:3, reps:'10/side', notes:'Full extension, hold 3 seconds. Add a mini-crunch at the end for extra challenge.' }
       ],
@@ -660,8 +669,8 @@ const SLIM_WORKOUTS = {
       [
         { id:'sw_cns1', type:'cns', name:'Shoulder Rolls + Neck Circles', sets:2, reps:'10 each', notes:'Full upper body warmup before peak loads.' },
         { id:'sw_cns2', type:'cns', name:'Band Pull-Apart', sets:2, reps:'15', notes:'Max resistance band. Full arc, full squeeze.' },
-        { id:'sw_p1', type:'pink', name:'Seated Dumbbell Press', sets:4, reps:'10', notes:'4 sets, heaviest weight yet. Controlled form — no back arch, no momentum. This is real shoulder strength.' },
-        { id:'sw_p2', type:'pink', name:'Lat Pulldown', sets:4, reps:'10', notes:'4 sets. Full range. You should feel a full stretch and a full squeeze every rep. Peak back loading.' },
+        { id:'sw_p1', type:'pink', name:'Seated Dumbbell Press', sets:4, reps:'10', ytId:'B-aVuyhvLHU', notes:'4 sets, heaviest weight yet. Controlled form — no back arch, no momentum. This is real shoulder strength.' },
+        { id:'sw_p2', type:'pink', name:'Lat Pulldown', sets:4, reps:'10', ytId:'CAwf7n6Luuc', notes:'4 sets. Full range. You should feel a full stretch and a full squeeze every rep. Peak back loading.' },
         { id:'sw_a1', type:'purple', name:'Seated Cable Row', sets:3, reps:'10', notes:'Heavier load. Slow controlled pulls. Strong back, upright posture.' },
         { id:'sw_a2', type:'purple', name:'Dumbbell Bicep Curl', sets:3, reps:'10', notes:'Add weight. 3-count lowering. Arms should be fatigued by rep 8.' },
         { id:'sw_f1', type:'red', name:'Side Plank (Knee or Full)', sets:3, reps:'15-20 sec/side', notes:'Oblique and hip stability. Knee version is great. Keep hips stacked.' }
@@ -676,9 +685,9 @@ const SLIM_WORKOUTS = {
       [
         { id:'sf_cns1', type:'cns', name:'March in Place', sets:2, reps:'30 sec', notes:'Swing arms, lift knees. Gets the heart rate up gently. This is your low-impact cardio warm-up.' },
         { id:'sf_cns2', type:'cns', name:'Hip Flexor Stretch (Standing)', sets:2, reps:'20 sec/side', notes:'Lunge position, back knee down. Shift hips forward gently. Opens up the hip flexors that get tight from sitting.' },
-        { id:'sf_p1', type:'pink', name:'Stationary Bike (Light)', sets:1, reps:'10 min', notes:'Level 3-5. Comfortable pace, conversational effort. This is aerobic base — burns fat directly and is 100% joint-friendly.' },
-        { id:'sf_p2', type:'pink', name:'Banded Glute Bridge', sets:3, reps:'20', notes:'Band above knees. Feet flat, push knees out against the band. Drive hips up, squeeze hard at the top for 2 seconds. Best low-back-safe glute exercise.' },
-        { id:'sf_a1', type:'purple', name:'Dumbbell Romanian Deadlift', sets:3, reps:'15', notes:'Light dumbbells. Hinge at hips, push them back. Feel the hamstring stretch. Drive hips forward to return. Builds the back of the legs and is safe on the lower back when done correctly.' },
+        { id:'sf_p1', type:'pink', name:'Stationary Bike (Light)', sets:1, reps:'10 min', ytId:'_kGkl3PVOeA', notes:'Level 3-5. Comfortable pace, conversational effort. This is aerobic base — burns fat directly and is 100% joint-friendly.' },
+        { id:'sf_p2', type:'pink', name:'Banded Glute Bridge', sets:3, reps:'20', ytId:'wPM8icPu6H8', notes:'Band above knees. Feet flat, push knees out against the band. Drive hips up, squeeze hard at the top for 2 seconds. Best low-back-safe glute exercise.' },
+        { id:'sf_a1', type:'purple', name:'Dumbbell Romanian Deadlift', sets:3, reps:'15', ytId:'JCXUYuzwNrM', notes:'Light dumbbells. Hinge at hips, push them back. Feel the hamstring stretch. Drive hips forward to return. Builds the back of the legs and is safe on the lower back when done correctly.' },
         { id:'sf_a2', type:'purple', name:'Seated Calf Raise', sets:3, reps:'20', notes:'Sit on a bench, weight on knees, rise up on toes. Full range. Prevents ankle weakness and supports knee health.' },
         { id:'sf_f1', type:'red', name:'Standing Side Bend (Stretch)', sets:2, reps:'30 sec/side', notes:'Hold one arm overhead and lean to the opposite side. Gentle stretch for the obliques and spine. Cool down.' }
       ],
@@ -686,9 +695,9 @@ const SLIM_WORKOUTS = {
       [
         { id:'sf_cns1', type:'cns', name:'March in Place', sets:2, reps:'30 sec', notes:'Swing arms, lift knees. Gentle cardio warm-up.' },
         { id:'sf_cns2', type:'cns', name:'Hip Flexor Stretch', sets:2, reps:'20 sec/side', notes:'Hold slightly longer than Phase 1. Deeper hip opening.' },
-        { id:'sf_p1', type:'pink', name:'Stationary Bike or Elliptical', sets:1, reps:'12 min', notes:'Increase to level 5-7. Push the effort — you should be slightly breathless but able to talk. This zone burns the most fat.' },
-        { id:'sf_p2', type:'pink', name:'Banded Glute Bridge', sets:3, reps:'20', notes:'Same form, heavier band or more focus on the squeeze. Pause 2 seconds at the top.' },
-        { id:'sf_a1', type:'purple', name:'Dumbbell Romanian Deadlift', sets:3, reps:'12', notes:'Go heavier this phase. Slow the lowering phase to 3 counts. You\'ll feel it more in the hamstrings.' },
+        { id:'sf_p1', type:'pink', name:'Stationary Bike or Elliptical', sets:1, reps:'12 min', ytId:'_kGkl3PVOeA', notes:'Increase to level 5-7. Push the effort — you should be slightly breathless but able to talk. This zone burns the most fat.' },
+        { id:'sf_p2', type:'pink', name:'Banded Glute Bridge', sets:3, reps:'20', ytId:'wPM8icPu6H8', notes:'Same form, heavier band or more focus on the squeeze. Pause 2 seconds at the top.' },
+        { id:'sf_a1', type:'purple', name:'Dumbbell Romanian Deadlift', sets:3, reps:'12', ytId:'JCXUYuzwNrM', notes:'Go heavier this phase. Slow the lowering phase to 3 counts. You\'ll feel it more in the hamstrings.' },
         { id:'sf_a2', type:'purple', name:'Walking Lunges (Bodyweight or Light DB)', sets:3, reps:'10/side', notes:'Slow lunges — step wide, control the descent. These burn calories and build real functional leg strength.' },
         { id:'sf_a3', type:'purple', name:'Seated Calf Raise', sets:3, reps:'20', notes:'Full range, pause at the top. Calves respond to high reps.' },
         { id:'sf_f1', type:'red', name:'Foam Roll (Quads/Hamstrings/IT Band)', sets:1, reps:'2 min', notes:'Slow rolling, hold on tight spots. This recovery work improves long-term mobility and reduces injury risk.' }
@@ -697,9 +706,9 @@ const SLIM_WORKOUTS = {
       [
         { id:'sf_cns1', type:'cns', name:'March in Place', sets:2, reps:'30 sec', notes:'Heart rate up, joints ready.' },
         { id:'sf_cns2', type:'cns', name:'Hip Flexor Stretch', sets:2, reps:'25 sec/side', notes:'Deepest stretch of the program. You have the flexibility now to go further.' },
-        { id:'sf_p1', type:'pink', name:'Stationary Bike or Elliptical', sets:1, reps:'15 min', notes:'Level 6-8. Your best cardio effort of the program. Push the resistance up and hold that pace. This is where the last layer of fat comes off.' },
-        { id:'sf_p2', type:'pink', name:'Banded Glute Bridge', sets:4, reps:'20', notes:'4 sets at peak intensity. Band tension maxed, full squeeze, 2 second hold. These should burn.' },
-        { id:'sf_a1', type:'purple', name:'Dumbbell Romanian Deadlift', sets:4, reps:'10', notes:'4 sets with your heaviest weight. Perfect hinge, controlled lowering, powerful drive up.' },
+        { id:'sf_p1', type:'pink', name:'Stationary Bike or Elliptical', sets:1, reps:'15 min', ytId:'_kGkl3PVOeA', notes:'Level 6-8. Your best cardio effort of the program. Push the resistance up and hold that pace. This is where the last layer of fat comes off.' },
+        { id:'sf_p2', type:'pink', name:'Banded Glute Bridge', sets:4, reps:'20', ytId:'wPM8icPu6H8', notes:'4 sets at peak intensity. Band tension maxed, full squeeze, 2 second hold. These should burn.' },
+        { id:'sf_a1', type:'purple', name:'Dumbbell Romanian Deadlift', sets:4, reps:'10', ytId:'JCXUYuzwNrM', notes:'4 sets with your heaviest weight. Perfect hinge, controlled lowering, powerful drive up.' },
         { id:'sf_a2', type:'purple', name:'Walking Lunges (Weighted)', sets:3, reps:'10/side', notes:'Dumbbells now. Lunge with intention. Balance, strength, and calorie burn all in one.' },
         { id:'sf_f1', type:'red', name:'Full Body Stretch Sequence', sets:1, reps:'5 min', notes:'Hip flexors, hamstrings, quads, chest, shoulders. You\'ve completed 8 weeks — take 5 minutes to honor the work.' }
       ]
@@ -740,7 +749,10 @@ function applyProgramTheme(prog) {
 }
 
 function getCurrentWorkouts() {
-  return activeProgram === 'slim' ? SLIM_WORKOUTS : WORKOUTS;
+  if (activeProgram === 'slim') {
+    return activeEnv === 'home' ? SLIM_HOME : SLIM_GYM;
+  }
+  return activeEnv === 'home' ? BUILD_HER_HOME : BUILD_HER_GYM;
 }
 
 function getCurrentPhases() {
@@ -832,40 +844,40 @@ function drawWeightChart() {
 }
 
 // Full workout data keyed by phase index (0/1/2) and day (mon/wed/fri)
-const WORKOUTS = {
+const BUILD_HER_GYM = {
   mon: {
     name: 'Glutes & Hamstrings',
     sub: 'Hip-dominant',
     phases: [
       // Phase 1
       [
-        { id:'mon_cns1', type:'cns', name:'Banded Clamshells', sets:2, reps:'15/side', notes:'Lie on side, band above knees. Open and close like a clamshell. Feel the outer glute fire. Move slowly.' },
-        { id:'mon_cns2', type:'cns', name:'Banded Glute Bridge', sets:2, reps:'15', notes:'Band above knees, feet flat, push knees out against band. Squeeze glutes at the top. This is your warmup, not a workout.' },
-        { id:'mon_p1', type:'pink', name:'Barbell Hip Thrust', sets:4, reps:'10', notes:'The king of glute exercises. Back on bench, barbell across hips with pad. Drive hips up explosively, squeeze hard at top for 1 second. Control down. Feel every rep in your glutes, not your lower back.' },
-        { id:'mon_p2', type:'pink', name:'Romanian Deadlift (RDL)', sets:4, reps:'10', notes:'Hinge at hips, push them back. Bar stays close to legs. Feel the hamstring stretch at the bottom. Drive hips forward to stand. This builds the under-butt and hamstrings.' },
-        { id:'mon_a1', type:'purple', name:'Cable Pull-Through', sets:3, reps:'12', notes:'Face away from cable, rope between legs. Hinge and squeeze. Great for glute-ham connection.' },
+        { id:'mon_cns1', type:'cns', name:'Banded Clamshells', sets:2, reps:'15/side', ytId:'2GEoAZOU83I', notes:'Lie on side, band above knees. Open and close like a clamshell. Feel the outer glute fire. Move slowly.' },
+        { id:'mon_cns2', type:'cns', name:'Banded Glute Bridge', sets:2, reps:'15', ytId:'wPM8icPu6H8', notes:'Band above knees, feet flat, push knees out against band. Squeeze glutes at the top. This is your warmup, not a workout.' },
+        { id:'mon_p1', type:'pink', name:'Barbell Hip Thrust', sets:4, reps:'10', ytId:'etrazdTsGEA', notes:'The king of glute exercises. Back on bench, barbell across hips with pad. Drive hips up explosively, squeeze hard at top for 1 second. Control down. Feel every rep in your glutes, not your lower back.' },
+        { id:'mon_p2', type:'pink', name:'Romanian Deadlift (RDL)', sets:4, reps:'10', ytId:'JCXUYuzwNrM', notes:'Hinge at hips, push them back. Bar stays close to legs. Feel the hamstring stretch at the bottom. Drive hips forward to stand. This builds the under-butt and hamstrings.' },
+        { id:'mon_a1', type:'purple', name:'Cable Pull-Through', sets:3, reps:'12', ytId:'vQZH8VXFKDQ', notes:'Face away from cable, rope between legs. Hinge and squeeze. Great for glute-ham connection.' },
         { id:'mon_a2', type:'purple', name:'Lying Leg Curl', sets:3, reps:'12', notes:'Full range of motion. Control the eccentric (lower slowly). Squeeze hamstrings at top.' },
-        { id:'mon_f1', type:'red', name:'Glute Kickback', sets:3, reps:'15/side', notes:'Squeeze at the top of every rep. Slow and controlled. Feel the burn.' }
+        { id:'mon_f1', type:'red', name:'Glute Kickback', sets:3, reps:'15/side', ytId:'SJ1Xuz9D-ZQ', notes:'Squeeze at the top of every rep. Slow and controlled. Feel the burn.' }
       ],
       // Phase 2
       [
-        { id:'mon_cns1', type:'cns', name:'Banded Clamshells', sets:2, reps:'15/side', notes:'Lie on side, band above knees. Open and close like a clamshell. Feel the outer glute fire. Move slowly.' },
-        { id:'mon_cns2', type:'cns', name:'Banded Glute Bridge', sets:2, reps:'15', notes:'Band above knees, feet flat, push knees out against band. Squeeze glutes at the top. This is your warmup, not a workout.' },
-        { id:'mon_p1', type:'pink', name:'Barbell Hip Thrust', sets:4, reps:'8', notes:'Heavier than Phase 1. Same form — drive up explosively, hard squeeze at top. Load the bar with intention.' },
-        { id:'mon_p2', type:'pink', name:'Romanian Deadlift (RDL)', sets:4, reps:'8', notes:'Go heavier. Maintain that hinge, feel the stretch. More weight = more stimulus = more growth.' },
-        { id:'mon_a1', type:'purple', name:'Cable Pull-Through', sets:3, reps:'12', notes:'Face away from cable, rope between legs. Hinge and squeeze. Great for glute-ham connection.' },
+        { id:'mon_cns1', type:'cns', name:'Banded Clamshells', sets:2, reps:'15/side', ytId:'2GEoAZOU83I', notes:'Lie on side, band above knees. Open and close like a clamshell. Feel the outer glute fire. Move slowly.' },
+        { id:'mon_cns2', type:'cns', name:'Banded Glute Bridge', sets:2, reps:'15', ytId:'wPM8icPu6H8', notes:'Band above knees, feet flat, push knees out against band. Squeeze glutes at the top. This is your warmup, not a workout.' },
+        { id:'mon_p1', type:'pink', name:'Barbell Hip Thrust', sets:4, reps:'8', ytId:'etrazdTsGEA', notes:'Heavier than Phase 1. Same form — drive up explosively, hard squeeze at top. Load the bar with intention.' },
+        { id:'mon_p2', type:'pink', name:'Romanian Deadlift (RDL)', sets:4, reps:'8', ytId:'JCXUYuzwNrM', notes:'Go heavier. Maintain that hinge, feel the stretch. More weight = more stimulus = more growth.' },
+        { id:'mon_a1', type:'purple', name:'Cable Pull-Through', sets:3, reps:'12', ytId:'vQZH8VXFKDQ', notes:'Face away from cable, rope between legs. Hinge and squeeze. Great for glute-ham connection.' },
         { id:'mon_a2', type:'purple', name:'Lying Leg Curl', sets:3, reps:'12', notes:'Full range of motion. Control the eccentric (lower slowly). Squeeze hamstrings at top.' },
-        { id:'mon_f1', type:'red', name:'Glute Kickback', sets:3, reps:'15/side', notes:'Squeeze at the top of every rep. Slow and controlled. Feel the burn.' }
+        { id:'mon_f1', type:'red', name:'Glute Kickback', sets:3, reps:'15/side', ytId:'SJ1Xuz9D-ZQ', notes:'Squeeze at the top of every rep. Slow and controlled. Feel the burn.' }
       ],
       // Phase 3
       [
-        { id:'mon_cns1', type:'cns', name:'Banded Clamshells', sets:2, reps:'15/side', notes:'Lie on side, band above knees. Open and close like a clamshell. Feel the outer glute fire. Move slowly.' },
-        { id:'mon_cns2', type:'cns', name:'Banded Glute Bridge', sets:2, reps:'15', notes:'Band above knees, feet flat, push knees out against band. Squeeze glutes at the top. This is your warmup, not a workout.' },
-        { id:'mon_p1', type:'pink', name:'Barbell Hip Thrust', sets:5, reps:'6', notes:'Heaviest loads of the program. 5 sets of 6. Every rep counts. This is your peak week effort.' },
-        { id:'mon_p2', type:'pink', name:'Romanian Deadlift (RDL)', sets:5, reps:'6', notes:'Peak weights. Slow down the eccentric, explode up. Leave everything in the gym.' },
-        { id:'mon_a1', type:'purple', name:'Cable Pull-Through', sets:3, reps:'12', notes:'Face away from cable, rope between legs. Hinge and squeeze. Great for glute-ham connection.' },
+        { id:'mon_cns1', type:'cns', name:'Banded Clamshells', sets:2, reps:'15/side', ytId:'2GEoAZOU83I', notes:'Lie on side, band above knees. Open and close like a clamshell. Feel the outer glute fire. Move slowly.' },
+        { id:'mon_cns2', type:'cns', name:'Banded Glute Bridge', sets:2, reps:'15', ytId:'wPM8icPu6H8', notes:'Band above knees, feet flat, push knees out against band. Squeeze glutes at the top. This is your warmup, not a workout.' },
+        { id:'mon_p1', type:'pink', name:'Barbell Hip Thrust', sets:5, reps:'6', ytId:'etrazdTsGEA', notes:'Heaviest loads of the program. 5 sets of 6. Every rep counts. This is your peak week effort.' },
+        { id:'mon_p2', type:'pink', name:'Romanian Deadlift (RDL)', sets:5, reps:'6', ytId:'JCXUYuzwNrM', notes:'Peak weights. Slow down the eccentric, explode up. Leave everything in the gym.' },
+        { id:'mon_a1', type:'purple', name:'Cable Pull-Through', sets:3, reps:'12', ytId:'vQZH8VXFKDQ', notes:'Face away from cable, rope between legs. Hinge and squeeze. Great for glute-ham connection.' },
         { id:'mon_a2', type:'purple', name:'Lying Leg Curl', sets:3, reps:'12', notes:'Full range of motion. Control the eccentric (lower slowly). Squeeze hamstrings at top.' },
-        { id:'mon_f1', type:'red', name:'Glute Kickback', sets:3, reps:'15/side', notes:'Squeeze at the top of every rep. Slow and controlled. Feel the burn.' }
+        { id:'mon_f1', type:'red', name:'Glute Kickback', sets:3, reps:'15/side', ytId:'SJ1Xuz9D-ZQ', notes:'Squeeze at the top of every rep. Slow and controlled. Feel the burn.' }
       ]
     ]
   },
@@ -875,31 +887,31 @@ const WORKOUTS = {
     phases: [
       // Phase 1
       [
-        { id:'wed_cns1', type:'cns', name:'Bodyweight Squat', sets:2, reps:'15', notes:'Feet shoulder-width, toes slightly out. Squat deep. Drive knees out. Warmup the hips and knees.' },
-        { id:'wed_cns2', type:'cns', name:'Hip Circle Walks', sets:2, reps:'10/side', notes:'Band above knees. Walk side to side, keeping tension in the band. Activates glutes before loading.' },
-        { id:'wed_p1', type:'pink', name:'Goblet Squat', sets:4, reps:'10', notes:'Hold a dumbbell at chest height. Feet shoulder-width, toes slightly out. Squat deep — below parallel if possible. Drive knees out. This teaches the squat pattern and builds quad and glute size.' },
-        { id:'wed_p2', type:'pink', name:'Bulgarian Split Squat', sets:4, reps:'10/side', notes:'Rear foot elevated on bench. Front foot far enough forward that your shin is vertical at the bottom. This is the best single-leg exercise for glute and quad size. It will burn.' },
-        { id:'wed_a1', type:'purple', name:'Leg Press', sets:3, reps:'12', notes:'Feet high and wide on the platform targets more glutes. Full range of motion — don\'t cut it short.' },
+        { id:'wed_cns1', type:'cns', name:'Bodyweight Squat', sets:2, reps:'15', ytId:'aclHkVaku9U', notes:'Feet shoulder-width, toes slightly out. Squat deep. Drive knees out. Warmup the hips and knees.' },
+        { id:'wed_cns2', type:'cns', name:'Hip Circle Walks', sets:2, reps:'10/side', ytId:'sPFylrIZMoU', notes:'Band above knees. Walk side to side, keeping tension in the band. Activates glutes before loading.' },
+        { id:'wed_p1', type:'pink', name:'Goblet Squat', sets:4, reps:'10', ytId:'MeIiIdhvXT4', notes:'Hold a dumbbell at chest height. Feet shoulder-width, toes slightly out. Squat deep — below parallel if possible. Drive knees out. This teaches the squat pattern and builds quad and glute size.' },
+        { id:'wed_p2', type:'pink', name:'Bulgarian Split Squat', sets:4, reps:'10/side', ytId:'2C-uNgKwPLE', notes:'Rear foot elevated on bench. Front foot far enough forward that your shin is vertical at the bottom. This is the best single-leg exercise for glute and quad size. It will burn.' },
+        { id:'wed_a1', type:'purple', name:'Leg Press', sets:3, reps:'12', ytId:'IZxyjW7MPJQ', notes:'Feet high and wide on the platform targets more glutes. Full range of motion — don\'t cut it short.' },
         { id:'wed_a2', type:'purple', name:'Walking Lunges', sets:3, reps:'12/side', notes:'Hold dumbbells, take long strides. Front knee tracks over toes. Builds quads, glutes, and coordination.' },
-        { id:'wed_f1', type:'red', name:'Wall Sit', sets:3, reps:'30-45 sec', notes:'Thighs parallel to floor. This burns so good. Hold it.' }
+        { id:'wed_f1', type:'red', name:'Wall Sit', sets:3, reps:'30-45 sec', ytId:'y-wV4Venusw', notes:'Thighs parallel to floor. This burns so good. Hold it.' }
       ],
       // Phase 2
       [
-        { id:'wed_cns1', type:'cns', name:'Bodyweight Squat', sets:2, reps:'15', notes:'Feet shoulder-width, toes slightly out. Squat deep. Drive knees out. Warmup the hips and knees.' },
-        { id:'wed_cns2', type:'cns', name:'Hip Circle Walks', sets:2, reps:'10/side', notes:'Band above knees. Walk side to side, keeping tension in the band. Activates glutes before loading.' },
+        { id:'wed_cns1', type:'cns', name:'Bodyweight Squat', sets:2, reps:'15', ytId:'aclHkVaku9U', notes:'Feet shoulder-width, toes slightly out. Squat deep. Drive knees out. Warmup the hips and knees.' },
+        { id:'wed_cns2', type:'cns', name:'Hip Circle Walks', sets:2, reps:'10/side', ytId:'sPFylrIZMoU', notes:'Band above knees. Walk side to side, keeping tension in the band. Activates glutes before loading.' },
         { id:'wed_p1', type:'pink', name:'Barbell Back Squat', sets:4, reps:'8', notes:'Bar on traps or low back. Brace your core, squat to parallel or below. Drive through heels. Knees track over toes. This is the big quad and glute builder.' },
-        { id:'wed_p2', type:'pink', name:'Bulgarian Split Squat', sets:4, reps:'8/side', notes:'Rear foot elevated on bench. Go heavier than Phase 1. Control the descent, drive through the heel.' },
-        { id:'wed_a1', type:'purple', name:'Leg Press', sets:3, reps:'12', notes:'Feet high and wide on the platform targets more glutes. Full range of motion — don\'t cut it short.' },
+        { id:'wed_p2', type:'pink', name:'Bulgarian Split Squat', sets:4, reps:'8/side', ytId:'2C-uNgKwPLE', notes:'Rear foot elevated on bench. Go heavier than Phase 1. Control the descent, drive through the heel.' },
+        { id:'wed_a1', type:'purple', name:'Leg Press', sets:3, reps:'12', ytId:'IZxyjW7MPJQ', notes:'Feet high and wide on the platform targets more glutes. Full range of motion — don\'t cut it short.' },
         { id:'wed_a2', type:'purple', name:'Walking Lunges', sets:3, reps:'12/side', notes:'Hold dumbbells, take long strides. Front knee tracks over toes. Builds quads, glutes, and coordination.' },
         { id:'wed_f1', type:'red', name:'Leg Extension', sets:3, reps:'15', notes:'Full extension at the top. Control the weight down. Pure quad isolation to finish.' }
       ],
       // Phase 3
       [
-        { id:'wed_cns1', type:'cns', name:'Bodyweight Squat', sets:2, reps:'15', notes:'Feet shoulder-width, toes slightly out. Squat deep. Drive knees out. Warmup the hips and knees.' },
-        { id:'wed_cns2', type:'cns', name:'Hip Circle Walks', sets:2, reps:'10/side', notes:'Band above knees. Walk side to side, keeping tension in the band. Activates glutes before loading.' },
+        { id:'wed_cns1', type:'cns', name:'Bodyweight Squat', sets:2, reps:'15', ytId:'aclHkVaku9U', notes:'Feet shoulder-width, toes slightly out. Squat deep. Drive knees out. Warmup the hips and knees.' },
+        { id:'wed_cns2', type:'cns', name:'Hip Circle Walks', sets:2, reps:'10/side', ytId:'sPFylrIZMoU', notes:'Band above knees. Walk side to side, keeping tension in the band. Activates glutes before loading.' },
         { id:'wed_p1', type:'pink', name:'Barbell Back Squat', sets:5, reps:'6', notes:'Heaviest squat of the program. 5 sets. Nail your form, push the weight. This is peak loading.' },
-        { id:'wed_p2', type:'pink', name:'Bulgarian Split Squat', sets:5, reps:'6/side', notes:'Peak effort. Load up the dumbbells or barbell. Every rep of every set counts.' },
-        { id:'wed_a1', type:'purple', name:'Leg Press', sets:4, reps:'10', notes:'Feet high and wide. Control the range, full depth. More volume this phase.' },
+        { id:'wed_p2', type:'pink', name:'Bulgarian Split Squat', sets:5, reps:'6/side', ytId:'2C-uNgKwPLE', notes:'Peak effort. Load up the dumbbells or barbell. Every rep of every set counts.' },
+        { id:'wed_a1', type:'purple', name:'Leg Press', sets:4, reps:'10', ytId:'IZxyjW7MPJQ', notes:'Feet high and wide. Control the range, full depth. More volume this phase.' },
         { id:'wed_a2', type:'purple', name:'Walking Lunges', sets:3, reps:'12/side', notes:'Hold dumbbells, take long strides. Front knee tracks over toes. Builds quads, glutes, and coordination.' },
         { id:'wed_f1', type:'red', name:'Leg Extension', sets:3, reps:'15', notes:'Full extension at the top. Control the weight down. Pure quad isolation to finish.' }
       ]
@@ -911,34 +923,262 @@ const WORKOUTS = {
     phases: [
       // Phase 1
       [
-        { id:'fri_cns1', type:'cns', name:'Hip Thrust Hold', sets:2, reps:'10 sec', notes:'Hold at the top of a glute bridge for 10 seconds. Feel the full contraction. Activate before loading.' },
-        { id:'fri_cns2', type:'cns', name:'Fire Hydrants', sets:2, reps:'15/side', notes:'On all fours, lift knee out to the side. Band makes this harder. Targets outer glutes and hip abductors.' },
-        { id:'fri_p1', type:'pink', name:'Sumo Deadlift', sets:4, reps:'10', notes:'Wide stance, toes pointed out. This variation hits the glutes and inner thighs more than conventional. Keep the bar close, chest up, drive through heels.' },
-        { id:'fri_p2', type:'pink', name:'DB Step Up', sets:4, reps:'10/side', notes:'Hold dumbbells, step onto a bench or box. Drive through the heel of the elevated foot. Squeeze the glute at the top. Don\'t use momentum.' },
-        { id:'fri_a1', type:'purple', name:'Seated Hip Abduction', sets:3, reps:'15', notes:'The outer glute builder. Full range of motion, squeeze at the widest point. Go heavier than you think.' },
-        { id:'fri_a2', type:'purple', name:'Back Extension / Hyperextension', sets:3, reps:'12', notes:'Squeeze glutes at the top. Don\'t hyperextend the lower back. Control down.' },
-        { id:'fri_f1', type:'red', name:'Banded Glute Bridge', sets:3, reps:'20', notes:'Band above knees. Drive knees out against the band. 20 reps of pure glute burn to finish.' }
+        { id:'fri_cns1', type:'cns', name:'Hip Thrust Hold', sets:2, reps:'10 sec', ytId:'wPM8icPu6H8', notes:'Hold at the top of a glute bridge for 10 seconds. Feel the full contraction. Activate before loading.' },
+        { id:'fri_cns2', type:'cns', name:'Fire Hydrants', sets:2, reps:'15/side', ytId:'_Bz15zPVFXY', notes:'On all fours, lift knee out to the side. Band makes this harder. Targets outer glutes and hip abductors.' },
+        { id:'fri_p1', type:'pink', name:'Sumo Deadlift', sets:4, reps:'10', ytId:'sSwf9O6JrkQ', notes:'Wide stance, toes pointed out. This variation hits the glutes and inner thighs more than conventional. Keep the bar close, chest up, drive through heels.' },
+        { id:'fri_p2', type:'pink', name:'DB Step Up', sets:4, reps:'10/side', ytId:'dQqApCGd5Ss', notes:'Hold dumbbells, step onto a bench or box. Drive through the heel of the elevated foot. Squeeze the glute at the top. Don\'t use momentum.' },
+        { id:'fri_a1', type:'purple', name:'Seated Hip Abduction', sets:3, reps:'15', ytId:'1nvK9-ltLUQ', notes:'The outer glute builder. Full range of motion, squeeze at the widest point. Go heavier than you think.' },
+        { id:'fri_a2', type:'purple', name:'Back Extension / Hyperextension', sets:3, reps:'12', ytId:'cc6UVNTKX5s', notes:'Squeeze glutes at the top. Don\'t hyperextend the lower back. Control down.' },
+        { id:'fri_f1', type:'red', name:'Banded Glute Bridge', sets:3, reps:'20', ytId:'wPM8icPu6H8', notes:'Band above knees. Drive knees out against the band. 20 reps of pure glute burn to finish.' }
       ],
       // Phase 2
       [
-        { id:'fri_cns1', type:'cns', name:'Hip Thrust Hold', sets:2, reps:'10 sec', notes:'Hold at the top of a glute bridge for 10 seconds. Feel the full contraction. Activate before loading.' },
-        { id:'fri_cns2', type:'cns', name:'Fire Hydrants', sets:2, reps:'15/side', notes:'On all fours, lift knee out to the side. Band makes this harder. Targets outer glutes and hip abductors.' },
+        { id:'fri_cns1', type:'cns', name:'Hip Thrust Hold', sets:2, reps:'10 sec', ytId:'wPM8icPu6H8', notes:'Hold at the top of a glute bridge for 10 seconds. Feel the full contraction. Activate before loading.' },
+        { id:'fri_cns2', type:'cns', name:'Fire Hydrants', sets:2, reps:'15/side', ytId:'_Bz15zPVFXY', notes:'On all fours, lift knee out to the side. Band makes this harder. Targets outer glutes and hip abductors.' },
         { id:'fri_p1', type:'pink', name:'Trap Bar Deadlift', sets:4, reps:'8', notes:'Neutral grip on the hex bar. Feet hip-width. Push the floor away. Great for glutes, hams, and back. Go heavier than sumo deadlift.' },
-        { id:'fri_p2', type:'pink', name:'DB Step Up', sets:4, reps:'8/side', notes:'Hold dumbbells, step onto a bench or box. Drive through the heel of the elevated foot. Squeeze the glute at the top. Heavier this phase.' },
-        { id:'fri_a1', type:'purple', name:'Seated Hip Abduction', sets:3, reps:'15', notes:'The outer glute builder. Full range of motion, squeeze at the widest point. Go heavier than you think.' },
-        { id:'fri_a2', type:'purple', name:'Back Extension / Hyperextension', sets:3, reps:'12', notes:'Squeeze glutes at the top. Don\'t hyperextend the lower back. Control down.' },
+        { id:'fri_p2', type:'pink', name:'DB Step Up', sets:4, reps:'8/side', ytId:'dQqApCGd5Ss', notes:'Hold dumbbells, step onto a bench or box. Drive through the heel of the elevated foot. Squeeze the glute at the top. Heavier this phase.' },
+        { id:'fri_a1', type:'purple', name:'Seated Hip Abduction', sets:3, reps:'15', ytId:'1nvK9-ltLUQ', notes:'The outer glute builder. Full range of motion, squeeze at the widest point. Go heavier than you think.' },
+        { id:'fri_a2', type:'purple', name:'Back Extension / Hyperextension', sets:3, reps:'12', ytId:'cc6UVNTKX5s', notes:'Squeeze glutes at the top. Don\'t hyperextend the lower back. Control down.' },
         { id:'fri_a3', type:'purple', name:'Glute Ham Raise', sets:3, reps:'8', notes:'Advanced movement. Anchor feet, lower body forward under control. Pull yourself back up using hamstrings and glutes.' },
-        { id:'fri_f1', type:'red', name:'Banded Glute Bridge', sets:3, reps:'20', notes:'Band above knees. Drive knees out against the band. 20 reps of pure glute burn to finish.' }
+        { id:'fri_f1', type:'red', name:'Banded Glute Bridge', sets:3, reps:'20', ytId:'wPM8icPu6H8', notes:'Band above knees. Drive knees out against the band. 20 reps of pure glute burn to finish.' }
       ],
       // Phase 3
       [
-        { id:'fri_cns1', type:'cns', name:'Hip Thrust Hold', sets:2, reps:'10 sec', notes:'Hold at the top of a glute bridge for 10 seconds. Feel the full contraction. Activate before loading.' },
-        { id:'fri_cns2', type:'cns', name:'Fire Hydrants', sets:2, reps:'15/side', notes:'On all fours, lift knee out to the side. Band makes this harder. Targets outer glutes and hip abductors.' },
+        { id:'fri_cns1', type:'cns', name:'Hip Thrust Hold', sets:2, reps:'10 sec', ytId:'wPM8icPu6H8', notes:'Hold at the top of a glute bridge for 10 seconds. Feel the full contraction. Activate before loading.' },
+        { id:'fri_cns2', type:'cns', name:'Fire Hydrants', sets:2, reps:'15/side', ytId:'_Bz15zPVFXY', notes:'On all fours, lift knee out to the side. Band makes this harder. Targets outer glutes and hip abductors.' },
         { id:'fri_p1', type:'pink', name:'Trap Bar Deadlift', sets:5, reps:'6', notes:'Max load. 5 sets of 6. Full pull, full reset each rep. This is your peak deadlift performance.' },
-        { id:'fri_p2', type:'pink', name:'DB Step Up', sets:5, reps:'6/side', notes:'Heaviest step-ups. Drive hard through the heel. Control the descent. Single-leg strength at its peak.' },
-        { id:'fri_a1', type:'purple', name:'Seated Hip Abduction', sets:4, reps:'15', notes:'Load it up. 4 sets this phase. Squeeze every rep at the widest point.' },
-        { id:'fri_a2', type:'purple', name:'Back Extension / Hyperextension', sets:3, reps:'12', notes:'Squeeze glutes at the top. Don\'t hyperextend the lower back. Control down.' },
-        { id:'fri_f1', type:'red', name:'Banded Glute Bridge', sets:3, reps:'20', notes:'Band above knees. Drive knees out against the band. 20 reps of pure glute burn to finish.' }
+        { id:'fri_p2', type:'pink', name:'DB Step Up', sets:5, reps:'6/side', ytId:'dQqApCGd5Ss', notes:'Heaviest step-ups. Drive hard through the heel. Control the descent. Single-leg strength at its peak.' },
+        { id:'fri_a1', type:'purple', name:'Seated Hip Abduction', sets:4, reps:'15', ytId:'1nvK9-ltLUQ', notes:'Load it up. 4 sets this phase. Squeeze every rep at the widest point.' },
+        { id:'fri_a2', type:'purple', name:'Back Extension / Hyperextension', sets:3, reps:'12', ytId:'cc6UVNTKX5s', notes:'Squeeze glutes at the top. Don\'t hyperextend the lower back. Control down.' },
+        { id:'fri_f1', type:'red', name:'Banded Glute Bridge', sets:3, reps:'20', ytId:'wPM8icPu6H8', notes:'Band above knees. Drive knees out against the band. 20 reps of pure glute burn to finish.' }
+      ]
+    ]
+  }
+};
+
+// ==================== BUILD HER HOME DATA ====================
+const BUILD_HER_HOME = {
+  mon: {
+    name: 'Glutes & Hamstrings',
+    sub: 'Hip-dominant (Home)',
+    phases: [
+      // Phase 1
+      [
+        { id:'mon_cns1_h', type:'cns', name:'Banded Clamshells', sets:2, reps:'15/side', ytId:'2GEoAZOU83I', notes:'Lie on side, band above knees. Open and close like a clamshell. Feel the outer glute fire. Move slowly.' },
+        { id:'mon_cns2_h', type:'cns', name:'Glute Bridge Hold', sets:2, reps:'10 sec', ytId:'wPM8icPu6H8', notes:'Hold at the top of a glute bridge for 10 seconds. Feel the full contraction. Activate before loading.' },
+        { id:'mon_p1_h', type:'pink', name:'Single-Leg Glute Bridge', sets:4, reps:'10/side', ytId:'H6d6_HDQ1_Q', notes:'Lie on back, one foot flat, other leg straight up. Drive hips up through the planted foot. Squeeze the glute hard at the top. This is your barbell hip thrust replacement — just as effective with bodyweight.' },
+        { id:'mon_p2_h', type:'pink', name:'Dumbbell or Backpack RDL', sets:4, reps:'12', ytId:'XxWcirHIwVo', notes:'Hold dumbbells or a loaded backpack. Hinge at hips, push them back, feel the hamstring stretch. Same movement as gym RDL — the load source doesn\'t matter, the hinge does.' },
+        { id:'mon_a1_h', type:'purple', name:'Resistance Band Pull-Through (standing)', sets:3, reps:'12', ytId:'vQZH8VXFKDQ', notes:'Anchor a resistance band at ankle height behind you. Stand facing away, rope between legs, hinge and squeeze.' },
+        { id:'mon_a2_h', type:'purple', name:'Nordic Curl Progression', sets:3, reps:'8', ytId:'nAKIFnPU1G4', notes:'Kneel and anchor your feet under a couch. Lower your body as slowly as possible. One of the best hamstring builders with zero equipment.' },
+        { id:'mon_f1_h', type:'red', name:'Donkey Kick', sets:3, reps:'15/side', ytId:'SJ1Xuz9D-ZQ', notes:'On all fours. Kick one leg back and up, squeeze the glute at the top. Same burn as cable kickback.' }
+      ],
+      // Phase 2
+      [
+        { id:'mon_cns1_h', type:'cns', name:'Banded Clamshells', sets:2, reps:'15/side', ytId:'2GEoAZOU83I', notes:'Lie on side, band above knees. Open and close like a clamshell. Feel the outer glute fire. Move slowly.' },
+        { id:'mon_cns2_h', type:'cns', name:'Glute Bridge Hold', sets:2, reps:'10 sec', ytId:'wPM8icPu6H8', notes:'Hold at the top of a glute bridge for 10 seconds. Feel the full contraction. Activate before loading.' },
+        { id:'mon_p1_h', type:'pink', name:'Single-Leg Glute Bridge', sets:4, reps:'12/side', ytId:'H6d6_HDQ1_Q', notes:'Lie on back, one foot flat, other leg straight up. Drive hips up through the planted foot. Squeeze the glute hard at the top. This is your barbell hip thrust replacement — just as effective with bodyweight.' },
+        { id:'mon_p2_h', type:'pink', name:'Dumbbell or Backpack RDL', sets:4, reps:'10', ytId:'XxWcirHIwVo', notes:'Hold dumbbells or a loaded backpack. Hinge at hips, push them back, feel the hamstring stretch. Same movement as gym RDL — the load source doesn\'t matter, the hinge does.' },
+        { id:'mon_a1_h', type:'purple', name:'Resistance Band Pull-Through (standing)', sets:3, reps:'12', ytId:'vQZH8VXFKDQ', notes:'Anchor a resistance band at ankle height behind you. Stand facing away, rope between legs, hinge and squeeze.' },
+        { id:'mon_a2_h', type:'purple', name:'Nordic Curl Progression', sets:3, reps:'8', ytId:'nAKIFnPU1G4', notes:'Kneel and anchor your feet under a couch. Lower your body as slowly as possible. One of the best hamstring builders with zero equipment.' },
+        { id:'mon_f1_h', type:'red', name:'Donkey Kick', sets:3, reps:'15/side', ytId:'SJ1Xuz9D-ZQ', notes:'On all fours. Kick one leg back and up, squeeze the glute at the top. Same burn as cable kickback.' }
+      ],
+      // Phase 3
+      [
+        { id:'mon_cns1_h', type:'cns', name:'Banded Clamshells', sets:2, reps:'15/side', ytId:'2GEoAZOU83I', notes:'Lie on side, band above knees. Open and close like a clamshell. Feel the outer glute fire. Move slowly.' },
+        { id:'mon_cns2_h', type:'cns', name:'Glute Bridge Hold', sets:2, reps:'10 sec', ytId:'wPM8icPu6H8', notes:'Hold at the top of a glute bridge for 10 seconds. Feel the full contraction. Activate before loading.' },
+        { id:'mon_p1_h', type:'pink', name:'Single-Leg Glute Bridge', sets:5, reps:'10/side', ytId:'H6d6_HDQ1_Q', notes:'Lie on back, one foot flat, other leg straight up. Drive hips up through the planted foot. Squeeze the glute hard at the top. This is your barbell hip thrust replacement — just as effective with bodyweight.' },
+        { id:'mon_p2_h', type:'pink', name:'Dumbbell or Backpack RDL', sets:5, reps:'8', ytId:'XxWcirHIwVo', notes:'Hold dumbbells or a loaded backpack. Hinge at hips, push them back, feel the hamstring stretch. Same movement as gym RDL — the load source doesn\'t matter, the hinge does.' },
+        { id:'mon_a1_h', type:'purple', name:'Resistance Band Pull-Through (standing)', sets:3, reps:'12', ytId:'vQZH8VXFKDQ', notes:'Anchor a resistance band at ankle height behind you. Stand facing away, rope between legs, hinge and squeeze.' },
+        { id:'mon_a2_h', type:'purple', name:'Nordic Curl Progression', sets:3, reps:'8', ytId:'nAKIFnPU1G4', notes:'Kneel and anchor your feet under a couch. Lower your body as slowly as possible. One of the best hamstring builders with zero equipment.' },
+        { id:'mon_f1_h', type:'red', name:'Donkey Kick', sets:3, reps:'15/side', ytId:'SJ1Xuz9D-ZQ', notes:'On all fours. Kick one leg back and up, squeeze the glute at the top. Same burn as cable kickback.' }
+      ]
+    ]
+  },
+  wed: {
+    name: 'Quads & Glutes',
+    sub: 'Knee-dominant (Home)',
+    phases: [
+      // Phase 1
+      [
+        { id:'wed_cns1_h', type:'cns', name:'Bodyweight Squat', sets:2, reps:'15', ytId:'aclHkVaku9U', notes:'Feet shoulder-width, toes slightly out. Squat deep. Drive knees out. Warmup the hips and knees.' },
+        { id:'wed_cns2_h', type:'cns', name:'Hip Circle Walks (band or no band)', sets:2, reps:'10/side', ytId:'sPFylrIZMoU', notes:'Walk side to side, keeping tension in the band if you have one. Activates glutes before loading.' },
+        { id:'wed_p1_h', type:'pink', name:'Goblet Squat (Dumbbell or Backpack)', sets:4, reps:'12', ytId:'MeIiIdhvXT4', notes:'Hold a dumbbell or load a backpack to your chest. Squat deep, drive knees out. Exactly the same as gym goblet squat.' },
+        { id:'wed_p2_h', type:'pink', name:'Reverse Lunge', sets:4, reps:'12/side', ytId:'0YFCnOFRUEs', notes:'Step back into a lunge. More stable than a forward lunge. Great quad and glute builder with no equipment needed.' },
+        { id:'wed_a1_h', type:'purple', name:'Chair-Assisted Sissy Squat', sets:3, reps:'12', ytId:'7HBQZ4HNtbU', notes:'Hold a chair for balance. Lean back and lower onto your toes. Targets quads like a leg press.' },
+        { id:'wed_a2_h', type:'purple', name:'Reverse Lunge to Knee Drive', sets:3, reps:'10/side', ytId:'D7KaRcUTQeE', notes:'Lunge back, then drive the knee up to hip height on return. Adds cardio and balance challenge.' },
+        { id:'wed_f1_h', type:'red', name:'Wall Sit', sets:3, reps:'40sec', ytId:'y-wV4Venusw', notes:'Back flat against wall, thighs parallel to floor. Hold. This burns exactly the same as the gym version.' }
+      ],
+      // Phase 2
+      [
+        { id:'wed_cns1_h', type:'cns', name:'Bodyweight Squat', sets:2, reps:'15', ytId:'aclHkVaku9U', notes:'Feet shoulder-width, toes slightly out. Squat deep. Drive knees out. Warmup the hips and knees.' },
+        { id:'wed_cns2_h', type:'cns', name:'Hip Circle Walks (band or no band)', sets:2, reps:'10/side', ytId:'sPFylrIZMoU', notes:'Walk side to side, keeping tension in the band if you have one. Activates glutes before loading.' },
+        { id:'wed_p1_h', type:'pink', name:'Jump-Free Split Squat', sets:4, reps:'10/side', ytId:'U4s4mEQ5VqU', notes:'Rear foot elevated on a chair or couch. Front foot forward. Slow descent, drive through the heel. Loaded with dumbbells or backpack. This is your Bulgarian split squat.' },
+        { id:'wed_p2_h', type:'pink', name:'Reverse Lunge', sets:4, reps:'12/side', ytId:'0YFCnOFRUEs', notes:'Step back into a lunge. More stable than a forward lunge. Great quad and glute builder with no equipment needed.' },
+        { id:'wed_a1_h', type:'purple', name:'Chair-Assisted Sissy Squat', sets:3, reps:'12', ytId:'7HBQZ4HNtbU', notes:'Hold a chair for balance. Lean back and lower onto your toes. Targets quads like a leg press.' },
+        { id:'wed_a2_h', type:'purple', name:'Reverse Lunge to Knee Drive', sets:3, reps:'10/side', ytId:'D7KaRcUTQeE', notes:'Lunge back, then drive the knee up to hip height on return. Adds cardio and balance challenge.' },
+        { id:'wed_f1_h', type:'red', name:'Wall Sit', sets:3, reps:'40sec', ytId:'y-wV4Venusw', notes:'Back flat against wall, thighs parallel to floor. Hold. This burns exactly the same as the gym version.' }
+      ],
+      // Phase 3
+      [
+        { id:'wed_cns1_h', type:'cns', name:'Bodyweight Squat', sets:2, reps:'15', ytId:'aclHkVaku9U', notes:'Feet shoulder-width, toes slightly out. Squat deep. Drive knees out. Warmup the hips and knees.' },
+        { id:'wed_cns2_h', type:'cns', name:'Hip Circle Walks (band or no band)', sets:2, reps:'10/side', ytId:'sPFylrIZMoU', notes:'Walk side to side, keeping tension in the band if you have one. Activates glutes before loading.' },
+        { id:'wed_p1_h', type:'pink', name:'Jump-Free Split Squat', sets:5, reps:'8/side', ytId:'U4s4mEQ5VqU', notes:'Rear foot elevated on a chair or couch. Front foot forward. Slow descent, drive through the heel. Loaded with dumbbells or backpack. This is your Bulgarian split squat.' },
+        { id:'wed_p2_h', type:'pink', name:'Reverse Lunge', sets:4, reps:'12/side', ytId:'0YFCnOFRUEs', notes:'Step back into a lunge. More stable than a forward lunge. Great quad and glute builder with no equipment needed.' },
+        { id:'wed_a1_h', type:'purple', name:'Chair-Assisted Sissy Squat', sets:3, reps:'12', ytId:'7HBQZ4HNtbU', notes:'Hold a chair for balance. Lean back and lower onto your toes. Targets quads like a leg press.' },
+        { id:'wed_a2_h', type:'purple', name:'Reverse Lunge to Knee Drive', sets:3, reps:'10/side', ytId:'D7KaRcUTQeE', notes:'Lunge back, then drive the knee up to hip height on return. Adds cardio and balance challenge.' },
+        { id:'wed_f1_h', type:'red', name:'Wall Sit', sets:3, reps:'40sec', ytId:'y-wV4Venusw', notes:'Back flat against wall, thighs parallel to floor. Hold. This burns exactly the same as the gym version.' }
+      ]
+    ]
+  },
+  fri: {
+    name: 'Full Glutes + Posterior',
+    sub: 'Posterior focus (Home)',
+    phases: [
+      // Phase 1
+      [
+        { id:'fri_cns1_h', type:'cns', name:'Hip Bridge Hold', sets:2, reps:'10 sec', ytId:'wPM8icPu6H8', notes:'Hold at the top of a glute bridge for 10 seconds. Feel the full contraction. Activate before loading.' },
+        { id:'fri_cns2_h', type:'cns', name:'Fire Hydrants', sets:2, reps:'15/side', ytId:'_Bz15zPVFXY', notes:'On all fours, lift knee out to the side. Band makes this harder. Targets outer glutes and hip abductors.' },
+        { id:'fri_p1_h', type:'pink', name:'Sumo Deadlift (DBs or Backpack)', sets:4, reps:'12', ytId:'sSwf9O6JrkQ', notes:'Wide stance, load in both hands. Hinge and pull. Same movement, different load source.' },
+        { id:'fri_p2_h', type:'pink', name:'Step Up (Chair or Stairs)', sets:4, reps:'10/side', ytId:'dQqApCGd5Ss', notes:'Use a sturdy chair or the bottom stair. Same movement pattern. Drive through the heel.' },
+        { id:'fri_a1_h', type:'purple', name:'Side-Lying Hip Abduction', sets:3, reps:'15/side', ytId:'1nvK9-ltLUQ', notes:'Lie on your side, lift the top leg. Band makes it harder. Same outer glute target as the machine.' },
+        { id:'fri_a2_h', type:'purple', name:'Superman Hold', sets:3, reps:'12', ytId:'cc6UVNTKX5s', notes:'Lie face down, lift arms and legs simultaneously. Hold for 2 seconds. Replaces back extension machine.' },
+        { id:'fri_f1_h', type:'red', name:'Banded Glute Bridge', sets:3, reps:'20', ytId:'wPM8icPu6H8', notes:'Band above knees. Same as gym version — this one needs no machine.' }
+      ],
+      // Phase 2
+      [
+        { id:'fri_cns1_h', type:'cns', name:'Hip Bridge Hold', sets:2, reps:'10 sec', ytId:'wPM8icPu6H8', notes:'Hold at the top of a glute bridge for 10 seconds. Feel the full contraction. Activate before loading.' },
+        { id:'fri_cns2_h', type:'cns', name:'Fire Hydrants', sets:2, reps:'15/side', ytId:'_Bz15zPVFXY', notes:'On all fours, lift knee out to the side. Band makes this harder. Targets outer glutes and hip abductors.' },
+        { id:'fri_p1_h', type:'pink', name:'Single-Leg RDL', sets:4, reps:'10/side', ytId:'2-LAMcpzODU', notes:'Stand on one leg, hinge forward, extend the other leg behind you. Best single-leg posterior chain exercise.' },
+        { id:'fri_p2_h', type:'pink', name:'Step Up (Chair or Stairs)', sets:4, reps:'8/side', ytId:'dQqApCGd5Ss', notes:'Use a sturdy chair or the bottom stair. Same movement pattern. Drive through the heel.' },
+        { id:'fri_a1_h', type:'purple', name:'Side-Lying Hip Abduction', sets:3, reps:'15/side', ytId:'1nvK9-ltLUQ', notes:'Lie on your side, lift the top leg. Band makes it harder. Same outer glute target as the machine.' },
+        { id:'fri_a2_h', type:'purple', name:'Superman Hold', sets:3, reps:'12', ytId:'cc6UVNTKX5s', notes:'Lie face down, lift arms and legs simultaneously. Hold for 2 seconds. Replaces back extension machine.' },
+        { id:'fri_f1_h', type:'red', name:'Banded Glute Bridge', sets:3, reps:'20', ytId:'wPM8icPu6H8', notes:'Band above knees. Same as gym version — this one needs no machine.' }
+      ],
+      // Phase 3
+      [
+        { id:'fri_cns1_h', type:'cns', name:'Hip Bridge Hold', sets:2, reps:'10 sec', ytId:'wPM8icPu6H8', notes:'Hold at the top of a glute bridge for 10 seconds. Feel the full contraction. Activate before loading.' },
+        { id:'fri_cns2_h', type:'cns', name:'Fire Hydrants', sets:2, reps:'15/side', ytId:'_Bz15zPVFXY', notes:'On all fours, lift knee out to the side. Band makes this harder. Targets outer glutes and hip abductors.' },
+        { id:'fri_p1_h', type:'pink', name:'Banded Good Morning', sets:5, reps:'10', ytId:'voSGGTnBqSI', notes:'Band over shoulders, feet hip-width. Hinge at hips, slight knee bend. Squeeze glutes and hamstrings to stand.' },
+        { id:'fri_p2_h', type:'pink', name:'Step Up (Chair or Stairs)', sets:5, reps:'6/side', ytId:'dQqApCGd5Ss', notes:'Use a sturdy chair or the bottom stair. Same movement pattern. Drive through the heel.' },
+        { id:'fri_a1_h', type:'purple', name:'Side-Lying Hip Abduction', sets:3, reps:'15/side', ytId:'1nvK9-ltLUQ', notes:'Lie on your side, lift the top leg. Band makes it harder. Same outer glute target as the machine.' },
+        { id:'fri_a2_h', type:'purple', name:'Superman Hold', sets:3, reps:'12', ytId:'cc6UVNTKX5s', notes:'Lie face down, lift arms and legs simultaneously. Hold for 2 seconds. Replaces back extension machine.' },
+        { id:'fri_f1_h', type:'red', name:'Banded Glute Bridge', sets:3, reps:'20', ytId:'wPM8icPu6H8', notes:'Band above knees. Same as gym version — this one needs no machine.' }
+      ]
+    ]
+  }
+};
+
+// ==================== SLIM HOME DATA ====================
+const SLIM_HOME = {
+  mon: {
+    name: 'Full Body A — Lower Focus',
+    sub: 'Legs, glutes & core (Home)',
+    phases: [
+      // Phase 1
+      [
+        { id:'sm_cns1_h', type:'cns', name:'Seated March', sets:2, reps:'20 steps', ytId:'TXHnvgBIi7c', notes:'Sit tall in a chair, lift each knee alternately. Warms up hips and core gently. No strain on knees.' },
+        { id:'sm_cns2_h', type:'cns', name:'Ankle Circles + Calf Raises (wall support)', sets:2, reps:'10 each', ytId:'I_AkTsWRZoQ', notes:'Stand at a wall for support. Rotate ankles both ways, then rise up on toes. Improves circulation and balance.' },
+        { id:'sm_p1_h', type:'pink', name:'Chair-Assisted Squat', sets:3, reps:'15', ytId:'8REBwJVnwE0', notes:'Stand in front of a sturdy chair. Sit back slowly until you barely touch, then stand. Perfect for beginners — the chair removes fear of falling and teaches the squat pattern safely.' },
+        { id:'sm_p2_h', type:'pink', name:'Step Up (Bottom Stair)', sets:3, reps:'12/side', ytId:'dQqApCGd5Ss', notes:'Use the bottom stair or a sturdy step. Step up one foot at a time, drive through the heel. Great for glutes and balance.' },
+        { id:'sm_a1_h', type:'purple', name:'Resistance Band Leg Extension (seated)', sets:3, reps:'15', ytId:'gVwz0fTgPXA', notes:'Sit in a chair, band around ankle, extend leg. Exact same motion as the machine.' },
+        { id:'sm_a2_h', type:'purple', name:'Standing Band Hip Abduction', sets:3, reps:'15/side', ytId:'jOc-OerBWDY', notes:'Band around ankles, stand and lift leg out to the side. Great for hip stability and outer thigh toning.' },
+        { id:'sm_f1_h', type:'red', name:'Dead Bug', sets:3, reps:'8/side', ytId:'YiSLTBPdFMs', notes:'Lie on back, arms up, knees at 90°. Lower opposite arm and leg to hover above floor. Breathe out as you lower. Rebuilds deep core without straining the lower back.' }
+      ],
+      // Phase 2
+      [
+        { id:'sm_cns1_h', type:'cns', name:'Seated March', sets:2, reps:'20 steps', ytId:'TXHnvgBIi7c', notes:'Sit tall in a chair, lift each knee alternately. Warms up hips and core gently.' },
+        { id:'sm_cns2_h', type:'cns', name:'Ankle Circles + Calf Raises (wall support)', sets:2, reps:'10 each', ytId:'I_AkTsWRZoQ', notes:'Stand at a wall for support. Rotate ankles both ways, then rise up on toes.' },
+        { id:'sm_p1_h', type:'pink', name:'Dumbbell Goblet Squat', sets:3, reps:'12', ytId:'MeIiIdhvXT4', notes:'Hold a dumbbell or load a backpack to your chest. Squat deep, drive knees out. Same form as Phase 1 but heavier.' },
+        { id:'sm_p2_h', type:'pink', name:'Weighted Step Up (DB)', sets:3, reps:'10/side', ytId:'dQqApCGd5Ss', notes:'Hold a dumbbell, step up on the stair or sturdy step. Increase difficulty from Phase 1.' },
+        { id:'sm_a1_h', type:'purple', name:'Resistance Band Leg Extension (seated)', sets:3, reps:'15', ytId:'gVwz0fTgPXA', notes:'Sit in a chair, band around ankle, extend leg. Exact same motion as the machine.' },
+        { id:'sm_a2_h', type:'purple', name:'Standing Band Hip Abduction', sets:3, reps:'15/side', ytId:'jOc-OerBWDY', notes:'Band around ankles, stand and lift leg out to the side.' },
+        { id:'sm_f1_h', type:'red', name:'Dead Bug', sets:3, reps:'10/side', ytId:'YiSLTBPdFMs', notes:'Full extension now — arm and leg hover as close to the floor as possible. Breathe. Control.' }
+      ],
+      // Phase 3
+      [
+        { id:'sm_cns1_h', type:'cns', name:'Seated March', sets:2, reps:'20 steps', ytId:'TXHnvgBIi7c', notes:'Warm up the hips and core gently before loading.' },
+        { id:'sm_cns2_h', type:'cns', name:'Ankle Circles + Calf Raises (wall support)', sets:2, reps:'12 each', ytId:'I_AkTsWRZoQ', notes:'Full range on the calf raises. Feel the stretch at the bottom.' },
+        { id:'sm_p1_h', type:'pink', name:'Split Squat (Bodyweight or Light DB)', sets:4, reps:'10/side', ytId:'U4s4mEQ5VqU', notes:'Rear foot elevated on a chair. Front foot forward. Slow descent. Peak quad and glute stimulus for this program.' },
+        { id:'sm_p2_h', type:'pink', name:'Weighted Step Up (DB)', sets:4, reps:'8/side', ytId:'dQqApCGd5Ss', notes:'4 sets with heavier DB. Single-leg strength is the best predictor of longevity and balance.' },
+        { id:'sm_a1_h', type:'purple', name:'Resistance Band Leg Extension (seated)', sets:4, reps:'12', ytId:'gVwz0fTgPXA', notes:'4 sets this phase. Add more band tension if available.' },
+        { id:'sm_a2_h', type:'purple', name:'Standing Band Hip Abduction', sets:3, reps:'12/side', ytId:'jOc-OerBWDY', notes:'Max resistance for this movement. Own the full range.' },
+        { id:'sm_f1_h', type:'red', name:'Dead Bug', sets:3, reps:'10/side', ytId:'YiSLTBPdFMs', notes:'Full extension. Slow and controlled. Core tight throughout.' }
+      ]
+    ]
+  },
+  wed: {
+    name: 'Full Body B — Upper & Core',
+    sub: 'Arms, back & stability (Home)',
+    phases: [
+      // Phase 1
+      [
+        { id:'sw_cns1_h', type:'cns', name:'Shoulder Rolls + Neck Circles', sets:2, reps:'10 each', ytId:'vSzEiLFP0wg', notes:'Slow and gentle. Loosen up the upper back and neck before any pressing or pulling.' },
+        { id:'sw_cns2_h', type:'cns', name:'Band Pull-Apart (or towel pull-apart)', sets:2, reps:'15', ytId:'7Rm5BBEAO4Q', notes:'Hold a light resistance band or towel at chest height with arms straight. Pull apart until band touches chest. Activates rear delts and opens the chest.' },
+        { id:'sw_p1_h', type:'pink', name:'Wall Push-Up', sets:3, reps:'15', ytId:'x7JjBGSxHWE', notes:'Hands on wall, lean in and push back. Zero joint stress. Builds shoulders and chest. As you get stronger, move hands lower (incline push-up, then floor).' },
+        { id:'sw_p2_h', type:'pink', name:'Resistance Band Row', sets:3, reps:'15', ytId:'n0lDFMQYBoo', notes:'Anchor band around a door handle or table leg. Sit or stand and pull toward your hips. Same motion as lat pulldown and row machines.' },
+        { id:'sw_a1_h', type:'purple', name:'Band or Towel Row', sets:3, reps:'12', ytId:'n0lDFMQYBoo', notes:'Pull toward your hips. Strong back = healthy spine.' },
+        { id:'sw_a2_h', type:'purple', name:'Dumbbell Curl', sets:3, reps:'15', ytId:'ykJmrZ5v0Oo', notes:'Light dumbbells. Full range. Squeeze at the top. Good for arm tone and bone density in the forearms.' },
+        { id:'sw_f1_h', type:'red', name:'Bird Dog', sets:3, reps:'8/side', ytId:'wiFNA3sqjCA', notes:'On hands and knees. Extend opposite arm and leg simultaneously, hold 2 seconds. Excellent for lower back rehab and core stability.' }
+      ],
+      // Phase 2
+      [
+        { id:'sw_cns1_h', type:'cns', name:'Shoulder Rolls + Neck Circles', sets:2, reps:'10 each', ytId:'vSzEiLFP0wg', notes:'Loosen the upper back before pressing or pulling.' },
+        { id:'sw_cns2_h', type:'cns', name:'Band Pull-Apart (or towel pull-apart)', sets:2, reps:'15', ytId:'7Rm5BBEAO4Q', notes:'Slightly more resistance this phase. Control the entire arc.' },
+        { id:'sw_p1_h', type:'pink', name:'Incline Push-Up (hands on chair)', sets:3, reps:'12', ytId:'cfns6QcfWb4', notes:'Hands on a chair or countertop. More resistance than wall push-up. Full range of motion.' },
+        { id:'sw_p2_h', type:'pink', name:'Band Lat Pulldown (door anchor overhead)', sets:3, reps:'12', ytId:'R9bHvzPsqco', notes:'Anchor band overhead on a door. Pull down to chest. Builds the upper back and improves posture.' },
+        { id:'sw_a1_h', type:'purple', name:'Band or Towel Row', sets:3, reps:'12', ytId:'n0lDFMQYBoo', notes:'Pull toward your hips. Slow and controlled this phase.' },
+        { id:'sw_a2_h', type:'purple', name:'Dumbbell Curl', sets:3, reps:'12', ytId:'ykJmrZ5v0Oo', notes:'Increase weight slightly. Slow down the lowering phase (2-3 counts). More time under tension = more tone.' },
+        { id:'sw_a3_h', type:'purple', name:'Band Tricep Pushdown', sets:3, reps:'12', ytId:'2-LAMcpzODU', notes:'Anchor band overhead. Lock elbows at sides, push down. Targets the back of the arms.' },
+        { id:'sw_f1_h', type:'red', name:'Bird Dog', sets:3, reps:'10/side', ytId:'wiFNA3sqjCA', notes:'Full extension, hold 3 seconds. Add a mini-crunch at the end for extra challenge.' }
+      ],
+      // Phase 3
+      [
+        { id:'sw_cns1_h', type:'cns', name:'Shoulder Rolls + Neck Circles', sets:2, reps:'10 each', ytId:'vSzEiLFP0wg', notes:'Full upper body warmup before peak loads.' },
+        { id:'sw_cns2_h', type:'cns', name:'Band Pull-Apart (or towel pull-apart)', sets:2, reps:'15', ytId:'7Rm5BBEAO4Q', notes:'Max resistance band. Full arc, full squeeze.' },
+        { id:'sw_p1_h', type:'pink', name:'Knee Push-Up or Full Push-Up', sets:4, reps:'10', ytId:'jWxvty2KROs', notes:'Knees down is perfectly fine. Core tight, hips level. Build to full push-up over time.' },
+        { id:'sw_p2_h', type:'pink', name:'Band Lat Pulldown (door anchor overhead)', sets:4, reps:'10', ytId:'R9bHvzPsqco', notes:'4 sets. Full range every rep. Peak back loading.' },
+        { id:'sw_a1_h', type:'purple', name:'Band or Towel Row', sets:3, reps:'10', ytId:'n0lDFMQYBoo', notes:'Heavier band. Slow controlled pulls. Strong back, upright posture.' },
+        { id:'sw_a2_h', type:'purple', name:'Dumbbell Curl', sets:3, reps:'10', ytId:'ykJmrZ5v0Oo', notes:'Add weight. 3-count lowering. Arms should be fatigued by rep 8.' },
+        { id:'sw_a3_h', type:'purple', name:'Band Tricep Pushdown', sets:3, reps:'12', ytId:'2-LAMcpzODU', notes:'Anchor band overhead. Lock elbows at sides, push down. Max tricep burn.' },
+        { id:'sw_f1_h', type:'red', name:'Bird Dog', sets:3, reps:'10/side', ytId:'wiFNA3sqjCA', notes:'Oblique and hip stability. Full extension, hold 3 seconds.' }
+      ]
+    ]
+  },
+  fri: {
+    name: 'Full Body C — Cardio & Tone',
+    sub: 'Burn calories, build endurance (Home)',
+    phases: [
+      // Phase 1
+      [
+        { id:'sf_cns1_h', type:'cns', name:'March in Place', sets:2, reps:'30 sec', ytId:'TXHnvgBIi7c', notes:'Swing arms, lift knees. Gets the heart rate up gently. This is your low-impact cardio warm-up.' },
+        { id:'sf_cns2_h', type:'cns', name:'Hip Flexor Stretch', sets:2, reps:'20 sec/side', ytId:'YQmpP9aHMgI', notes:'Lunge position, back knee down. Shift hips forward gently. Opens up the hip flexors that get tight from sitting.' },
+        { id:'sf_p1_h', type:'pink', name:'Low-Impact Stepping (step side to side 10 min)', sets:1, reps:'10 min', ytId:'UItMmIaGlGc', notes:'Step side to side to any music. Swing your arms. This is your cardio — no equipment, no impact, same fat burn as a bike.' },
+        { id:'sf_p2_h', type:'pink', name:'Banded Glute Bridge', sets:3, reps:'20', ytId:'wPM8icPu6H8', notes:'Band above knees. Feet flat, push knees out against the band. Drive hips up, squeeze hard at the top for 2 seconds. Best low-back-safe glute exercise.' },
+        { id:'sf_a1_h', type:'purple', name:'Dumbbell RDL', sets:3, reps:'15', ytId:'XxWcirHIwVo', notes:'Light dumbbells. Hinge at hips, push them back. Feel the hamstring stretch. Drive hips forward to return.' },
+        { id:'sf_a2_h', type:'purple', name:'Reverse Lunge', sets:3, reps:'10/side', ytId:'0YFCnOFRUEs', notes:'Step back into a lunge. More stable than a forward lunge. Burns calories and builds real functional leg strength.' },
+        { id:'sf_f1_h', type:'red', name:'Full Body Stretch / Foam Roll', sets:1, reps:'5 min', ytId:'L_xrDAtykMI', notes:'Stretch sequence you can do anywhere on the floor.' }
+      ],
+      // Phase 2
+      [
+        { id:'sf_cns1_h', type:'cns', name:'March in Place', sets:2, reps:'30 sec', ytId:'TXHnvgBIi7c', notes:'Swing arms, lift knees. Gentle cardio warm-up.' },
+        { id:'sf_cns2_h', type:'cns', name:'Hip Flexor Stretch', sets:2, reps:'20 sec/side', ytId:'YQmpP9aHMgI', notes:'Hold slightly longer than Phase 1. Deeper hip opening.' },
+        { id:'sf_p1_h', type:'pink', name:'Low-Impact Cardio Intervals', sets:1, reps:'12 min', ytId:'UItMmIaGlGc', notes:'Step side to side or march with intensity intervals. Push the effort — you should be slightly breathless but able to talk.' },
+        { id:'sf_p2_h', type:'pink', name:'Banded Glute Bridge', sets:3, reps:'20', ytId:'wPM8icPu6H8', notes:'Same form, heavier band or more focus on the squeeze. Pause 2 seconds at the top.' },
+        { id:'sf_a1_h', type:'purple', name:'Dumbbell RDL', sets:3, reps:'12', ytId:'XxWcirHIwVo', notes:'Go heavier this phase. Slow the lowering phase to 3 counts. You\'ll feel it more in the hamstrings.' },
+        { id:'sf_a2_h', type:'purple', name:'Reverse Lunge', sets:3, reps:'10/side', ytId:'0YFCnOFRUEs', notes:'Slow lunges — step wide, control the descent. These burn calories and build real functional leg strength.' },
+        { id:'sf_a3_h', type:'purple', name:'Calf Raise (wall support)', sets:3, reps:'20', ytId:'I_AkTsWRZoQ', notes:'Full range, pause at the top. Calves respond to high reps.' },
+        { id:'sf_f1_h', type:'red', name:'Full Body Stretch / Foam Roll', sets:1, reps:'5 min', ytId:'L_xrDAtykMI', notes:'Stretch sequence you can do anywhere on the floor.' }
+      ],
+      // Phase 3
+      [
+        { id:'sf_cns1_h', type:'cns', name:'March in Place', sets:2, reps:'30 sec', ytId:'TXHnvgBIi7c', notes:'Heart rate up, joints ready.' },
+        { id:'sf_cns2_h', type:'cns', name:'Hip Flexor Stretch', sets:2, reps:'25 sec/side', ytId:'YQmpP9aHMgI', notes:'Deepest stretch of the program. You have the flexibility now to go further.' },
+        { id:'sf_p1_h', type:'pink', name:'Low-Impact Cardio (continuous)', sets:1, reps:'15 min', ytId:'UItMmIaGlGc', notes:'Your best cardio effort of the program. Continuous stepping with full arm swing. This is where the last layer of fat comes off.' },
+        { id:'sf_p2_h', type:'pink', name:'Banded Glute Bridge', sets:4, reps:'20', ytId:'wPM8icPu6H8', notes:'4 sets at peak intensity. Band tension maxed, full squeeze, 2 second hold. These should burn.' },
+        { id:'sf_a1_h', type:'purple', name:'Dumbbell RDL', sets:4, reps:'10', ytId:'XxWcirHIwVo', notes:'4 sets with your heaviest weight. Perfect hinge, controlled lowering, powerful drive up.' },
+        { id:'sf_a2_h', type:'purple', name:'Reverse Lunge', sets:3, reps:'10/side', ytId:'0YFCnOFRUEs', notes:'Dumbbells now. Lunge with intention. Balance, strength, and calorie burn all in one.' },
+        { id:'sf_a3_h', type:'purple', name:'Calf Raise (wall support)', sets:3, reps:'20', ytId:'I_AkTsWRZoQ', notes:'Full range, pause at the top. Calves respond to high reps.' },
+        { id:'sf_f1_h', type:'red', name:'Full Body Stretch / Foam Roll', sets:1, reps:'5 min', ytId:'L_xrDAtykMI', notes:'Stretch sequence you can do anywhere on the floor. You\'ve completed 8 weeks — take 5 minutes to honor the work.' }
       ]
     ]
   }
@@ -953,6 +1193,7 @@ const REST_TIPS = {
 
 // ==================== STATE ====================
 let state = JSON.parse(localStorage.getItem('bh_state') || '{"week":1,"day":"mon"}');
+let activeEnv = localStorage.getItem('bh_env') || 'gym';
 let currentWorkoutDay = null;
 let currentWorkoutWeek = null;
 
@@ -1085,6 +1326,24 @@ document.getElementById('back-btn').addEventListener('click', () => {
   showView('today');
 });
 
+// Env toggle
+document.getElementById('env-toggle').addEventListener('click', (e) => {
+  const btn = e.target.closest('.env-btn');
+  if (!btn) return;
+  const env = btn.dataset.env;
+  if (env === activeEnv) return;
+  activeEnv = env;
+  localStorage.setItem('bh_env', env);
+  document.getElementById('env-btn-gym').classList.toggle('active', env === 'gym');
+  document.getElementById('env-btn-home').classList.toggle('active', env === 'home');
+  // Re-render exercise list with new env
+  if (currentWorkoutDay && currentWorkoutWeek) {
+    const pIdx = getPhaseIdx(currentWorkoutWeek);
+    const exercises = getCurrentWorkouts()[currentWorkoutDay].phases[pIdx];
+    renderExerciseList(exercises, currentWorkoutWeek);
+  }
+});
+
 // ==================== TODAY VIEW ====================
 function getStreakWeeks() {
   let streak = 0;
@@ -1198,6 +1457,10 @@ function launchWorkout(week, day) {
   notesEl.oninput = () => saveNotes(week, day, notesEl.value);
 
   renderExerciseList(exercises, week);
+
+  // Sync env toggle UI
+  document.getElementById('env-btn-gym').classList.toggle('active', activeEnv === 'gym');
+  document.getElementById('env-btn-home').classList.toggle('active', activeEnv === 'home');
 }
 
 function renderExerciseList(exercises, week) {
@@ -1208,6 +1471,53 @@ function renderExerciseList(exercises, week) {
   });
 }
 
+function buildVideoHtml(ex) {
+  if (!ex.ytId) {
+    const q = encodeURIComponent(ex.name + ' exercise for women');
+    return `<a class="yt-thumb" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener">
+      <div class="yt-img-wrap"><div class="yt-play"></div></div>
+      <div class="yt-label"><strong>${ex.name}</strong>Search on YouTube</div>
+    </a>`;
+  }
+  return `<div style="margin:0 0 12px;border-radius:8px;overflow:hidden;background:var(--bg3);" id="vid-wrap-${ex.id}">
+    <div onclick="bhExpandVideo('${ex.id}','${ex.ytId}')" style="display:flex;align-items:center;gap:10px;cursor:pointer;padding-right:10px;">
+      <div style="position:relative;flex-shrink:0;width:96px;height:54px;">
+        <img src="https://img.youtube.com/vi/${ex.ytId}/mqdefault.jpg" style="width:96px;height:54px;object-fit:cover;display:block;" loading="lazy">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+          <div style="width:28px;height:28px;background:rgba(255,0,0,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="white"><polygon points="3,1 9,5 3,9"/></svg>
+          </div>
+        </div>
+      </div>
+      <span style="font-size:12px;font-weight:600;color:var(--text2);">&#9654; Play Demo</span>
+    </div>
+    <div id="vid-player-${ex.id}" style="display:none;position:relative;padding-bottom:56.25%;height:0;">
+      <iframe id="vid-iframe-${ex.id}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen allow="autoplay;encrypted-media"></iframe>
+      <button onclick="bhCollapseVideo('${ex.id}')" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.7);border:none;color:#fff;border-radius:4px;padding:4px 8px;font-size:12px;font-weight:700;cursor:pointer;z-index:10;">&#x2715;</button>
+    </div>
+  </div>`;
+}
+
+function bhExpandVideo(exId, ytId) {
+  const thumb = document.querySelector(`#vid-wrap-${exId} > div:first-child`);
+  const player = document.getElementById(`vid-player-${exId}`);
+  const iframe = document.getElementById(`vid-iframe-${exId}`);
+  if (!thumb || !player || !iframe) return;
+  thumb.style.display = 'none';
+  player.style.display = 'block';
+  iframe.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`;
+}
+
+function bhCollapseVideo(exId) {
+  const thumb = document.querySelector(`#vid-wrap-${exId} > div:first-child`);
+  const player = document.getElementById(`vid-player-${exId}`);
+  const iframe = document.getElementById(`vid-iframe-${exId}`);
+  if (!thumb || !player || !iframe) return;
+  iframe.src = '';
+  player.style.display = 'none';
+  thumb.style.display = 'flex';
+}
+
 function buildExCard(ex, week, exercises, idx) {
   const skipped = isSkipped(ex.id, week);
   const completedSets = getSets(ex.id, week);
@@ -1215,9 +1525,6 @@ function buildExCard(ex, week, exercises, idx) {
   const card = document.createElement('div');
   card.className = `ex-card type-${ex.type}${skipped ? ' skipped' : ''}`;
   card.id = `excard-${ex.id}`;
-
-  const ytQuery = encodeURIComponent(ex.name + ' exercise for women');
-  const ytUrl = `https://www.youtube.com/results?search_query=${ytQuery}`;
 
   const setsHtml = buildSetsHtml(ex, week, completedSets);
   const lastW = getLastW(ex.id, week);
@@ -1235,14 +1542,8 @@ function buildExCard(ex, week, exercises, idx) {
       <div class="ex-reps-badge">${ex.sets}&times;${ex.reps}</div>
     </div>
     <div class="ex-body${idx === 0 ? ' open' : ''}" id="exbody-${ex.id}">
-      <a class="yt-thumb" href="${ytUrl}" target="_blank" rel="noopener">
-        <div class="yt-img-wrap"><div class="yt-play"></div></div>
-        <div class="yt-label">
-          <strong>${ex.name}</strong>
-          Watch on YouTube
-        </div>
-      </a>
-      <div class="how-to-toggle" data-target="howto-${ex.id}">▶ How To</div>
+      ${buildVideoHtml(ex)}
+      <div class="how-to-toggle" data-target="howto-${ex.id}">&#9654; How To</div>
       <div class="how-to-text" id="howto-${ex.id}">${ex.notes}</div>
       <div class="sets-row" id="sets-${ex.id}">${setsHtml}</div>
       <div class="weight-row">
@@ -1253,7 +1554,7 @@ function buildExCard(ex, week, exercises, idx) {
       ${nudge}
       <div style="display:flex;justify-content:flex-end;margin-top:8px">
         <button class="skip-btn" data-exid="${ex.id}">
-          ${skipped ? '✓ Unskip' : 'Skip exercise'}
+          ${skipped ? '&#10003; Unskip' : 'Skip exercise'}
         </button>
       </div>
     </div>
@@ -1564,6 +1865,10 @@ document.querySelectorAll('.surplus-tab').forEach(btn => {
 document.getElementById('save-measurements-btn').addEventListener('click', logMeasurement);
 
 // ==================== INIT ====================
+// Set initial env toggle state
+document.getElementById('env-btn-gym').classList.toggle('active', activeEnv === 'gym');
+document.getElementById('env-btn-home').classList.toggle('active', activeEnv === 'home');
+
 if (!activeProgram) {
   showProgramSelect();
 } else {
