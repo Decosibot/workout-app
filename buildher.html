@@ -3,6 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyCS6hfr0jIxDrn6IiTVXDtNI5y2huR7AiE",
+    authDomain: "workout-app-576c0.firebaseapp.com",
+    projectId: "workout-app-576c0",
+    storageBucket: "workout-app-576c0.firebasestorage.app",
+    messagingSenderId: "93802465651",
+    appId: "1:93802465651:web:e5453d53128bf6b8d25d06"
+  });
+  const db = firebase.firestore();
+
+  function getUID() {
+    let uid = localStorage.getItem('wapp_uid');
+    if (!uid) {
+      uid = 'u_' + Math.random().toString(36).substr(2,9) + Date.now().toString(36);
+      localStorage.setItem('wapp_uid', uid);
+    }
+    return uid;
+  }
+</script>
 <title>Build Her</title>
 <style>
 :root {
@@ -319,7 +341,10 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
     <div class="hero">
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
         <div class="hero-label" id="hero-prog-label">Build Her</div>
-        <button onclick="showProgramSelect()" style="background:rgba(255,255,255,.07);border:none;color:var(--text2);font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px;cursor:pointer;font-family:inherit">Switch Program</button>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span id="sync-status" style="font-size:10px;color:var(--text3);font-weight:600">☁️</span>
+          <button onclick="showProgramSelect()" style="background:rgba(255,255,255,.07);border:none;color:var(--text2);font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px;cursor:pointer;font-family:inherit">Switch Program</button>
+        </div>
       </div>
       <div class="hero-title" id="hero-day-name">Monday</div>
       <div class="hero-sub">Build the body you want.</div>
@@ -765,7 +790,7 @@ function getCurrentGetPhase(week) {
 
 // ==================== MEASUREMENT TRACKER ====================
 function getMeasurements() { return JSON.parse(localStorage.getItem('bh_measurements') || '[]'); }
-function saveMeasurementLog(arr) { localStorage.setItem('bh_measurements', JSON.stringify(arr)); }
+function saveMeasurementLog(arr) { localStorage.setItem('bh_measurements', JSON.stringify(arr)); syncToCloud(); }
 
 function logMeasurement() {
   const w = parseFloat(document.getElementById('t-weight').value);
@@ -1197,10 +1222,10 @@ let activeEnv = localStorage.getItem('bh_env') || 'gym';
 let currentWorkoutDay = null;
 let currentWorkoutWeek = null;
 
-function saveState() { localStorage.setItem('bh_state', JSON.stringify(state)); }
+function saveState() { localStorage.setItem('bh_state', JSON.stringify(state)); syncToCloud(); }
 
 function getW(exId, week) { return localStorage.getItem(`bh_w_${exId}_${week}`) || ''; }
-function setW(exId, week, val) { localStorage.setItem(`bh_w_${exId}_${week}`, val); }
+function setW(exId, week, val) { localStorage.setItem(`bh_w_${exId}_${week}`, val); clearTimeout(window._syncTimer); window._syncTimer = setTimeout(syncToCloud, 2000); }
 function getLastW(exId, week) {
   for (let w = week-1; w >= 1; w--) {
     const v = localStorage.getItem(`bh_w_${exId}_${w}`);
@@ -1213,9 +1238,9 @@ function getSets(exId, week) {
   const d = localStorage.getItem(`bh_sets_${exId}_${week}`);
   return d ? JSON.parse(d) : [];
 }
-function saveSets(exId, week, arr) { localStorage.setItem(`bh_sets_${exId}_${week}`, JSON.stringify(arr)); }
+function saveSets(exId, week, arr) { localStorage.setItem(`bh_sets_${exId}_${week}`, JSON.stringify(arr)); syncToCloud(); }
 function isDone(week, day) { return !!localStorage.getItem(`bh_done_${week}_${day}`); }
-function setDone(week, day) { localStorage.setItem(`bh_done_${week}_${day}`, '1'); }
+function setDone(week, day) { localStorage.setItem(`bh_done_${week}_${day}`, '1'); syncToCloud(); }
 function isSkipped(exId, week) { return !!localStorage.getItem(`bh_skip_${exId}_${week}`); }
 function setSkipped(exId, week, v) {
   if (v) localStorage.setItem(`bh_skip_${exId}_${week}`, '1');
@@ -1230,10 +1255,10 @@ function addHistory(entry) {
   localStorage.setItem('bh_history', JSON.stringify(h));
 }
 function getNotes(week, day) { return localStorage.getItem(`bh_notes_${week}_${day}`) || ''; }
-function saveNotes(week, day, val) { localStorage.setItem(`bh_notes_${week}_${day}`, val); }
+function saveNotes(week, day, val) { localStorage.setItem(`bh_notes_${week}_${day}`, val); syncToCloud(); }
 
 function getNutrition() { return JSON.parse(localStorage.getItem('bh_nutrition') || '{}'); }
-function saveNutrition(obj) { localStorage.setItem('bh_nutrition', JSON.stringify(obj)); }
+function saveNutrition(obj) { localStorage.setItem('bh_nutrition', JSON.stringify(obj)); syncToCloud(); }
 
 // ==================== TOAST ====================
 let toastTimer;
@@ -1864,17 +1889,61 @@ document.querySelectorAll('.surplus-tab').forEach(btn => {
 // ==================== TRACKER EVENTS ====================
 document.getElementById('save-measurements-btn').addEventListener('click', logMeasurement);
 
+// ==================== FIREBASE CLOUD SYNC ====================
+function syncToCloud() {
+  if (typeof db === 'undefined') return;
+  const statusEl = document.getElementById('sync-status');
+  if (statusEl) statusEl.textContent = '↑';
+  const uid = getUID();
+  const data = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key === 'wapp_uid') continue;
+    try {
+      data[key.replace(/\./g, '_dot_')] = localStorage.getItem(key);
+    } catch(e) {}
+  }
+  db.collection('users').doc(uid).collection('buildher').doc('progress')
+    .set(data, { merge: true })
+    .then(() => { if (statusEl) statusEl.textContent = '☁️'; })
+    .catch(e => { if (statusEl) statusEl.textContent = '⚠️'; console.log('Sync error:', e); });
+}
+
+function loadFromCloud(onDone) {
+  if (typeof db === 'undefined') { onDone(); return; }
+  const uid = getUID();
+  db.collection('users').doc(uid).collection('buildher').doc('progress')
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        const data = doc.data();
+        Object.keys(data).forEach(key => {
+          const realKey = key.replace(/_dot_/g, '.');
+          if (realKey !== 'wapp_uid') {
+            localStorage.setItem(realKey, data[key]);
+          }
+        });
+      }
+      onDone();
+    })
+    .catch(e => { console.log('Load error:', e); onDone(); });
+}
+
 // ==================== INIT ====================
 // Set initial env toggle state
 document.getElementById('env-btn-gym').classList.toggle('active', activeEnv === 'gym');
 document.getElementById('env-btn-home').classList.toggle('active', activeEnv === 'home');
 
-if (!activeProgram) {
-  showProgramSelect();
-} else {
-  applyProgramTheme(activeProgram);
-}
-renderToday();
+loadFromCloud(() => {
+  activeProgram = localStorage.getItem('bh_program') || null;
+  state = JSON.parse(localStorage.getItem('bh_state') || '{"week":1,"day":"mon"}');
+  if (!activeProgram) {
+    showProgramSelect();
+  } else {
+    applyProgramTheme(activeProgram);
+  }
+  renderToday();
+});
 </script>
 </body>
 </html>

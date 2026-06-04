@@ -9,6 +9,28 @@
 <meta name="apple-mobile-web-app-title" content="12-Week Growth">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyCS6hfr0jIxDrn6IiTVXDtNI5y2huR7AiE",
+    authDomain: "workout-app-576c0.firebaseapp.com",
+    projectId: "workout-app-576c0",
+    storageBucket: "workout-app-576c0.firebasestorage.app",
+    messagingSenderId: "93802465651",
+    appId: "1:93802465651:web:e5453d53128bf6b8d25d06"
+  });
+  const db = firebase.firestore();
+
+  function getUID() {
+    let uid = localStorage.getItem('wapp_uid');
+    if (!uid) {
+      uid = 'u_' + Math.random().toString(36).substr(2,9) + Date.now().toString(36);
+      localStorage.setItem('wapp_uid', uid);
+    }
+    return uid;
+  }
+</script>
 <title>12-Week Growth System</title>
 <style>
   :root {
@@ -577,6 +599,7 @@
       <div id="header-day" style="font-size:11px;color:var(--text3);margin-top:1px;"></div>
     </div>
     <button id="switch-prog-btn" onclick="showProgSelect()" style="background:none;border:none;color:var(--text3);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.5px;text-transform:uppercase">Levels</button>
+    <span id="sync-status" style="font-size:10px;color:var(--text3);font-weight:600">☁️</span>
     <button id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">☀️</button>
   </div>
 </header>
@@ -1589,6 +1612,7 @@ function getGrowthState() {
 }
 function saveGrowthState(obj) {
   localStorage.setItem('growth_state', JSON.stringify(obj));
+  syncToCloud();
 }
 
 // Mansour Method day helpers (1-15, cycles)
@@ -1598,6 +1622,7 @@ function getMansourDay() {
 }
 function saveMansourDay(d) {
   localStorage.setItem('mansour_day', String(d));
+  syncToCloud();
 }
 function getMansourDayData(dayNum) {
   // Even days are off days
@@ -1620,6 +1645,7 @@ function loadState() {
 }
 function saveState() {
   lsSet('hc_state', { currentWeek: state.currentWeek, currentDayIdx: state.currentDayIdx });
+  syncToCloud();
 }
 
 // Weight log: key = "weight_exId_week"
@@ -2102,6 +2128,7 @@ function renderWorkout() {
       weightInput.value = getWeight(ex.id, state.currentWeek);
       weightInput.addEventListener('change', () => {
         setWeight(ex.id, state.currentWeek, weightInput.value);
+        clearTimeout(window._syncTimer); window._syncTimer = setTimeout(syncToCloud, 2000);
       });
       // Progressive overload nudge (yellow/orange only)
       if (ex.type === 'yellow' || ex.type === 'orange') {
@@ -2109,6 +2136,7 @@ function renderWorkout() {
         weightInput.addEventListener('input', () => {
           setWeight(ex.id, state.currentWeek, weightInput.value);
           updatePONudge(ex.id, weightInput.value);
+          clearTimeout(window._syncTimer); window._syncTimer = setTimeout(syncToCloud, 2000);
         });
       }
     }
@@ -2411,10 +2439,12 @@ function bindExerciseCards(exercises, noteKey) {
           if (done.includes(i)) {
             saveSets(ex.id, weekKey, done.filter(s => s !== i));
             c.classList.remove('done');
+            syncToCloud();
           } else {
             done.push(i);
             saveSets(ex.id, weekKey, done);
             c.classList.add('done');
+            syncToCloud();
             if (navigator.vibrate) navigator.vibrate(50);
             let restSecs = REST_TIMES.orange;
             if (ex.type === 'cns') restSecs = REST_TIMES.cns;
@@ -2430,7 +2460,10 @@ function bindExerciseCards(exercises, noteKey) {
     const weightInput = document.getElementById(`weight-${ex.id}`);
     if (weightInput) {
       weightInput.value = getWeight(ex.id, weekKey);
-      weightInput.addEventListener('change', () => setWeight(ex.id, weekKey, weightInput.value));
+      weightInput.addEventListener('change', () => {
+        setWeight(ex.id, weekKey, weightInput.value);
+        clearTimeout(window._syncTimer); window._syncTimer = setTimeout(syncToCloud, 2000);
+      });
     }
   });
 
@@ -2636,6 +2669,7 @@ function handleSetClick(ex, setIdx, dayName) {
     const newSets = completedSets.filter(s => s !== setIdx);
     saveSets(ex.id, state.currentWeek, newSets);
     circle.classList.remove('done');
+    syncToCloud();
     return;
   }
 
@@ -2643,6 +2677,7 @@ function handleSetClick(ex, setIdx, dayName) {
   completedSets.push(setIdx);
   saveSets(ex.id, state.currentWeek, completedSets);
   circle.classList.add('done');
+  syncToCloud();
   if (navigator.vibrate) navigator.vibrate(50);
 
   // Determine rest time
@@ -2786,6 +2821,7 @@ function completeWorkout() {
     }
   }
   saveState();
+  syncToCloud();
   switchView('today');
   checkLevelComplete();
 }
@@ -3053,6 +3089,7 @@ function saveNutrition() {
   if (!bw || bw <= 0) { showToast('Enter a valid bodyweight'); return; }
   lsSet('nutr_bw', bw);
   lsSet('nutr_goal', nutritionGoalMode);
+  syncToCloud();
   renderNutritionCard();
 }
 
@@ -3426,21 +3463,65 @@ function loadMassInputs() {
   calcMassGain();
 }
 
-function init() {
-  loadState();
-  applyTheme(ls('theme', 'dark'));
-  // Show program selector on first launch (no program saved)
-  if (!activeMensProgram) {
-    showProgSelect();
-  } else {
-    updateProgHeader();
-    renderToday();
-    updateHeader();
+// ════════════════════════════════════════════════════════════
+// FIREBASE CLOUD SYNC
+// ════════════════════════════════════════════════════════════
+function syncToCloud() {
+  if (typeof db === 'undefined') return;
+  const statusEl = document.getElementById('sync-status');
+  if (statusEl) statusEl.textContent = '↑';
+  const uid = getUID();
+  const data = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key === 'wapp_uid') continue;
+    try {
+      data[key.replace(/\./g, '_dot_')] = localStorage.getItem(key);
+    } catch(e) {}
   }
-  loadMassInputs();
+  db.collection('users').doc(uid).collection('mens').doc('progress')
+    .set(data, { merge: true })
+    .then(() => { if (statusEl) statusEl.textContent = '☁️'; })
+    .catch(e => { if (statusEl) statusEl.textContent = '⚠️'; console.log('Sync error:', e); });
+}
+
+function loadFromCloud(onDone) {
+  if (typeof db === 'undefined') { onDone(); return; }
+  const uid = getUID();
+  db.collection('users').doc(uid).collection('mens').doc('progress')
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        const data = doc.data();
+        Object.keys(data).forEach(key => {
+          const realKey = key.replace(/_dot_/g, '.');
+          if (realKey !== 'wapp_uid') {
+            localStorage.setItem(realKey, data[key]);
+          }
+        });
+      }
+      onDone();
+    })
+    .catch(e => { console.log('Load error:', e); onDone(); });
+}
+
+function init() {
+  applyTheme(ls('theme', 'dark'));
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
+  loadFromCloud(() => {
+    loadState();
+    activeMensProgram = localStorage.getItem('mens_program') || null;
+    if (!activeMensProgram) {
+      showProgSelect();
+    } else {
+      updateProgHeader();
+      renderToday();
+      updateHeader();
+    }
+    loadMassInputs();
+  });
 }
 
 // Call updateHeader + renderToday after init (always needed for non-first-launch)
