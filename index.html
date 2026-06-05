@@ -841,25 +841,26 @@
 
   <!-- TODAY VIEW -->
   <div id="view-today" class="view">
+    <!-- Progress bar (only progress detail on Today) -->
+    <div style="margin-bottom:14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">16-Week Progress</span>
+        <span style="font-size:12px;font-weight:700;color:var(--yellow)" id="progress-week-label">Week 1 of 16</span>
+      </div>
+      <div style="height:6px;background:var(--bg3);border-radius:3px;overflow:hidden">
+        <div id="progress-bar-fill" style="height:100%;background:linear-gradient(90deg,var(--yellow),var(--orange));border-radius:3px;transition:width .4s ease;width:0%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px">
+        <span style="font-size:10px;color:var(--text3)" id="prog-level-label">Level 1</span>
+        <span style="font-size:10px;color:var(--text3)">16 Weeks Total</span>
+      </div>
+    </div>
+
     <!-- Hero card (workout day) -->
     <div class="today-hero" id="today-hero-card">
-      <div style="margin-bottom:14px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">16-Week Progress</span>
-          <span style="font-size:12px;font-weight:700;color:var(--yellow)" id="progress-week-label">Week 1 of 16</span>
-        </div>
-        <div style="height:6px;background:var(--bg3);border-radius:3px;overflow:hidden">
-          <div id="progress-bar-fill" style="height:100%;background:linear-gradient(90deg,var(--yellow),var(--orange));border-radius:3px;transition:width .4s ease;width:0%"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-top:6px">
-          <span style="font-size:10px;color:var(--text3)" id="prog-level-label">Level 1</span>
-          <span style="font-size:10px;color:var(--text3)">16 Weeks Total</span>
-        </div>
-      </div>
       <div class="phase-badge" id="hero-phase">Phase 1</div>
       <h2 id="hero-day">Monday Upper</h2>
       <div class="subtitle" id="hero-sub">Week 1 · 8×5 Cluster</div>
-      <div id="streak-display"></div>
       <button class="start-btn" onclick="startWorkout()">Start Today's Workout →</button>
     </div>
 
@@ -868,14 +869,10 @@
       <h2 id="rest-day-heading">Rest Day 💪</h2>
       <div class="rest-day-name" id="rest-day-name"></div>
       <div class="rest-tip" id="rest-day-tip"></div>
-      <div id="streak-display-rest" style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:16px;align-items:center;flex-wrap:wrap;"></div>
     </div>
 
     <!-- Level nav -->
     <div id="level-nav-row" style="display:flex;gap:8px;margin-bottom:16px;"></div>
-
-    <!-- Collapsed banners: nutrition + goal (read-only, tap goes to Program tab) -->
-    <div id="today-banners"></div>
   </div>
 
   <!-- WORKOUT VIEW -->
@@ -2551,7 +2548,7 @@ function renderToday() {
     document.getElementById('hero-phase').textContent = `STRENGTH TEST · WEEK ${ow}`;
     document.getElementById('hero-day').textContent = `Max Test Day ${testNum}`;
     document.getElementById('hero-sub').textContent = `Bench · Squat · Deadlift · OHP · Row`;
-    document.getElementById('streak-display').innerHTML = buildStreakHTML();
+    
     renderTodayBanners();
     updateProgressBar();
     renderLevelNav();
@@ -2579,14 +2576,14 @@ function renderToday() {
     document.getElementById('rest-day-name').textContent = REST_DAY_NAMES[todayDow];
     document.getElementById('rest-day-tip').textContent = REST_DAY_TIPS[todayDow];
     // streak in rest card
-    document.getElementById('streak-display-rest').innerHTML = buildStreakHTML();
+    
   } else {
     heroCard.style.display = '';
     restCard.style.display = 'none';
     document.getElementById('hero-phase').textContent = `LEVEL 1 · WEEK ${state.currentWeek} OF 4`;
     document.getElementById('hero-day').textContent = `${dayData.label} ${dayData.name}`;
     document.getElementById('hero-sub').textContent = `Week ${state.currentWeek} · ${phase.scheme} Cluster`;
-    document.getElementById('streak-display').innerHTML = buildStreakHTML();
+    
   }
 
   renderTodayBanners();
@@ -2609,7 +2606,7 @@ function renderTodayGrowth() {
     document.getElementById('hero-phase').textContent = `STRENGTH TEST · WEEK ${ow}`;
     document.getElementById('hero-day').textContent = `Max Test Day ${testNum}`;
     document.getElementById('hero-sub').textContent = `Bench · Squat · Deadlift · OHP · Row`;
-    document.getElementById('streak-display').innerHTML = '';
+    
     renderTodayBanners(); updateProgressBar(); renderLevelNav();
     return;
   }
@@ -2619,7 +2616,7 @@ function renderTodayGrowth() {
   document.getElementById('hero-phase').textContent = `LEVEL 2 · WEEK ${gs.week} OF 4`;
   document.getElementById('hero-day').textContent = currentDay ? currentDay.name : '';
   document.getElementById('hero-sub').textContent = currentDay ? `Week ${gs.week} · ${currentDay.label}` : '';
-  document.getElementById('streak-display').innerHTML = '';
+  
 
   renderTodayBanners();
   updateProgressBar();
@@ -2640,7 +2637,7 @@ function renderTodayMansour() {
     document.getElementById('hero-phase').textContent = `STRENGTH TEST · WEEK ${ow}`;
     document.getElementById('hero-day').textContent = `Max Test Day ${testNum}`;
     document.getElementById('hero-sub').textContent = `Bench · Squat · Deadlift · OHP · Row`;
-    document.getElementById('streak-display').innerHTML = '';
+    
     renderTodayBanners(); updateProgressBar(); renderLevelNav();
     return;
   }
@@ -2655,7 +2652,7 @@ function renderTodayMansour() {
     document.getElementById('hero-phase').textContent = `LEVEL 3 · WEEK ${mansourWeek} OF 4`;
     document.getElementById('hero-day').textContent = 'Active Recovery Day';
     document.getElementById('hero-sub').textContent = `Cycle Day ${currentMansourDay} · Chest & Forearm Maintenance`;
-    document.getElementById('streak-display').innerHTML = '';
+    
   } else {
     heroCard.style.display = '';
     restCard.style.display = 'none';
@@ -2663,7 +2660,7 @@ function renderTodayMansour() {
     document.getElementById('hero-phase').textContent = `LEVEL 3 · WEEK ${mansourWeek} OF 4`;
     document.getElementById('hero-day').textContent = dayData.name;
     document.getElementById('hero-sub').textContent = `Cycle Day ${currentMansourDay} · ${dayData.label}`;
-    document.getElementById('streak-display').innerHTML = '';
+    
   }
 
   renderTodayBanners();
@@ -3676,6 +3673,50 @@ function renderProgress() {
   if (!container) return;
   const history = getHistory();
   let html = '';
+
+  // ── Program Progress Bar ──
+  let overallWeek = 1;
+  if (activeMensProgram === 'growth') overallWeek = 8 + getGrowthState().week;
+  else if (activeMensProgram === 'mansour') overallWeek = 12 + Math.ceil(getMansourDay() / 3);
+  else overallWeek = state.currentWeek || 1;
+  const pct = Math.round((overallWeek / 16) * 100);
+
+  // Streak calculation
+  let streak = 0;
+  if (activeMensProgram === 'hc12' || !activeMensProgram) {
+    let w = state.currentWeek;
+    while (w >= 1) {
+      const phase = getPhaseForWeek(w);
+      const allDone = phase.days.every(d => ls(`wk_done_${w}_${d.id}`, false));
+      if (allDone) { streak++; w--; } else break;
+    }
+  }
+  let totalWorkouts = history.length;
+
+  html += `
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;">16-Week Progress</span>
+      <span style="font-size:13px;font-weight:800;color:var(--yellow);">Week ${overallWeek} of 16 · ${pct}%</span>
+    </div>
+    <div style="height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-bottom:10px;">
+      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--yellow),var(--orange));border-radius:4px;transition:width .4s;"></div>
+    </div>
+    <div style="display:flex;gap:20px;">
+      <div style="text-align:center;">
+        <div style="font-size:20px;font-weight:900;color:var(--yellow);">${totalWorkouts}</div>
+        <div style="font-size:11px;color:var(--text3);">workouts done</div>
+      </div>
+      ${streak > 0 ? `<div style="text-align:center;">
+        <div style="font-size:20px;font-weight:900;color:var(--yellow);">🔥${streak}</div>
+        <div style="font-size:11px;color:var(--text3);">week streak</div>
+      </div>` : ''}
+      <div style="text-align:center;">
+        <div style="font-size:20px;font-weight:900;">${16 - overallWeek}</div>
+        <div style="font-size:11px;color:var(--text3);">weeks left</div>
+      </div>
+    </div>
+  </div>`;
 
   // ── PRs ──
   const prLifts = ['Bench Press','DB Bench Press','Front Squat','High Bar Back Squat','Low Bar Back Squat','Deadlift','Sumo / Semi-Sumo Deadlift','Trap Bar Deadlift'];
