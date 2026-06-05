@@ -39,10 +39,10 @@
 <style>
   :root {
     --bg: #0a0a0a;
-    --bg2: rgba(18,18,18,0.82);
-    --bg3: rgba(28,28,28,0.88);
-    --bg4: rgba(38,38,38,0.92);
-    --border: rgba(80,80,80,0.45);
+    --bg2: #121212;
+    --bg3: #1c1c1c;
+    --bg4: #262626;
+    --border: #404040;
     --text: #f0f0f0;
     --text2: #aaa;
     --text3: #666;
@@ -204,13 +204,11 @@
   }
   #view-today.active { display: flex !important; }
   .today-hero {
-    background: linear-gradient(135deg, rgba(26,21,0,0.88) 0%, rgba(42,26,0,0.92) 100%);
+    background: linear-gradient(135deg, #1a1500 0%, #2a1a00 100%);
     border: 1px solid var(--yellow-border);
     border-radius: var(--radius);
     padding: 24px;
     margin-bottom: 16px;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
   }
   .today-hero .phase-badge {
     display: inline-block;
@@ -276,8 +274,6 @@
     border-radius: var(--radius);
     border: 1px solid var(--border);
     background: var(--bg2);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     padding: 14px;
     margin-bottom: 8px;
     position: relative;
@@ -4081,33 +4077,61 @@ function renderProgramSchedule(container) {
         }
       "
     />
-    ${startISO ? `<div style="font-size:11px;color:var(--text3);margin-top:6px;">Week ${Math.min(activeMensProgram==='growth'?4:8, Math.max(1, weeksElapsed(startISO)+1))} of ${activeMensProgram==='growth'?4:8} · Today is ${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()]}</div>` : ''}
+    ${startISO ? `<div style="font-size:11px;color:var(--text3);margin-top:6px;">Week ${Math.min(16, Math.max(1, weeksElapsed(startISO)+1))} of 16 · Today is ${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()]}</div>` : ''}
   </div>
   <div style="font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.5;">Use these selectors to manually override the current position or preview a specific week.</div>`;
 
+  // Unified 16-week timeline — phases map to overall weeks
+  // hc12: weeks 1–8 | growth: weeks 9–12 | mansour: weeks 13–16
+  const phaseMap = [
+    { id:'hc12',    label:'Phase 1 — The Grind',    color:'var(--yellow)', overallStart:1,  overallEnd:8  },
+    { id:'growth',  label:'Phase 2 — The Surge',    color:'var(--orange)', overallStart:9,  overallEnd:12 },
+    { id:'mansour', label:'Phase 3 — The Takeover', color:'var(--blue)',   overallStart:13, overallEnd:16 },
+  ];
+
+  html += `<div class="section-header" style="margin-top:0">16-Week Timeline</div>`;
+  html += `<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-bottom:16px;" id="week-selector-prog"></div>`;
+  html += `<div class="section-header">Current Day</div>`;
+  html += `<div class="day-selector" id="day-selector-prog"></div>`;
+  container.innerHTML = html;
+
+  const weekSel = document.getElementById('week-selector-prog');
+  for (let w = 1; w <= 16; w++) {
+    const pm = phaseMap.find(p => w >= p.overallStart && w <= p.overallEnd);
+    // determine if this week is the "active" one in overall terms
+    let isActive = false;
+    if (activeMensProgram === 'hc12' && w === state.currentWeek) isActive = true;
+    if (activeMensProgram === 'growth' && w === getGrowthState().week + 8) isActive = true;
+    if (activeMensProgram === 'mansour' && w >= 13) {
+      const cd = getMansourDay();
+      const mansourWeek = 13 + Math.floor((cd - 1) / 2);
+      if (w === mansourWeek) isActive = true;
+    }
+    const btn = document.createElement('div');
+    btn.style.cssText = `padding:6px 2px;border-radius:6px;text-align:center;cursor:pointer;font-size:11px;font-weight:700;
+      border:1px solid ${isActive ? pm.color : 'var(--border)'};
+      background:${isActive ? 'var(--yellow-bg)' : 'var(--bg2)'};
+      color:${isActive ? pm.color : 'var(--text3)'};`;
+    btn.textContent = `W${w}`;
+    btn.title = `${pm.label} · Week ${w - pm.overallStart + 1}`;
+    btn.onclick = () => {
+      const localW = w - pm.id === 'hc12' ? 0 : pm.id === 'growth' ? 8 : 12;
+      if (pm.id === 'hc12') {
+        state.currentWeek = w; state.currentDayIdx = 0; saveState();
+      } else if (pm.id === 'growth') {
+        saveGrowthState({ week: w - 8, day: `w${w - 8}_d1` });
+      } else {
+        saveMansourDay((w - 13) * 2 + 1);
+      }
+      renderProgramSchedule(container); updateHeader(); showToast(`Jumped to Week ${w}`);
+    };
+    weekSel.appendChild(btn);
+  }
+
+  // Day selector — phase-specific
+  const daySel = document.getElementById('day-selector-prog');
   if (activeMensProgram === 'hc12' || !activeMensProgram) {
     const phase = getPhaseForWeek(state.currentWeek);
-    html += `<div class="section-header" style="margin-top:0">Current Week</div>
-    <div class="week-selector" id="week-selector-prog" style="margin-bottom:16px;"></div>
-    <div class="section-header">Current Day</div>
-    <div class="day-selector" id="day-selector-prog"></div>`;
-    container.innerHTML = html;
-
-    // Week buttons
-    const weekSel = document.getElementById('week-selector-prog');
-    [1,2,3,4,5,6,7,8].forEach(w => {
-      const ph = getPhaseForWeek(w);
-      const completed = ls(`week_done_${w}`, false);
-      const btn = document.createElement('div');
-      btn.className = `week-btn${w === state.currentWeek ? ' active' : ''}${completed ? ' completed' : ''}`;
-      btn.textContent = `W${w}`;
-      btn.title = ph.name;
-      btn.onclick = () => { state.currentWeek = w; state.currentDayIdx = 0; saveState(); renderProgramSchedule(container); updateHeader(); showToast(`Jumped to Week ${w}`); };
-      weekSel.appendChild(btn);
-    });
-
-    // Day buttons
-    const daySel = document.getElementById('day-selector-prog');
     phase.days.forEach((d, i) => {
       const completed = ls(`wk_done_${state.currentWeek}_${d.id}`, false);
       const btn = document.createElement('div');
@@ -4116,21 +4140,8 @@ function renderProgramSchedule(container) {
       btn.onclick = () => { state.currentDayIdx = i; saveState(); renderProgramSchedule(container); updateHeader(); };
       daySel.appendChild(btn);
     });
-
   } else if (activeMensProgram === 'growth') {
     const gs = getGrowthState();
-    html += `<div class="section-header" style="margin-top:0">Week</div><div class="week-selector" id="week-selector-prog" style="margin-bottom:16px;"></div>`;
-    html += `<div class="section-header">Day</div><div class="day-selector" id="day-selector-prog"></div>`;
-    container.innerHTML = html;
-    const weekSel = document.getElementById('week-selector-prog');
-    [1,2,3,4].forEach(w => {
-      const btn = document.createElement('div');
-      btn.className = `week-btn${gs.week === w ? ' active' : ''}`;
-      btn.textContent = `W${w}`;
-      btn.onclick = () => { saveGrowthState({ week: w, day: `w${w}_d1` }); renderProgramSchedule(container); showToast(`Jumped to Week ${w}`); };
-      weekSel.appendChild(btn);
-    });
-    const daySel = document.getElementById('day-selector-prog');
     for (let d = 1; d <= 6; d++) {
       const key = `w${gs.week}_d${d}`;
       const dayInfo = GROWTH_PLAN.days[key];
@@ -4141,12 +4152,9 @@ function renderProgramSchedule(container) {
       btn.onclick = () => { saveGrowthState({ week: gs.week, day: key }); renderProgramSchedule(container); updateHeader(); };
       daySel.appendChild(btn);
     }
-
   } else if (activeMensProgram === 'mansour') {
+    daySel.style.gridTemplateColumns = 'repeat(5,1fr)';
     const cd = getMansourDay();
-    html += `<div class="section-header" style="margin-top:0">Cycle Day</div><div class="day-selector" id="day-selector-prog" style="grid-template-columns:repeat(5,1fr);"></div>`;
-    container.innerHTML = html;
-    const daySel = document.getElementById('day-selector-prog');
     for (let d = 1; d <= 15; d += 2) {
       const btn = document.createElement('div');
       btn.className = `day-btn${cd === d ? ' active' : ''}`;
