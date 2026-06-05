@@ -4058,13 +4058,13 @@ function renderProgramSchedule(container) {
 
   // ── Calendar start date picker ──
   let html = `
-  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:16px;">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:16px;overflow:hidden;">
     <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;">📅 Program Start Date</div>
     <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.5;">
       The app syncs your current week and workout day automatically based on this date. Week 1 starts on the Monday of your start week.
     </div>
     <input type="date" id="prog-start-input" value="${startISO}"
-      style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;box-sizing:border-box;"
+      style="width:100%;max-width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;box-sizing:border-box;display:block;min-width:0;"
       onchange="
         const val = this.value;
         if (val) {
