@@ -2450,6 +2450,24 @@ function renderToday() {
   if (activeMensProgram === 'growth') { renderTodayGrowth(); return; }
   if (activeMensProgram === 'mansour') { renderTodayMansour(); return; }
 
+  // ── Max Test Day Detection ──
+  if (isMaxTestDay()) {
+    const heroCard = document.getElementById('today-hero-card');
+    const restCard = document.getElementById('rest-day-card');
+    heroCard.style.display = '';
+    restCard.style.display = 'none';
+    const ow = getOverallWeek();
+    const testNum = ow <= 4 ? 1 : ow <= 8 ? 2 : ow <= 12 ? 3 : 4;
+    document.getElementById('hero-phase').textContent = `STRENGTH TEST · WEEK ${ow}`;
+    document.getElementById('hero-day').textContent = `Max Test Day ${testNum}`;
+    document.getElementById('hero-sub').textContent = `Bench · Squat · Deadlift · OHP · Row`;
+    document.getElementById('streak-display').innerHTML = buildStreakHTML();
+    renderTodayBanners();
+    updateProgressBar();
+    renderLevelNav();
+    return;
+  }
+
   const phase = getPhaseForWeek(state.currentWeek);
   const dayData = getCurrentDayData();
   const wi = getWeekInPhase(state.currentWeek);
@@ -2490,16 +2508,23 @@ function renderToday() {
 // GROWTH PLAN TODAY VIEW
 // ════════════════════════════════════════════════════════════
 function renderTodayGrowth() {
-  // Show the hero card, hide rest day card
   const heroCard = document.getElementById('today-hero-card');
   const restCard = document.getElementById('rest-day-card');
   heroCard.style.display = '';
   restCard.style.display = 'none';
 
+  if (isMaxTestDay()) {
+    const ow = getOverallWeek();
+    const testNum = ow <= 4 ? 1 : ow <= 8 ? 2 : ow <= 12 ? 3 : 4;
+    document.getElementById('hero-phase').textContent = `STRENGTH TEST · WEEK ${ow}`;
+    document.getElementById('hero-day').textContent = `Max Test Day ${testNum}`;
+    document.getElementById('hero-sub').textContent = `Bench · Squat · Deadlift · OHP · Row`;
+    document.getElementById('streak-display').innerHTML = '';
+    renderTodayBanners(); updateProgressBar(); renderLevelNav();
+    return;
+  }
+
   const gs = getGrowthState();
-
-
-  // Update hero card
   const currentDay = GROWTH_PLAN.days[gs.day];
   document.getElementById('hero-phase').textContent = `LEVEL 2 · WEEK ${gs.week} OF 4`;
   document.getElementById('hero-day').textContent = currentDay ? currentDay.name : '';
@@ -2517,6 +2542,19 @@ function renderTodayGrowth() {
 function renderTodayMansour() {
   const heroCard = document.getElementById('today-hero-card');
   const restCard = document.getElementById('rest-day-card');
+
+  if (isMaxTestDay()) {
+    heroCard.style.display = ''; restCard.style.display = 'none';
+    const ow = getOverallWeek();
+    const testNum = ow <= 4 ? 1 : ow <= 8 ? 2 : ow <= 12 ? 3 : 4;
+    document.getElementById('hero-phase').textContent = `STRENGTH TEST · WEEK ${ow}`;
+    document.getElementById('hero-day').textContent = `Max Test Day ${testNum}`;
+    document.getElementById('hero-sub').textContent = `Bench · Squat · Deadlift · OHP · Row`;
+    document.getElementById('streak-display').innerHTML = '';
+    renderTodayBanners(); updateProgressBar(); renderLevelNav();
+    return;
+  }
+
   const currentMansourDay = getMansourDay();
   const isOffDay = currentMansourDay % 2 === 0;
 
@@ -2560,10 +2598,180 @@ function mansourNextDay() {
 }
 
 // ════════════════════════════════════════════════════════════
+// MAX TEST DAY
+// ════════════════════════════════════════════════════════════
+const MAX_TEST_LIFTS = [
+  { key: 'Bench Press',          label: 'Bench Press',         cue: 'Flat bar bench. Full ROM, touch chest.' },
+  { key: 'High Bar Back Squat',  label: 'Back Squat',          cue: 'High bar, hip crease below parallel.' },
+  { key: 'Deadlift',             label: 'Deadlift',            cue: 'Conventional. Lock out fully at top.' },
+  { key: 'Overhead Press',       label: 'Overhead Press (OHP)',cue: 'Standing strict press. No leg drive.' },
+  { key: 'Barbell Row',          label: 'Barbell Row',         cue: '45° torso, row to lower chest.' }
+];
+
+// Test weeks: last Friday of weeks 4, 8, 12, 16 (overall program weeks)
+function getOverallWeek() {
+  if (activeMensProgram === 'growth') return 8 + getGrowthState().week;
+  if (activeMensProgram === 'mansour') return 12 + Math.ceil(getMansourDay() / 3);
+  return state.currentWeek;
+}
+
+function isMaxTestDay() {
+  if (activeMensProgram === 'hc12') {
+    const testWeeks = [4, 8];
+    const isLastDay = state.currentDayIdx === getPhaseForWeek(state.currentWeek).days.length - 1;
+    return testWeeks.includes(state.currentWeek) && isLastDay;
+  }
+  if (activeMensProgram === 'growth') {
+    const gs = getGrowthState();
+    return gs.week === 4 && gs.day === 'w4_d6';
+  }
+  if (activeMensProgram === 'mansour') {
+    return getMansourDay() === 14;
+  }
+  return false;
+}
+
+function renderMaxTestDay() {
+  const container = document.getElementById('workout-content');
+  const ow = getOverallWeek();
+  const testNum = ow <= 4 ? 1 : ow <= 8 ? 2 : ow <= 12 ? 3 : 4;
+
+  let html = `
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:2px;color:var(--yellow);margin-bottom:4px;">MAX TEST · WEEK ${ow}</div>
+      <div style="font-size:22px;font-weight:900;">Strength Test Day ${testNum}</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.5;">Find your working max on 5 key lifts.<br>Warm up properly — this is about accurate numbers.</div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--yellow);border-radius:var(--radius);padding:12px 16px;margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:800;color:var(--yellow);margin-bottom:6px;">WARM-UP PROTOCOL</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8;">
+        Set 1 — 50% of expected max × 5 reps<br>
+        Set 2 — 70% × 3 reps<br>
+        Set 3 — 85% × 1 rep<br>
+        <strong style="color:var(--text);">Max Attempt — 95–100% × 1 rep</strong>
+      </div>
+    </div>`;
+
+  MAX_TEST_LIFTS.forEach((lift, i) => {
+    const prev = get1RM(lift.key);
+    const prevDisplay = prev ? `Previous: <strong>${prev} lbs</strong>` : 'No previous record';
+    html += `
+    <div class="test-lift-card" id="test-card-${i}" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <div>
+          <div style="font-size:15px;font-weight:800;">${lift.label}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;">${lift.cue}</div>
+        </div>
+        <span style="font-size:11px;color:var(--text3);">${prevDisplay}</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="number" id="test-input-${i}" placeholder="Max lbs" min="0" step="2.5"
+          style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:18px;font-weight:800;padding:10px 12px;flex:1;outline:none;-webkit-tap-highlight-color:transparent;"
+          value="${prev || ''}">
+        <span style="font-size:11px;color:var(--text3);min-width:24px;">lbs</span>
+      </div>
+      ${prev ? `<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+        <button onclick="prefillWarmup(${i}, ${prev})" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:11px;padding:4px 10px;cursor:pointer;">Show warm-up weights</button>
+      </div>
+      <div id="warmup-${i}" style="display:none;margin-top:8px;font-size:12px;color:var(--text2);line-height:1.8;background:var(--bg3);border-radius:8px;padding:8px 12px;"></div>` : ''}
+    </div>`;
+  });
+
+  html += `
+    <button onclick="completeMaxTest()" style="background:var(--yellow);color:#000;border:none;border-radius:12px;font-size:16px;font-weight:800;padding:16px;width:100%;cursor:pointer;margin-top:8px;margin-bottom:32px;">
+      Save PRs &amp; Complete Test Day ✓
+    </button>`;
+
+  container.innerHTML = html;
+}
+
+function prefillWarmup(idx, prevMax) {
+  const w = parseFloat(prevMax);
+  if (!w) return;
+  const input = document.getElementById(`test-input-${idx}`);
+  const div = document.getElementById(`warmup-${idx}`);
+  if (!div) return;
+  const round5 = v => Math.round(v / 5) * 5;
+  div.innerHTML = `Set 1: <strong>${round5(w * 0.50)} lbs</strong> × 5 &nbsp;|&nbsp; Set 2: <strong>${round5(w * 0.70)} lbs</strong> × 3 &nbsp;|&nbsp; Set 3: <strong>${round5(w * 0.85)} lbs</strong> × 1 &nbsp;|&nbsp; Max: <strong>~${round5(w)} lbs</strong>`;
+  div.style.display = 'block';
+}
+
+function completeMaxTest() {
+  const results = [];
+  MAX_TEST_LIFTS.forEach((lift, i) => {
+    const input = document.getElementById(`test-input-${i}`);
+    const val = parseFloat(input ? input.value : '');
+    if (val && val > 0) {
+      const prev = parseFloat(get1RM(lift.key)) || 0;
+      set1RM(lift.key, val);
+      results.push({ label: lift.label, val, prev });
+    }
+  });
+
+  // Build summary to show
+  let lines = results.map(r => {
+    const diff = r.val - r.prev;
+    const arrow = diff > 0 ? `+${diff.toFixed(1)} lbs ↑` : diff < 0 ? `${diff.toFixed(1)} lbs ↓` : 'same';
+    const color = diff > 0 ? 'var(--green)' : diff < 0 ? 'var(--red)' : 'var(--text3)';
+    return `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:13px;color:var(--text2);">${r.label}</span>
+      <span style="font-size:13px;font-weight:800;">${r.val} lbs &nbsp;<span style="color:${color};font-size:11px;">${r.prev ? arrow : 'first test'}</span></span>
+    </div>`;
+  }).join('');
+
+  // Save test day to history
+  const weights = {};
+  results.forEach(r => { weights[r.label] = r.val; });
+  addHistory({
+    date: new Date().toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}),
+    dateRaw: Date.now(),
+    phase: 'Max Test',
+    week: getOverallWeek(),
+    dayId: 'max-test',
+    day: `Max Test Day`,
+    weights,
+    isTestDay: true
+  });
+
+  // Advance program state (same logic as completeWorkout)
+  if (activeMensProgram === 'hc12') {
+    state.currentDayIdx = 0;
+    if (state.currentWeek < 8) { state.currentWeek++; lsSet(`week_done_${state.currentWeek - 1}`, true); }
+    saveState();
+  } else if (activeMensProgram === 'growth') {
+    const gs = getGrowthState();
+    const nextDay = !GROWTH_PLAN.days[gs.day] ? gs.day : gs.day.replace(/d(\d)$/, (m, n) => `d${parseInt(n)+1}`);
+    if (GROWTH_PLAN.days[nextDay]) saveGrowthState({ week: gs.week, day: nextDay });
+    else if (gs.week < 4) saveGrowthState({ week: gs.week + 1, day: 'w1_d1' });
+  } else if (activeMensProgram === 'mansour') {
+    const md = getMansourDay();
+    saveMansourDay(md >= 15 ? 15 : md + 1);
+  }
+
+  syncToCloud();
+  updateGoalProgress();
+
+  // Show results modal
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:700;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;';
+  modal.innerHTML = `
+    <div style="width:100%;max-width:360px;">
+      <div style="font-size:36px;text-align:center;margin-bottom:8px;">🏆</div>
+      <div style="font-size:20px;font-weight:900;text-align:center;color:var(--yellow);margin-bottom:4px;">Test Day Complete!</div>
+      <div style="font-size:13px;color:var(--text2);text-align:center;margin-bottom:20px;">New PRs saved. Weight hints will update next session.</div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:20px;">${lines || '<div style="color:var(--text3);font-size:13px;">No weights entered.</div>'}</div>
+      <button onclick="this.closest('div[style]').remove();switchView('today');" style="background:var(--yellow);color:#000;border:none;border-radius:12px;font-size:16px;font-weight:800;padding:14px;width:100%;cursor:pointer;">Done →</button>
+    </div>`;
+  document.body.appendChild(modal);
+}
+
+// ════════════════════════════════════════════════════════════
 // WORKOUT VIEW
 // ════════════════════════════════════════════════════════════
 function startWorkout() {
   switchView('workout');
+  if (isMaxTestDay()) { renderMaxTestDay(); return; }
   if (activeMensProgram === 'growth') { renderWorkoutGrowth(); return; }
   if (activeMensProgram === 'mansour') { renderWorkoutMansour(); return; }
   renderWorkout();
