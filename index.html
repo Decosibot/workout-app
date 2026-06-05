@@ -854,21 +854,6 @@
 
   <!-- TODAY VIEW -->
   <div id="view-today" class="view">
-    <!-- Progress bar (only progress detail on Today) -->
-    <div style="margin-bottom:14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">16-Week Progress</span>
-        <span style="font-size:12px;font-weight:700;color:var(--yellow)" id="progress-week-label">Week 1 of 16</span>
-      </div>
-      <div style="height:6px;background:var(--bg3);border-radius:3px;overflow:hidden">
-        <div id="progress-bar-fill" style="height:100%;background:linear-gradient(90deg,var(--yellow),var(--orange));border-radius:3px;transition:width .4s ease;width:0%"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;margin-top:6px">
-        <span style="font-size:10px;color:var(--text3)" id="prog-level-label">Level 1</span>
-        <span style="font-size:10px;color:var(--text3)">16 Weeks Total</span>
-      </div>
-    </div>
-
     <!-- Hero card (workout day) -->
     <div class="today-hero" id="today-hero-card">
       <div class="phase-badge" id="hero-phase">Phase 1</div>
@@ -909,10 +894,6 @@
     <div id="program-content"></div>
   </div>
 
-  <!-- PROGRESS VIEW -->
-  <div id="view-progress" class="view">
-    <div id="progress-content"></div>
-  </div>
 
   <!-- TOOLS VIEW -->
   <div id="view-tools" class="view">
@@ -1016,12 +997,6 @@
       <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
     </svg>
     Program
-  </div>
-  <div class="nav-tab" data-view="progress" onclick="switchView('progress')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-    </svg>
-    Progress
   </div>
   <div class="nav-tab" data-view="tools" onclick="switchView('tools')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1903,30 +1878,24 @@ function deleteBWByDate(dateISO) {
 // Call after any data write to refresh whatever is currently visible
 function syncActiveView() {
   const v = state.activeView;
-  if (v === 'today') { renderTodayBanners(); }
   if (v === 'home') { renderHome(); }
-  if (v === 'progress') { renderProgress(); }
   if (v === 'tools') { renderWeightView(); renderORM(); }
 }
 
-// Refresh Today banners + Home if either is visible; used after goal/nutrition/bw changes
+// Refresh Home after goal/nutrition changes
 function syncGoalViews() {
-  if (state.activeView === 'today') renderTodayBanners();
   if (state.activeView === 'home') renderHome();
 }
 
-// Refresh PRs in Progress + Home after a 1RM is written
+// Refresh Home PRs after a 1RM is written
 function syncPRViews() {
-  if (state.activeView === 'progress') renderProgress();
   if (state.activeView === 'home') renderHome();
 }
 
-// Refresh body weight across all tabs that show it
+// Refresh body weight on Home or Tools when either logs weight
 function syncBWViews() {
   if (state.activeView === 'tools') renderWeightView();
-  if (state.activeView === 'progress') renderProgress();
   if (state.activeView === 'home') renderHome();
-  if (state.activeView === 'today') renderTodayBanners();
 }
 
 // ════════════════════════════════════════════════════════════
@@ -2481,9 +2450,46 @@ function renderHome() {
     html += `
     <div style="background:var(--bg2);border:1px dashed var(--border);border-radius:var(--radius);padding:14px;margin-bottom:16px;text-align:center;cursor:pointer;" onclick="switchView('today')">
       <div style="font-size:13px;font-weight:700;color:var(--text2);">No goal set</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:4px;">Tap to set a goal on the Today tab →</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px;">Tap to set a goal on the Program tab →</div>
     </div>`;
   }
+  // ── Lift Charts (only if 2+ sessions logged) ──
+  const mainLifts = ['Bench Press','DB Bench Press','Front Squat','High Bar Back Squat','Low Bar Back Squat','Deadlift','Sumo / Semi-Sumo Deadlift','Trap Bar Deadlift'];
+  const liftData = {};
+  history.forEach(session => {
+    Object.entries(session.weights || {}).forEach(([name, weight]) => {
+      const norm = mainLifts.find(l => name.toLowerCase().includes(l.toLowerCase().split(' ')[0]));
+      if (norm) {
+        if (!liftData[norm]) liftData[norm] = [];
+        liftData[norm].push({ date: session.date, weight: parseFloat(weight), dateRaw: session.dateRaw });
+      }
+    });
+  });
+  const chartLifts = Object.entries(liftData).filter(([,arr]) => arr.length >= 2).slice(0, 4);
+  if (chartLifts.length) {
+    html += `<div class="section-header">Lift Progression</div>`;
+    chartLifts.forEach(([name, data]) => {
+      const sorted = data.sort((a,b) => a.dateRaw - b.dateRaw);
+      html += `<div class="chart-section"><div class="chart-title">${name}</div><div class="chart-wrap">${renderChart(sorted)}</div></div>`;
+    });
+  }
+
+  // ── Workout History ──
+  if (history.length) {
+    html += `<div class="section-header">Workout Log</div>`;
+    history.forEach(session => {
+      const weights = Object.entries(session.weights || {});
+      html += `
+        <div class="history-item">
+          <div class="hi-header">
+            <div class="hi-date">${session.date}</div>
+            <div class="hi-badge">${session.day} · W${session.week}</div>
+          </div>
+          ${weights.length ? `<div class="hi-weights">${weights.map(([n,w]) => `<div class="hi-weight-row"><span>${n}</span><strong>${w} lbs</strong></div>`).join('')}</div>` : '<div style="font-size:12px;color:var(--text3);">No weights logged</div>'}
+        </div>`;
+    });
+  }
+
   html += `<div style="height:8px;"></div>`;
 
   document.getElementById('home-content').innerHTML = html;
@@ -2505,7 +2511,6 @@ function switchView(viewName) {
   if (viewName === 'home') renderHome();
   if (viewName === 'today') renderToday();
   if (viewName === 'program') renderProgram();
-  if (viewName === 'progress') renderProgress();
   if (viewName === 'tools') { renderWeightView(); renderORM(); loadMassInputs(); }
   updateHeader();
   window.scrollTo(0, 0);
@@ -3681,167 +3686,6 @@ function completeWorkout() {
 // ════════════════════════════════════════════════════════════
 // PROGRESS VIEW
 // ════════════════════════════════════════════════════════════
-function renderProgress() {
-  const container = document.getElementById('progress-content');
-  if (!container) return;
-  const history = getHistory();
-  let html = '';
-
-  // ── Program Progress Bar ──
-  let overallWeek = 1;
-  if (activeMensProgram === 'growth') overallWeek = 8 + getGrowthState().week;
-  else if (activeMensProgram === 'mansour') overallWeek = 12 + Math.ceil(getMansourDay() / 3);
-  else overallWeek = state.currentWeek || 1;
-  const pct = Math.round((overallWeek / 16) * 100);
-
-  // Streak calculation
-  let streak = 0;
-  if (activeMensProgram === 'hc12' || !activeMensProgram) {
-    let w = state.currentWeek;
-    while (w >= 1) {
-      const phase = getPhaseForWeek(w);
-      const allDone = phase.days.every(d => ls(`wk_done_${w}_${d.id}`, false));
-      if (allDone) { streak++; w--; } else break;
-    }
-  }
-  let totalWorkouts = history.length;
-
-  html += `
-  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-      <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;">16-Week Progress</span>
-      <span style="font-size:13px;font-weight:800;color:var(--yellow);">Week ${overallWeek} of 16 · ${pct}%</span>
-    </div>
-    <div style="height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-bottom:10px;">
-      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--yellow),var(--orange));border-radius:4px;transition:width .4s;"></div>
-    </div>
-    <div style="display:flex;gap:20px;">
-      <div style="text-align:center;">
-        <div style="font-size:20px;font-weight:900;color:var(--yellow);">${totalWorkouts}</div>
-        <div style="font-size:11px;color:var(--text3);">workouts done</div>
-      </div>
-      ${streak > 0 ? `<div style="text-align:center;">
-        <div style="font-size:20px;font-weight:900;color:var(--yellow);">🔥${streak}</div>
-        <div style="font-size:11px;color:var(--text3);">week streak</div>
-      </div>` : ''}
-      <div style="text-align:center;">
-        <div style="font-size:20px;font-weight:900;">${16 - overallWeek}</div>
-        <div style="font-size:11px;color:var(--text3);">weeks left</div>
-      </div>
-    </div>
-  </div>`;
-
-  // ── PRs ──
-  const prLifts = ['Bench Press','DB Bench Press','Front Squat','High Bar Back Squat','Low Bar Back Squat','Deadlift','Sumo / Semi-Sumo Deadlift','Trap Bar Deadlift'];
-  const prs = prLifts.map(l => {
-    const val = get1RM(l);
-    return val ? { name: l, val } : null;
-  }).filter(Boolean);
-  // Also scan history for max weights logged
-  const historyMaxes = {};
-  history.forEach(s => {
-    Object.entries(s.weights || {}).forEach(([name, w]) => {
-      const val = parseFloat(w);
-      if (!historyMaxes[name] || val > historyMaxes[name]) historyMaxes[name] = val;
-    });
-  });
-  const allPRs = [...prs];
-  Object.entries(historyMaxes).forEach(([name, val]) => {
-    if (!allPRs.find(p => p.name === name)) allPRs.push({ name, val: val + ' (logged)' });
-  });
-
-  if (allPRs.length) {
-    html += `<div class="section-header" style="margin-top:0;">Personal Records</div>`;
-    html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;">`;
-    allPRs.forEach(p => {
-      html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
-        <span style="font-size:13px;color:var(--text2);">${p.name}</span>
-        <span style="font-size:15px;font-weight:800;">${p.val} lbs</span>
-      </div>`;
-    });
-    html += `</div>`;
-  }
-
-  // ── Body Weight Chart ──
-  const bwLog = getBWLog();
-  html += `<div class="section-header">Body Weight</div>`;
-  html += `<div class="bw-log-row" style="margin-bottom:8px;">
-    <input type="number" id="bw-input-prog" placeholder="lbs" step="0.1" min="0" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:16px;font-weight:700;padding:10px;width:100%;outline:none;">
-    <button onclick="logBodyWeightProg()" style="background:var(--yellow);color:#000;border:none;border-radius:8px;font-size:13px;font-weight:800;padding:10px 16px;cursor:pointer;white-space:nowrap;">Log</button>
-  </div>`;
-  if (bwLog.length >= 2) {
-    html += `<div class="bw-chart-wrap" id="bw-chart-prog"></div>`;
-  }
-  if (bwLog.length) {
-    const latest = bwLog[bwLog.length - 1];
-    const first = bwLog[0];
-    const delta = (latest.weight - first.weight).toFixed(1);
-    const sign = delta > 0 ? '+' : '';
-    html += `<div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Latest: <strong style="color:var(--text);">${latest.weight} lbs</strong> · Change: <strong style="color:${delta > 0 ? 'var(--green)' : 'var(--red)'};">${sign}${delta} lbs</strong></div>`;
-  }
-
-  // ── Lift Charts ──
-  const mainLifts = ['Bench Press','DB Bench Press','Front Squat','High Bar Back Squat','Low Bar Back Squat','Deadlift','Sumo / Semi-Sumo Deadlift','Trap Bar Deadlift'];
-  const liftData = {};
-  history.forEach(session => {
-    Object.entries(session.weights || {}).forEach(([name, weight]) => {
-      const norm = mainLifts.find(l => name.toLowerCase().includes(l.toLowerCase().split(' ')[0]));
-      if (norm) {
-        if (!liftData[norm]) liftData[norm] = [];
-        liftData[norm].push({ date: session.date, weight: parseFloat(weight), dateRaw: session.dateRaw });
-      }
-    });
-  });
-  const chartLifts = Object.entries(liftData).filter(([,arr]) => arr.length >= 2).slice(0, 4);
-  if (chartLifts.length) {
-    html += `<div class="section-header">Lift Progression</div>`;
-    chartLifts.forEach(([name, data]) => {
-      const sorted = data.sort((a,b) => a.dateRaw - b.dateRaw);
-      html += `<div class="chart-section"><div class="chart-title">${name}</div><div class="chart-wrap">${renderChart(sorted)}</div></div>`;
-    });
-  }
-
-  // ── Workout History ──
-  html += `<div class="section-header">${history.length ? 'Workout Log' : ''}</div>`;
-  if (!history.length) {
-    html += `<div class="history-empty"><div style="font-size:48px;margin-bottom:12px;">🏋️</div><div style="font-size:16px;font-weight:700;color:var(--text2);">No workouts yet</div><div style="font-size:13px;margin-top:8px;">Complete your first session to see history here.</div></div>`;
-  } else {
-    history.forEach(session => {
-      const weights = Object.entries(session.weights || {});
-      html += `
-        <div class="history-item">
-          <div class="hi-header">
-            <div class="hi-date">${session.date}</div>
-            <div class="hi-badge">${session.day} · W${session.week}</div>
-          </div>
-          ${weights.length ? `<div class="hi-weights">${weights.map(([n,w]) => `<div class="hi-weight-row"><span>${n}</span><strong>${w} lbs</strong></div>`).join('')}</div>` : '<div style="font-size:12px;color:var(--text3);">No weights logged</div>'}
-        </div>`;
-    });
-  }
-
-  container.innerHTML = html;
-
-  // Render body weight chart inline if enough data
-  if (bwLog.length >= 2) {
-    const chartEl = document.getElementById('bw-chart-prog');
-    if (chartEl) {
-      const entries = bwLog.map(e => ({ weight: e.weight, dateRaw: e.dateRaw || (e.dateISO ? new Date(e.dateISO+'T00:00:00').getTime() : Date.now()), date: e.date || e.dateISO || '' }));
-      chartEl.innerHTML = renderChart(entries.sort((a,b) => a.dateRaw - b.dateRaw));
-    }
-  }
-}
-
-function logBodyWeightProg() {
-  const input = document.getElementById('bw-input-prog');
-  if (!input) return;
-  const val = parseFloat(input.value);
-  if (!val || val < 50 || val > 500) { showToast('Enter a valid weight'); return; }
-  logBW(val);
-  input.value = '';
-  showToast('Weight logged!');
-  renderProgress();
-}
-
 // ════════════════════════════════════════════════════════════
 // PROGRAM VIEW
 // ════════════════════════════════════════════════════════════
