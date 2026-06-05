@@ -486,6 +486,74 @@
     transition: opacity 0.15s; margin-top: 8px;
   }
   .nutrition-set-btn:active { opacity: 0.8; }
+  /* ── GOAL CARD ── */
+  #goal-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px; margin-bottom: 12px;
+  }
+  #goal-card.goal-active { border-color: var(--yellow-border); background: var(--yellow-bg); }
+  #goal-card.goal-on-track { border-color: #4caf50; background: rgba(76,175,80,0.07); }
+  #goal-card.goal-behind { border-color: var(--red); background: var(--red-bg); }
+  .goal-status-pill {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .goal-status-pill.on-track { background: rgba(76,175,80,0.2); color: #4caf50; }
+  .goal-status-pill.behind { background: rgba(245,66,66,0.2); color: var(--red); }
+  .goal-status-pill.ahead { background: rgba(74,158,255,0.2); color: var(--blue); }
+  .goal-status-pill.no-data { background: var(--bg3); color: var(--text3); }
+  .goal-realism-box {
+    font-size: 12px; line-height: 1.55; border-radius: 6px;
+    padding: 10px 12px; margin-top: 10px;
+  }
+  .goal-realism-box.ok { color: #4caf50; background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.25); }
+  .goal-realism-box.warn { color: var(--orange); background: var(--orange-bg); border: 1px solid var(--orange-border); }
+  .goal-realism-box.bad { color: var(--red); background: var(--red-bg); border: 1px solid var(--red-border); }
+  .goal-field-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+  .goal-field-row label { font-size: 12px; color: var(--text2); white-space: nowrap; min-width: 80px; }
+  .goal-input {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-size: 14px; font-weight: 700;
+    padding: 7px 10px; width: 80px; text-align: center; outline: none;
+    transition: border-color 0.15s; -webkit-appearance: none;
+  }
+  .goal-input:focus { border-color: var(--yellow); }
+  .goal-input.wide { width: 110px; }
+  .goal-set-btn {
+    background: var(--yellow); color: #000; border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 800; padding: 12px; cursor: pointer;
+    width: 100%; margin-top: 4px; transition: opacity .15s;
+  }
+  .goal-set-btn:active { opacity: 0.8; }
+  .goal-set-btn.secondary {
+    background: none; border: 1px solid var(--border); color: var(--text2);
+    font-size: 12px; padding: 8px; margin-top: 6px;
+  }
+  .goal-type-row { display: flex; gap: 6px; margin-bottom: 10px; }
+  .goal-type-btn {
+    flex: 1; background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text2); border-radius: 8px; padding: 8px 4px;
+    font-size: 12px; font-weight: 700; cursor: pointer; text-align: center;
+    transition: all 0.15s;
+  }
+  .goal-type-btn.active { background: var(--yellow-bg); border-color: var(--yellow); color: var(--yellow); }
+  .goal-type-btn.active.cut { background: var(--blue-bg, rgba(74,158,255,.1)); border-color: var(--blue); color: var(--blue); }
+  .goal-type-btn.active.recomp { background: rgba(76,175,80,.1); border-color: #4caf50; color: #4caf50; }
+  .goal-banner-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .goal-banner-main { font-size: 13px; font-weight: 700; color: var(--text); flex: 1; }
+  .goal-banner-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+  .goal-edit-btn {
+    background: none; border: 1px solid var(--border); color: var(--text2);
+    border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 700;
+    cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  }
+  .goal-prog-tips {
+    margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 12px; color: var(--text3); line-height: 1.6;
+  }
+  .goal-prog-tips strong { color: var(--yellow); }
   #nutrition-banner-text { font-size: 14px; font-weight: 700; color: var(--yellow); flex: 1; }
   #nutrition-edit-btn {
     background: none; border: 1px solid var(--yellow-border); color: var(--yellow);
@@ -783,6 +851,9 @@
     <!-- Quick Stats -->
     <div class="section-header">Quick Stats</div>
     <div id="quick-stats" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;"></div>
+
+    <!-- Goal Card -->
+    <div id="goal-card"></div>
 
     <!-- Nutrition Target Card -->
     <div id="nutrition-card">
@@ -2326,6 +2397,31 @@ function renderHome() {
     </div>`;
   }
 
+  // Goal status card
+  const goalData = getGoalData();
+  const goalProg = getGoalProgress();
+  if (goalData) {
+    const pillClass = { on_track: 'on-track', ahead: 'ahead', behind: 'behind', no_data: 'no-data' }[goalProg?.status || 'no_data'] || 'no-data';
+    const pillText  = { on_track: 'On Track ✓', ahead: 'Ahead ↑', behind: 'Behind — push harder', no_data: 'In Progress' }[goalProg?.status || 'no_data'];
+    const weeksLeft = Math.max(0, goalData.timeframeWeeks - Math.round((Date.now() - (goalData.startDate || Date.now())) / (7 * 86400000)));
+    html += `
+    <div style="background:var(--bg2);border:1px solid var(--yellow-border);border-radius:var(--radius);padding:14px;margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <div>
+          <div style="font-size:13px;font-weight:800;">${{bulk:'Bulk',cut:'Cut',recomp:'Recomp'}[goalData.type]} Goal</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;">${goalData.currentWeight} → ${goalData.targetWeight} lbs · ${weeksLeft} weeks left</div>
+        </div>
+        <span class="goal-status-pill ${pillClass}">${pillText}</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);">${goalData.calTarget.toLocaleString()} kcal/day · ${goalData.protein}g protein</div>
+    </div>`;
+  } else {
+    html += `
+    <div style="background:var(--bg2);border:1px dashed var(--border);border-radius:var(--radius);padding:14px;margin-bottom:16px;text-align:center;cursor:pointer;" onclick="switchView('today')">
+      <div style="font-size:13px;font-weight:700;color:var(--text2);">No goal set</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px;">Tap to set a goal on the Today tab →</div>
+    </div>`;
+  }
   html += `<div style="height:8px;"></div>`;
 
   document.getElementById('home-content').innerHTML = html;
@@ -2477,6 +2573,7 @@ function renderToday() {
   `).join('');
 
   renderNutritionCard();
+  renderGoalCard();
   updateProgressBar();
   renderLevelNav();
 }
@@ -2554,6 +2651,7 @@ function renderTodayGrowth() {
   `;
 
   renderNutritionCard();
+  renderGoalCard();
   updateProgressBar();
   renderLevelNav();
 }
@@ -2634,6 +2732,7 @@ function renderTodayMansour() {
   `;
 
   renderNutritionCard();
+  renderGoalCard();
   updateProgressBar();
   renderLevelNav();
 }
@@ -2867,6 +2966,7 @@ function completeWorkoutGrowth() {
     saveGrowthState({ week: nextWeek, day: `w${nextWeek}_d1` });
   }
   showToast('Workout complete!');
+  updateGoalProgress();
   switchView('today');
   if (wasLastDay) {
     showLevelUpBanner(
@@ -2965,6 +3065,7 @@ function completeWorkoutMansour() {
   const nextDay = currentDay >= 15 ? 1 : currentDay + 1;
   saveMansourDay(nextDay);
   showToast('Workout complete!');
+  updateGoalProgress();
   switchView('today');
   if (wasLastDay) {
     showLevelUpBanner(
@@ -3445,6 +3546,7 @@ function completeWorkout() {
   lsSet(`wk_done_${state.currentWeek}_${dayData.id}`, true);
 
   showToast('Workout complete! 💪');
+  updateGoalProgress();
 
   // Advance to next day
   if (state.currentDayIdx < phase.days.length - 1) {
@@ -3717,6 +3819,422 @@ function setGoalMode(mode) {
   nutritionGoalMode = mode;
   document.getElementById('goal-bulk').classList.toggle('active', mode === 'bulk');
   document.getElementById('goal-maintain').classList.toggle('active', mode === 'maintain');
+}
+
+// ════════════════════════════════════════════════════════════
+// GOAL SYSTEM
+// ════════════════════════════════════════════════════════════
+
+let goalType = 'bulk'; // 'bulk' | 'cut' | 'recomp'
+let goalWeeksMode = 'weeks'; // 'weeks' | 'date'
+let goalSaveAnyway = false;
+
+function getGoalData() { return ls('goal_data', null); }
+function saveGoalData(obj) { lsSet('goal_data', obj); syncToCloud(); }
+function clearGoalData() { localStorage.removeItem('goal_data'); localStorage.removeItem('goal_progress_cache'); }
+
+function calcTDEE(weightLbs, heightFt, heightIn, age, activityMult) {
+  const heightCm = (heightFt * 12 + (heightIn || 0)) * 2.54;
+  const weightKg = weightLbs * 0.453592;
+  const bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + 5;
+  return Math.round(bmr * (activityMult || 1.55));
+}
+
+function computeGoalRealism(currentWeight, targetWeight, weeks, tdee, type) {
+  const lbsToChange = targetWeight - currentWeight;
+  const absChange = Math.abs(lbsToChange);
+  const lbsPerWeek = lbsToChange / weeks;
+  const calDeltaPerDay = (lbsPerWeek * 3500) / 7;
+  let calTarget = Math.round(tdee + calDeltaPerDay);
+
+  let verdict = 'ok', message = '', adjustedWeeks = weeks;
+
+  if (type === 'bulk') {
+    if (lbsToChange <= 0) {
+      verdict = 'bad';
+      message = 'Target weight must be higher than current weight for a bulk goal.';
+    } else if (lbsPerWeek > 1.0) {
+      verdict = 'warn';
+      const minWeeks = Math.ceil(absChange / 1.0);
+      const idealWeeks = Math.ceil(absChange / 0.5);
+      adjustedWeeks = minWeeks;
+      calTarget = Math.round(tdee + 500);
+      message = `That's ${lbsPerWeek.toFixed(1)} lbs/week — even on an aggressive bulk, 1 lb/week is the natural ceiling. To gain ${absChange} lbs realistically: ${minWeeks}–${idealWeeks} weeks. Setting target at +500 cal/day.`;
+    } else if (lbsPerWeek >= 0.5) {
+      verdict = 'ok';
+      message = `Aggressive lean bulk — achievable. Expect ${Math.round(weeks * 0.5)}–${Math.round(weeks * 1.0)} lbs in ${weeks} weeks at this pace.`;
+    } else {
+      verdict = 'ok';
+      message = `Ideal lean bulk pace (${lbsPerWeek.toFixed(2)} lbs/week). Maximize muscle, minimize fat gain.`;
+    }
+  } else if (type === 'cut') {
+    if (lbsToChange >= 0) {
+      verdict = 'bad';
+      message = 'Target weight must be lower than current weight for a cut goal.';
+    } else if (lbsPerWeek < -2.0) {
+      verdict = 'warn';
+      const minWeeks = Math.ceil(absChange / 1.5);
+      adjustedWeeks = minWeeks;
+      calTarget = Math.max(Math.round(tdee - 750), 1200);
+      message = `${Math.abs(lbsPerWeek).toFixed(1)} lbs/week is too aggressive — max safe fat loss is ~2 lbs/week. Minimum ${minWeeks} weeks recommended. Capping deficit at 750 cal/day.`;
+    } else {
+      verdict = 'ok';
+      message = `Solid cut pace. You'll preserve muscle while dropping fat. Protein target is critical — hit it every day.`;
+    }
+  } else {
+    // recomp
+    calTarget = tdee;
+    verdict = 'ok';
+    message = `Recomp: eat at maintenance, train hard. Slow process — expect 0.25–0.5 lbs of net change per month. Best for intermediate lifters.`;
+  }
+
+  // Absolute calorie floors/ceilings
+  calTarget = Math.max(calTarget, 1200);
+  calTarget = Math.min(calTarget, tdee + 1000);
+
+  const protein = type === 'cut'
+    ? Math.round(currentWeight * 1.1)
+    : Math.round(targetWeight * 1.0);
+
+  return { verdict, message, lbsPerWeek, calTarget, protein, adjustedWeeks, calDeltaPerDay };
+}
+
+function computeProgramPlan(weeks) {
+  const ratio = weeks / 16;
+  let l1 = 8, l2 = 4, l3 = 4;
+  let daysPerWeek = { l1: 4, l2: 6, l3: 'alternating' };
+  let tips = [];
+  let warning = '';
+
+  if (ratio >= 1.25) {
+    l1 = Math.min(Math.round(8 * ratio), 12);
+    l2 = Math.min(Math.round(4 * ratio), 6);
+    l3 = Math.max(weeks - l1 - l2, 4);
+    tips = ['Take a deload week at the end of each level — lighter weights, same movements.', 'Add optional active recovery (walking, stretching) on off days.', 'Progressive overload: add 2.5–5 lbs to main lifts each week.'];
+  } else if (ratio >= 1.0) {
+    tips = ['Follow the standard program. You have exactly the right amount of time.', 'Focus on progressive overload every session.'];
+  } else if (ratio >= 0.75) {
+    l1 = Math.max(weeks - 8, 4);
+    l2 = 4; l3 = 4;
+    tips = ['Prioritize yellow (cluster) and orange exercises each session.', 'Red pump sets are optional — skip if short on time.', 'Complete L2 and L3 in full — they are already the shortest blocks.'];
+  } else if (ratio >= 0.5) {
+    l1 = 4; l2 = Math.max(weeks - 6, 2); l3 = Math.max(weeks - l1 - l2, 2);
+    tips = ['Cut red pump sets from every session.', 'Reduce rest between sets by 20% to maintain volume.', 'Focus on supersets — they save time without cutting muscle stimulus.'];
+  } else {
+    l1 = weeks; l2 = 0; l3 = 0;
+    warning = `${weeks} weeks is not enough to complete all 3 levels. Focusing on Level 1 only.`;
+    tips = ['Max out at 4 days/week.', 'Complete every session — consistency is everything at this timeframe.'];
+  }
+
+  return { l1, l2, l3, daysPerWeek, tips, warning, ratio };
+}
+
+function updateGoalProgress() {
+  const goal = getGoalData();
+  if (!goal) return;
+
+  const history = getHistory();
+  const bwLog = ls('bw_log', []);
+  const completedWorkouts = history.filter(h => h.dateRaw >= (goal.startDate || 0)).length;
+  const daysElapsed = Math.max(1, Math.round((Date.now() - (goal.startDate || Date.now())) / 86400000));
+  const weeksElapsed = daysElapsed / 7;
+  const expectedWorkouts = Math.round(weeksElapsed * (goal.daysPerWeek || 4));
+
+  const latestEntry = bwLog.length ? bwLog[bwLog.length - 1] : null;
+  const latestWeight = latestEntry ? latestEntry.weight : null;
+  const weightDelta = latestWeight ? latestWeight - (goal.startWeight || goal.currentWeight) : null;
+  const expectedWeightDelta = weeksElapsed * (goal.lbsPerWeek || 0);
+
+  let status = 'no_data';
+  if (bwLog.length >= 1 || completedWorkouts >= 1) {
+    const workoutGap = completedWorkouts - expectedWorkouts;
+    if (workoutGap >= -1) status = 'on_track';
+    else if (workoutGap >= -3) status = 'behind';
+    else status = 'behind';
+
+    if (workoutGap > 2) status = 'ahead';
+  }
+
+  lsSet('goal_progress_cache', {
+    completedWorkouts, expectedWorkouts, weeksElapsed,
+    latestWeight, weightDelta, expectedWeightDelta, status,
+    lastUpdated: Date.now()
+  });
+}
+
+function getGoalProgress() { return ls('goal_progress_cache', null); }
+
+function setGoalType(type) {
+  goalType = type;
+  document.querySelectorAll('.goal-type-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.type === type);
+  });
+  liveGoalCheck();
+}
+
+function setGoalWeeksMode(mode) {
+  goalWeeksMode = mode;
+  const wInput = document.getElementById('goal-weeks-input');
+  const dInput = document.getElementById('goal-date-input');
+  const wBtn = document.getElementById('gwmode-weeks');
+  const dBtn = document.getElementById('gwmode-date');
+  if (wInput) wInput.style.display = mode === 'weeks' ? '' : 'none';
+  if (dInput) dInput.style.display = mode === 'date' ? '' : 'none';
+  if (wBtn) wBtn.classList.toggle('active', mode === 'weeks');
+  if (dBtn) dBtn.classList.toggle('active', mode === 'date');
+  liveGoalCheck();
+}
+
+function liveGoalCheck() {
+  goalSaveAnyway = false;
+  const currentW = parseFloat(document.getElementById('goal-current-weight')?.value);
+  const targetW  = parseFloat(document.getElementById('goal-target-weight')?.value);
+  const ft       = parseFloat(document.getElementById('goal-height-ft')?.value) || 0;
+  const inches   = parseFloat(document.getElementById('goal-height-in')?.value) || 0;
+  const age      = parseFloat(document.getElementById('goal-age')?.value);
+  const preview  = document.getElementById('goal-realism-preview');
+  if (!preview) return;
+
+  let weeks = 0;
+  if (goalWeeksMode === 'weeks') {
+    weeks = parseInt(document.getElementById('goal-weeks-input')?.value) || 0;
+  } else {
+    const dateVal = document.getElementById('goal-date-input')?.value;
+    if (dateVal) weeks = Math.max(1, Math.round((new Date(dateVal) - new Date()) / (7 * 86400000)));
+  }
+
+  if (!currentW || !targetW || !weeks || weeks < 1) { preview.innerHTML = ''; return; }
+
+  let tdee = 0;
+  if (ft && age) {
+    const actMult = parseFloat(document.getElementById('goal-activity')?.dataset?.val) || 1.55;
+    tdee = calcTDEE(currentW, ft, inches, age, actMult);
+  } else {
+    // Fallback rough estimate
+    tdee = goalType === 'bulk' ? Math.round(currentW * 18) : Math.round(currentW * 15);
+  }
+
+  const result = computeGoalRealism(currentW, targetW, weeks, tdee, goalType);
+  const plan = computeProgramPlan(result.adjustedWeeks);
+
+  let html = `<div class="goal-realism-box ${result.verdict}">${result.message}</div>`;
+  if (result.verdict !== 'bad') {
+    html += `<div style="margin-top:8px;font-size:12px;color:var(--text2);">
+      <strong style="color:var(--text);">${result.calTarget.toLocaleString()} kcal/day</strong> ·
+      <strong style="color:var(--text);">${result.protein}g protein</strong>
+      ${tdee ? ` · TDEE: ${tdee.toLocaleString()}` : ''}
+    </div>`;
+    if (plan.warning) html += `<div style="font-size:11px;color:var(--orange);margin-top:6px;">⚠ ${plan.warning}</div>`;
+    else html += `<div style="font-size:11px;color:var(--text3);margin-top:6px;">Program pace: L1 ${plan.l1}wks · L2 ${plan.l2}wks · L3 ${plan.l3}wks</div>`;
+  }
+  preview.innerHTML = html;
+}
+
+function saveGoal() {
+  const currentW = parseFloat(document.getElementById('goal-current-weight')?.value);
+  const targetW  = parseFloat(document.getElementById('goal-target-weight')?.value);
+  const ft       = parseFloat(document.getElementById('goal-height-ft')?.value) || 0;
+  const inchesV  = parseFloat(document.getElementById('goal-height-in')?.value) || 0;
+  const age      = parseFloat(document.getElementById('goal-age')?.value);
+
+  if (!currentW || !targetW) { showToast('Enter current and target weight'); return; }
+
+  let weeks = 0;
+  if (goalWeeksMode === 'weeks') {
+    weeks = parseInt(document.getElementById('goal-weeks-input')?.value) || 0;
+  } else {
+    const dateVal = document.getElementById('goal-date-input')?.value;
+    if (dateVal) weeks = Math.max(1, Math.round((new Date(dateVal) - new Date()) / (7 * 86400000)));
+  }
+  if (!weeks || weeks < 1) { showToast('Set a valid timeframe'); return; }
+
+  const actMult = parseFloat(document.getElementById('goal-activity')?.dataset?.val) || 1.55;
+  const tdee = (ft && age) ? calcTDEE(currentW, ft, inchesV, age, actMult) : (goalType === 'bulk' ? Math.round(currentW * 18) : Math.round(currentW * 15));
+  const result = computeGoalRealism(currentW, targetW, weeks, tdee, goalType);
+
+  if (result.verdict === 'bad') { showToast('Fix the goal inputs first'); return; }
+
+  if (result.verdict === 'warn' && !goalSaveAnyway) {
+    goalSaveAnyway = true;
+    const btn = document.getElementById('goal-save-btn');
+    if (btn) btn.textContent = 'Save Anyway — I Understand';
+    showToast('Review the warning above first');
+    return;
+  }
+
+  const plan = computeProgramPlan(result.adjustedWeeks);
+  const goalData = {
+    type: goalType,
+    currentWeight: currentW,
+    targetWeight: targetW,
+    startWeight: currentW,
+    heightFt: ft, heightIn: inchesV, age, activityMult: actMult,
+    timeframeWeeks: result.adjustedWeeks,
+    startDate: Date.now(),
+    tdee, calTarget: result.calTarget, protein: result.protein,
+    lbsPerWeek: result.lbsPerWeek,
+    l1Weeks: plan.l1, l2Weeks: plan.l2, l3Weeks: plan.l3,
+    compressionRatio: plan.ratio,
+    tips: plan.tips,
+    daysPerWeek: goalType === 'cut' ? 4 : (plan.ratio >= 1 ? 4 : 5)
+  };
+
+  saveGoalData(goalData);
+
+  // Also sync nutrition card with goal calories
+  lsSet('nutr_bw', currentW);
+  lsSet('nutr_goal', goalType === 'cut' ? 'maintain' : 'bulk');
+
+  // Save height/age to mass_inputs for reuse
+  if (ft && age) {
+    const existing = ls('mass_inputs', {});
+    lsSet('mass_inputs', { ...existing, current: currentW, ft, inches: inchesV, age, activity: actMult });
+  }
+
+  updateGoalProgress();
+  renderGoalCard();
+  renderNutritionCard();
+  showToast('Goal saved!');
+}
+
+function editGoal() {
+  goalSaveAnyway = false;
+  renderGoalCard(true);
+}
+
+function clearGoal() {
+  if (!confirm('Clear your current goal?')) return;
+  clearGoalData();
+  renderGoalCard();
+  showToast('Goal cleared');
+}
+
+function setGoalActivity(el) {
+  document.querySelectorAll('.goal-act-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  el.dataset.val = el.dataset.val;
+  liveGoalCheck();
+}
+
+function renderGoalCard(forceSetup) {
+  const card = document.getElementById('goal-card');
+  if (!card) return;
+  const goal = getGoalData();
+
+  if (!goal || forceSetup) {
+    // ── SETUP STATE ──
+    card.className = '';
+    card.style.cssText = 'background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px;';
+
+    // Pre-populate from saved data
+    const saved = ls('mass_inputs', {});
+    const savedBW = ls('nutr_bw', '');
+    const prefillCurrent = (goal && goal.currentWeight) || savedBW || saved.current || '';
+    const prefillTarget  = (goal && goal.targetWeight) || saved.goal || '';
+    const prefillFt      = (goal && goal.heightFt) || saved.ft || '';
+    const prefillIn      = (goal && goal.heightIn != null ? goal.heightIn : saved.inches) ?? '';
+    const prefillAge     = (goal && goal.age) || saved.age || '';
+    const prefillAct     = (goal && goal.activityMult) || saved.activity || 1.55;
+    const prefillWeeks   = (goal && goal.timeframeWeeks) || 16;
+    const prefillType    = (goal && goal.type) || 'bulk';
+    goalType = prefillType;
+
+    card.innerHTML = `
+      <div style="font-size:13px;font-weight:800;margin-bottom:12px;color:var(--text);">Set Your Goal</div>
+
+      <div class="goal-type-row">
+        <div class="goal-type-btn${prefillType==='bulk'?' active':''}" data-type="bulk" onclick="setGoalType('bulk')">Bulk</div>
+        <div class="goal-type-btn${prefillType==='cut'?' active cut':''}" data-type="cut" onclick="setGoalType('cut')">Cut</div>
+        <div class="goal-type-btn${prefillType==='recomp'?' active recomp':''}" data-type="recomp" onclick="setGoalType('recomp')">Recomp</div>
+      </div>
+
+      <div class="goal-field-row">
+        <label>Current (lbs)</label>
+        <input class="goal-input" id="goal-current-weight" type="number" placeholder="175" value="${prefillCurrent}" oninput="liveGoalCheck()" min="50" max="500">
+      </div>
+      <div class="goal-field-row">
+        <label>Target (lbs)</label>
+        <input class="goal-input" id="goal-target-weight" type="number" placeholder="195" value="${prefillTarget}" oninput="liveGoalCheck()" min="50" max="500">
+      </div>
+      <div class="goal-field-row">
+        <label>Height</label>
+        <input class="goal-input" id="goal-height-ft" type="number" placeholder="ft" min="4" max="7" value="${prefillFt}" oninput="liveGoalCheck()" style="width:52px;">
+        <input class="goal-input" id="goal-height-in" type="number" placeholder="in" min="0" max="11" value="${prefillIn}" oninput="liveGoalCheck()" style="width:52px;">
+        <label style="min-width:0;">Age</label>
+        <input class="goal-input" id="goal-age" type="number" placeholder="yrs" value="${prefillAge}" oninput="liveGoalCheck()" style="width:60px;">
+      </div>
+
+      <div class="goal-field-row" style="margin-bottom:6px;">
+        <label>Activity</label>
+        <button class="goal-act-btn goal-type-btn${prefillAct===1.55?' active':''}" data-val="1.55" onclick="this.parentNode.querySelectorAll('.goal-act-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');liveGoalCheck()">Moderate</button>
+        <button class="goal-act-btn goal-type-btn${prefillAct===1.725?' active':''}" data-val="1.725" onclick="this.parentNode.querySelectorAll('.goal-act-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');liveGoalCheck()">Very Active</button>
+      </div>
+
+      <div class="goal-field-row" style="margin-bottom:6px;">
+        <label>Timeframe</label>
+        <button id="gwmode-weeks" class="goal-type-btn active" style="flex:0;padding:6px 12px;" onclick="setGoalWeeksMode('weeks')">Weeks</button>
+        <button id="gwmode-date" class="goal-type-btn" style="flex:0;padding:6px 12px;" onclick="setGoalWeeksMode('date')">End Date</button>
+      </div>
+      <div class="goal-field-row">
+        <label>&nbsp;</label>
+        <input class="goal-input wide" id="goal-weeks-input" type="number" placeholder="16" min="4" max="52" value="${prefillWeeks}" oninput="liveGoalCheck()">
+        <input class="goal-input wide" id="goal-date-input" type="date" style="display:none;width:140px;" oninput="liveGoalCheck()">
+        <span style="font-size:12px;color:var(--text3);">weeks</span>
+      </div>
+
+      <div id="goal-realism-preview"></div>
+
+      <button class="goal-set-btn" id="goal-save-btn" onclick="saveGoal()">Set Goal</button>
+      ${goal ? `<button class="goal-set-btn secondary" onclick="clearGoal()">Clear Goal</button>` : ''}
+    `;
+
+    // Trigger live check if values prefilled
+    if (prefillCurrent && prefillTarget) setTimeout(liveGoalCheck, 50);
+    return;
+  }
+
+  // ── ACTIVE STATE ──
+  const progress = getGoalProgress();
+  const status = progress ? progress.status : 'no_data';
+  const typeLabel = { bulk: 'Bulk', cut: 'Cut', recomp: 'Recomp' }[goal.type] || 'Goal';
+  const directionLabel = goal.type === 'cut' ? 'Lose' : goal.type === 'recomp' ? 'Recomp' : 'Gain';
+  const lbsDiff = Math.abs(goal.targetWeight - goal.currentWeight);
+  const pillClass = { on_track: 'on-track', ahead: 'ahead', behind: 'behind', no_data: 'no-data' }[status] || 'no-data';
+  const pillText = { on_track: 'On Track', ahead: 'Ahead', behind: 'Behind', no_data: 'In Progress' }[status] || 'In Progress';
+  const weeksLeft = Math.max(0, goal.timeframeWeeks - Math.round((Date.now() - (goal.startDate || Date.now())) / (7 * 86400000)));
+
+  const cardClass = status === 'on_track' || status === 'ahead' ? 'goal-on-track' : status === 'behind' ? 'goal-behind' : 'goal-active';
+  card.className = cardClass;
+  card.style.cssText = '';
+
+  let progressLine = '';
+  if (progress && progress.latestWeight) {
+    const delta = progress.weightDelta > 0 ? `+${progress.weightDelta.toFixed(1)}` : progress.weightDelta.toFixed(1);
+    progressLine = `<div style="font-size:11px;color:var(--text3);margin-top:2px;">Weight: ${progress.latestWeight} lbs (${delta} lbs from start)</div>`;
+  }
+
+  let tipsHtml = '';
+  if (goal.tips && goal.tips.length) {
+    tipsHtml = `<div class="goal-prog-tips">
+      <strong>Program Tips for Your Timeframe</strong><br>
+      ${goal.tips.map(t => `• ${t}`).join('<br>')}
+    </div>`;
+  }
+
+  card.innerHTML = `
+    <div class="goal-banner-row">
+      <div style="flex:1;">
+        <div class="goal-banner-main">${typeLabel} · ${goal.currentWeight}→${goal.targetWeight} lbs · ${goal.timeframeWeeks} wks</div>
+        <div class="goal-banner-sub">${goal.calTarget.toLocaleString()} kcal/day · ${goal.protein}g protein · ${weeksLeft} wks left</div>
+        ${progressLine}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+        <span class="goal-status-pill ${pillClass}">${pillText}</span>
+        <button class="goal-edit-btn" onclick="editGoal()">Edit</button>
+      </div>
+    </div>
+    ${tipsHtml}
+  `;
 }
 
 function saveNutrition() {
@@ -4155,6 +4673,7 @@ function init() {
       updateProgHeader();
       updateHeader();
       renderHome();
+      renderGoalCard();
       switchView('home');
     }
     loadMassInputs();
