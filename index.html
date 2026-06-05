@@ -5137,24 +5137,29 @@ function setAuthError(msg) {
 function signInWithGoogle() {
   setAuthError('');
   const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider).catch(e => setAuthError(e.message));
+  // Use redirect on mobile/PWA — popups are blocked by iOS Safari and many Android browsers
+  auth.signInWithRedirect(provider).catch(e => setAuthError(friendlyAuthError(e.code)));
 }
 
 function signInEmail() {
-  setAuthError('');
+  setAuthError('Signing in...');
   const email = document.getElementById('auth-email').value.trim();
   const pw = document.getElementById('auth-password').value;
   if (!email || !pw) { setAuthError('Enter email and password'); return; }
-  auth.signInWithEmailAndPassword(email, pw).catch(e => setAuthError(friendlyAuthError(e.code)));
+  auth.signInWithEmailAndPassword(email, pw)
+    .then(() => setAuthError(''))
+    .catch(e => setAuthError(friendlyAuthError(e.code)));
 }
 
 function signUpEmail() {
-  setAuthError('');
+  setAuthError('Creating account...');
   const email = document.getElementById('auth-email').value.trim();
   const pw = document.getElementById('auth-password').value;
   if (!email || !pw) { setAuthError('Enter email and password'); return; }
   if (pw.length < 6) { setAuthError('Password must be at least 6 characters'); return; }
-  auth.createUserWithEmailAndPassword(email, pw).catch(e => setAuthError(friendlyAuthError(e.code)));
+  auth.createUserWithEmailAndPassword(email, pw)
+    .then(() => setAuthError(''))
+    .catch(e => setAuthError(friendlyAuthError(e.code)));
 }
 
 function continueAsGuest() {
@@ -5166,13 +5171,16 @@ function friendlyAuthError(code) {
   const map = {
     'auth/user-not-found': 'No account found with that email.',
     'auth/wrong-password': 'Incorrect password.',
+    'auth/invalid-credential': 'Incorrect email or password.',
     'auth/email-already-in-use': 'An account with that email already exists.',
     'auth/invalid-email': 'Invalid email address.',
     'auth/too-many-requests': 'Too many attempts. Try again later.',
     'auth/network-request-failed': 'Network error. Check your connection.',
-    'auth/popup-closed-by-user': 'Sign-in cancelled.'
+    'auth/popup-closed-by-user': 'Sign-in cancelled.',
+    'auth/redirect-cancelled-by-user': 'Sign-in cancelled.',
+    'auth/operation-not-allowed': 'This sign-in method is not enabled. Enable it in Firebase Console.'
   };
-  return map[code] || 'Sign-in failed. Try again.';
+  return map[code] || `Sign-in failed (${code}). Try again.`;
 }
 
 function showAccountMenu() {
@@ -5290,17 +5298,25 @@ function init() {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
 
+  // Handle Google redirect result (fires after returning from Google sign-in page)
+  auth.getRedirectResult()
+    .then(result => { /* onAuthStateChanged handles the rest */ })
+    .catch(e => {
+      if (e.code && e.code !== 'auth/no-current-user') {
+        const el = document.getElementById('auth-error');
+        if (el) el.textContent = friendlyAuthError(e.code);
+      }
+    });
+
   // Auth state listener — fires on every page load with persisted session
   auth.onAuthStateChanged(user => {
     const loginOverlay = document.getElementById('login-overlay');
     if (user) {
-      // Signed in — hide login, load cloud data, start app
       if (loginOverlay) loginOverlay.style.display = 'none';
       const btn = document.getElementById('account-btn');
       if (btn) btn.title = user.email || user.displayName || 'Account';
       loadFromCloud(() => bootApp(true));
     } else {
-      // Not signed in — show login screen
       if (loginOverlay) loginOverlay.style.display = 'flex';
     }
   });
