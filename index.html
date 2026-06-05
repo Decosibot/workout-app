@@ -1830,6 +1830,62 @@ function get1RM(name) { return ls(`orm_${name}`, ''); }
 function set1RM(name, val) { lsSet(`orm_${name}`, val); }
 
 // ════════════════════════════════════════════════════════════
+// UNIFIED BODY WEIGHT LOG  (single source: 'bw_log' array)
+// ════════════════════════════════════════════════════════════
+function getBWLog() { return ls('bw_log', []); }
+function logBW(weightLbs) {
+  const log = getBWLog();
+  const today = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+  // Overwrite today's entry if it already exists
+  const existingIdx = log.findIndex(e => e.dateISO === today);
+  const entry = { weight: weightLbs, dateISO: today, dateRaw: Date.now(),
+    date: new Date().toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) };
+  if (existingIdx >= 0) log[existingIdx] = entry;
+  else log.push(entry);
+  log.sort((a,b) => (a.dateISO||'').localeCompare(b.dateISO||''));
+  lsSet('bw_log', log);
+  syncToCloud();
+}
+function deleteBWByDate(dateISO) {
+  const log = getBWLog().filter(e => e.dateISO !== dateISO);
+  lsSet('bw_log', log);
+  syncToCloud();
+}
+
+// ════════════════════════════════════════════════════════════
+// CROSS-TAB SYNC HELPERS
+// ════════════════════════════════════════════════════════════
+
+// Call after any data write to refresh whatever is currently visible
+function syncActiveView() {
+  const v = state.activeView;
+  if (v === 'today') { renderTodayBanners(); }
+  if (v === 'home') { renderHome(); }
+  if (v === 'progress') { renderProgress(); }
+  if (v === 'tools') { renderWeightView(); renderORM(); }
+}
+
+// Refresh Today banners + Home if either is visible; used after goal/nutrition/bw changes
+function syncGoalViews() {
+  if (state.activeView === 'today') renderTodayBanners();
+  if (state.activeView === 'home') renderHome();
+}
+
+// Refresh PRs in Progress + Home after a 1RM is written
+function syncPRViews() {
+  if (state.activeView === 'progress') renderProgress();
+  if (state.activeView === 'home') renderHome();
+}
+
+// Refresh body weight across all tabs that show it
+function syncBWViews() {
+  if (state.activeView === 'tools') renderWeightView();
+  if (state.activeView === 'progress') renderProgress();
+  if (state.activeView === 'home') renderHome();
+  if (state.activeView === 'today') renderTodayBanners();
+}
+
+// ════════════════════════════════════════════════════════════
 // REST TIMER
 // ════════════════════════════════════════════════════════════
 let restTimer = null;
@@ -2277,7 +2333,7 @@ function renderHome() {
   const setPRs = prLifts.map(l => ({ name: l, val: get1RM(l) })).filter(p => p.val);
 
   // Body weight
-  const bwEntries = ls('bw_log', []);
+  const bwEntries = getBWLog();
   const latestBW = bwEntries.length ? bwEntries[bwEntries.length - 1].weight : null;
 
   const aff = FSS_AFFIRMATIONS[getDayOfYear() % FSS_AFFIRMATIONS.length];
@@ -3619,7 +3675,7 @@ function renderProgress() {
   }
 
   // ── Body Weight Chart ──
-  const bwLog = ls('bw_log', []);
+  const bwLog = getBWLog();
   html += `<div class="section-header">Body Weight</div>`;
   html += `<div class="bw-log-row" style="margin-bottom:8px;">
     <input type="number" id="bw-input-prog" placeholder="lbs" step="0.1" min="0" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:16px;font-weight:700;padding:10px;width:100%;outline:none;">
@@ -3681,7 +3737,7 @@ function renderProgress() {
   if (bwLog.length >= 2) {
     const chartEl = document.getElementById('bw-chart-prog');
     if (chartEl) {
-      const entries = bwLog.map(e => ({ weight: e.weight, dateRaw: new Date(e.date).getTime() || e.dateRaw || Date.now(), date: e.date }));
+      const entries = bwLog.map(e => ({ weight: e.weight, dateRaw: e.dateRaw || (e.dateISO ? new Date(e.dateISO+'T00:00:00').getTime() : Date.now()), date: e.date || e.dateISO || '' }));
       chartEl.innerHTML = renderChart(entries.sort((a,b) => a.dateRaw - b.dateRaw));
     }
   }
@@ -3692,12 +3748,9 @@ function logBodyWeightProg() {
   if (!input) return;
   const val = parseFloat(input.value);
   if (!val || val < 50 || val > 500) { showToast('Enter a valid weight'); return; }
-  const log = ls('bw_log', []);
-  log.push({ weight: val, date: new Date().toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}), dateRaw: Date.now() });
-  lsSet('bw_log', log);
+  logBW(val);
   input.value = '';
   showToast('Weight logged!');
-  syncToCloud();
   renderProgress();
 }
 
@@ -4048,6 +4101,7 @@ function calcORM(name) {
     pctDivs[i].textContent = val;
   });
 
+  syncPRViews();
   showToast(`${name}: ~${estimated} lbs 1RM`);
 }
 
@@ -4207,7 +4261,7 @@ function updateGoalProgress() {
   if (!goal) return;
 
   const history = getHistory();
-  const bwLog = ls('bw_log', []);
+  const bwLog = getBWLog();
   const completedWorkouts = history.filter(h => h.dateRaw >= (goal.startDate || 0)).length;
   const daysElapsed = Math.max(1, Math.round((Date.now() - (goal.startDate || Date.now())) / 86400000));
   const weeksElapsed = daysElapsed / 7;
@@ -4367,6 +4421,7 @@ function saveGoal() {
   updateGoalProgress();
   renderGoalCard();
   renderNutritionCard();
+  syncGoalViews();
   showToast('Goal saved!');
 }
 
@@ -4518,6 +4573,7 @@ function saveNutrition() {
   lsSet('nutr_goal', nutritionGoalMode);
   syncToCloud();
   renderNutritionCard();
+  syncGoalViews();
 }
 
 function editNutrition() {
@@ -4676,34 +4732,27 @@ function bwDateKey(date) {
 }
 
 function getAllBWEntries() {
-  const entries = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && key.startsWith('bw_')) {
-      const dateStr = key.slice(3); // YYYY-MM-DD
-      const val = ls(key, null);
-      if (val !== null) {
-        entries.push({ date: dateStr, weight: parseFloat(val) });
-      }
-    }
-  }
-  entries.sort((a,b) => a.date.localeCompare(b.date));
-  return entries;
+  // Unified: reads from canonical bw_log array, returns same shape as before
+  return getBWLog().map(e => ({
+    date: e.dateISO || e.date || '',
+    weight: e.weight,
+    dateRaw: e.dateRaw
+  }));
 }
 
 function logBodyWeight() {
   const input = document.getElementById('bw-input');
   const val = parseFloat(input.value);
   if (!val || val <= 0) { showToast('Enter a valid weight'); return; }
-  const key = bwDateKey(new Date());
-  lsSet(key, val);
+  logBW(val);
   input.value = '';
   showToast(`Logged ${val} lbs`);
   renderWeightView();
 }
 
 function deleteBWEntry(dateStr) {
-  try { localStorage.removeItem(`bw_${dateStr}`); } catch(e) {}
+  // dateStr may be YYYY-MM-DD (new entries) or a locale string (old entries)
+  deleteBWByDate(dateStr);
   renderWeightView();
 }
 
@@ -4742,8 +4791,11 @@ function renderWeightView() {
     } else {
       const reversed = [...allEntries].reverse();
       listEl.innerHTML = reversed.map(e => {
-        const d = new Date(e.date + 'T00:00:00');
-        const label = d.toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'});
+        // date field is YYYY-MM-DD for new entries; fall back to raw string for legacy
+        const isISO = /^\d{4}-\d{2}-\d{2}$/.test(e.date);
+        const label = isISO
+          ? new Date(e.date + 'T00:00:00').toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'})
+          : e.date;
         return `
           <div class="bw-list-item">
             <span class="bw-date">${label}</span>
