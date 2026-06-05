@@ -193,16 +193,16 @@
   }
 
   /* ── VIEWS ── */
-  .view { display: none; overflow-x: hidden; }
-  .view.active { display: block; overflow-x: hidden; }
+  .view { display: none !important; overflow-x: hidden; }
+  .view.active { display: block !important; overflow-x: hidden; }
 
   /* ── TODAY VIEW ── */
   #view-today {
     min-height: calc(100vh - var(--header-h) - var(--nav-h));
-    display: flex;
     flex-direction: column;
     justify-content: center;
   }
+  #view-today.active { display: flex !important; }
   .today-hero {
     background: linear-gradient(135deg, rgba(26,21,0,0.88) 0%, rgba(42,26,0,0.92) 100%);
     border: 1px solid var(--yellow-border);
