@@ -1,7 +1,7 @@
 {
-  "name": "Hypertrophy Clusters 1.2",
-  "short_name": "HC 1.2",
-  "description": "Hypertrophy Clusters 1.2 workout tracker",
+  "name": "Takeover",
+  "short_name": "Takeover",
+  "description": "Takeover 16-Week Growth System",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f0f0f",
