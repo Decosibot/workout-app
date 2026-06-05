@@ -1737,12 +1737,17 @@ let activeMensProgram = localStorage.getItem('mens_program') || null;
 function selectMensProgram(prog) {
   activeMensProgram = prog;
   localStorage.setItem('mens_program', prog);
+  // Record start date only on first selection (don't overwrite if changing programs)
+  if (!getProgramStartDate()) {
+    setProgramStartDate(new Date().toISOString().slice(0, 10));
+  }
   const overlay = document.getElementById('prog-select-overlay');
   overlay.style.display = 'none';
   document.getElementById('psc-hc12').classList.toggle('selected', prog === 'hc12');
   document.getElementById('psc-growth').classList.toggle('selected', prog === 'growth');
   document.getElementById('psc-mansour').classList.toggle('selected', prog === 'mansour');
   updateProgHeader();
+  syncStateToCalendar();
   renderToday();
 }
 
@@ -1819,9 +1824,67 @@ function lsSet(key, val) {
   try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {}
 }
 
+// ── Calendar sync helpers ──────────────────────────────────────
+// HC12: Mon/Tue/Thu/Fri are workout days (idx 0-3). Wed/Sat/Sun = rest.
+// Growth: Mon–Sat are workout days (d1–d6). Sun = rest.
+// Mansour: own off-day pattern, no calendar sync needed.
+const HC12_DOW_TO_IDX = { 1: 0, 2: 1, 4: 2, 5: 3 }; // Mon=1,Tue=2,Thu=4,Fri=5
+const GROWTH_DOW_TO_DAY = { 1:'d1', 2:'d2', 3:'d3', 4:'d4', 5:'d5', 6:'d6' }; // Mon-Sat
+
+function getProgramStartDate() { return localStorage.getItem('prog_start_date') || null; }
+function setProgramStartDate(isoDate) {
+  localStorage.setItem('prog_start_date', isoDate);
+  syncToCloud();
+}
+
+// Returns ISO date (YYYY-MM-DD) for the most recent Monday on or before today
+function lastMonday(isoToday) {
+  const d = new Date(isoToday + 'T12:00:00');
+  const dow = d.getDay(); // 0=Sun
+  const diff = dow === 0 ? 6 : dow - 1; // days since Monday
+  d.setDate(d.getDate() - diff);
+  return d.toISOString().slice(0, 10);
+}
+
+// Number of full weeks elapsed since startISO (each week starts Monday)
+function weeksElapsed(startISO) {
+  const startMonday = new Date(lastMonday(startISO) + 'T12:00:00');
+  const thisMonday = new Date(lastMonday(new Date().toISOString().slice(0, 10)) + 'T12:00:00');
+  const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+  return Math.max(0, Math.round((thisMonday - startMonday) / msPerWeek));
+}
+
+function syncStateToCalendar() {
+  const startISO = getProgramStartDate();
+  if (!startISO) return; // no start date set — don't override manual state
+
+  const todayISO = new Date().toISOString().slice(0, 10);
+  const todayDow = new Date(todayISO + 'T12:00:00').getDay(); // 0=Sun
+
+  if (activeMensProgram === 'hc12' || !activeMensProgram) {
+    const elapsed = weeksElapsed(startISO);
+    const newWeek = Math.min(8, Math.max(1, elapsed + 1));
+    state.currentWeek = newWeek;
+    // Map today's DOW to workout day index; default to Mon (idx 0) on rest days
+    state.currentDayIdx = (todayDow in HC12_DOW_TO_IDX) ? HC12_DOW_TO_IDX[todayDow] : 0;
+    lsSet('hc_state', { currentWeek: state.currentWeek, currentDayIdx: state.currentDayIdx });
+
+  } else if (activeMensProgram === 'growth') {
+    const elapsed = weeksElapsed(startISO);
+    const newWeek = Math.min(4, Math.max(1, elapsed + 1));
+    const dayKey = GROWTH_DOW_TO_DAY[todayDow] || 'd1'; // default Mon on Sun rest
+    const fullKey = `w${newWeek}_${dayKey}`;
+    const resolved = GROWTH_PLAN.days[fullKey] ? fullKey : `w${newWeek}_d1`;
+    localStorage.setItem('growth_state', JSON.stringify({ week: newWeek, day: resolved }));
+
+  }
+  // Mansour: date-based sync not applicable — it's a cycling block, not calendar-weekly
+}
+
 function loadState() {
   const s = ls('hc_state', null);
   if (s) { state.currentWeek = s.currentWeek || 1; state.currentDayIdx = s.currentDayIdx || 0; }
+  // Note: syncStateToCalendar() is called in bootApp after activeMensProgram is loaded
 }
 function saveState() {
   lsSet('hc_state', { currentWeek: state.currentWeek, currentDayIdx: state.currentDayIdx });
@@ -3789,8 +3852,32 @@ function renderProgramOverview(container) {
 }
 
 function renderProgramSchedule(container) {
-  // Day + Week manual selectors (for override/review)
-  let html = `<div style="font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.5;">The program advances automatically as you complete workouts. Use these selectors to review or manually jump to a specific day.</div>`;
+  const startISO = getProgramStartDate() || '';
+
+  // ── Calendar start date picker ──
+  let html = `
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:16px;">
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;">📅 Program Start Date</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.5;">
+      The app syncs your current week and workout day automatically based on this date. Week 1 starts on the Monday of your start week.
+    </div>
+    <input type="date" id="prog-start-input" value="${startISO}"
+      style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;box-sizing:border-box;"
+      onchange="
+        const val = this.value;
+        if (val) {
+          setProgramStartDate(val);
+          syncStateToCalendar();
+          loadState();
+          renderToday();
+          renderProgramSchedule(document.getElementById('program-content'));
+          showToast('Calendar synced to ' + val);
+        }
+      "
+    />
+    ${startISO ? `<div style="font-size:11px;color:var(--text3);margin-top:6px;">Week ${Math.min(activeMensProgram==='growth'?4:8, Math.max(1, weeksElapsed(startISO)+1))} of ${activeMensProgram==='growth'?4:8} · Today is ${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()]}</div>` : ''}
+  </div>
+  <div style="font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.5;">Use these selectors to manually override the current position or preview a specific week.</div>`;
 
   if (activeMensProgram === 'hc12' || !activeMensProgram) {
     const phase = getPhaseForWeek(state.currentWeek);
@@ -5121,6 +5208,7 @@ function confirmFullReset() {
 function bootApp(fromCloud) {
   loadState();
   activeMensProgram = localStorage.getItem('mens_program') || null;
+  syncStateToCalendar(); // apply calendar date sync now that activeMensProgram is known
   if (!activeMensProgram) {
     showProgSelect();
   } else {
