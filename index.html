@@ -11,6 +11,7 @@
 <link rel="manifest" href="manifest.json">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script>
   firebase.initializeApp({
     apiKey: "AIzaSyCS6hfr0jIxDrn6IiTVXDtNI5y2huR7AiE",
@@ -21,14 +22,11 @@
     appId: "1:93802465651:web:e5453d53128bf6b8d25d06"
   });
   const db = firebase.firestore();
+  const auth = firebase.auth();
 
   function getUID() {
-    let uid = localStorage.getItem('wapp_uid');
-    if (!uid) {
-      uid = 'u_' + Math.random().toString(36).substr(2,9) + Date.now().toString(36);
-      localStorage.setItem('wapp_uid', uid);
-    }
-    return uid;
+    const user = auth.currentUser;
+    return user ? user.uid : (localStorage.getItem('wapp_uid') || 'local');
   }
 </script>
 <title>16-Week Growth System</title>
@@ -761,9 +759,45 @@
     </div>
     <button id="switch-prog-btn" onclick="showProgSelect()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;">Levels ↕</button>
     <span id="sync-status" style="font-size:13px;color:var(--text3);font-weight:600;cursor:pointer;" onclick="syncToCloud(true)" title="Sync">☁️</span>
+    <button id="account-btn" onclick="showAccountMenu()" title="Account" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:20px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">👤</button>
     <button id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:none;font-size:16px;cursor:pointer;padding:4px;">☀️</button>
   </div>
 </header>
+
+<!-- LOGIN OVERLAY -->
+<div id="login-overlay" style="display:flex;position:fixed;inset:0;background:var(--bg);z-index:900;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;">
+  <div style="width:100%;max-width:360px;">
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="font-size:40px;margin-bottom:10px;">⚡</div>
+      <div style="font-size:24px;font-weight:900;color:var(--yellow);">16-Week Growth</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:6px;">Sign in to save your progress across devices</div>
+    </div>
+
+    <!-- Google Sign-In -->
+    <button onclick="signInWithGoogle()" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#fff;color:#222;border:none;border-radius:12px;font-size:15px;font-weight:700;padding:14px;cursor:pointer;margin-bottom:12px;">
+      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+      Continue with Google
+    </button>
+
+    <div style="display:flex;align-items:center;gap:10px;margin:16px 0;">
+      <div style="flex:1;height:1px;background:var(--border);"></div>
+      <span style="font-size:12px;color:var(--text3);">or use email</span>
+      <div style="flex:1;height:1px;background:var(--border);"></div>
+    </div>
+
+    <!-- Email/Password -->
+    <input id="auth-email" type="email" placeholder="Email address" autocomplete="email"
+      style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;outline:none;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">
+    <input id="auth-password" type="password" placeholder="Password" autocomplete="current-password"
+      style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;outline:none;box-sizing:border-box;margin-bottom:6px;font-family:inherit;">
+    <div id="auth-error" style="font-size:12px;color:#ff6b6b;min-height:18px;margin-bottom:8px;text-align:center;"></div>
+
+    <button onclick="signInEmail()" style="width:100%;background:var(--yellow);color:#000;border:none;border-radius:12px;font-size:15px;font-weight:800;padding:14px;cursor:pointer;margin-bottom:10px;">Sign In</button>
+    <button onclick="signUpEmail()" style="width:100%;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:12px;font-size:15px;font-weight:700;padding:14px;cursor:pointer;margin-bottom:16px;">Create Account</button>
+
+    <button onclick="continueAsGuest()" style="width:100%;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;padding:8px;">Continue without account (progress won't sync)</button>
+  </div>
+</div>
 
 <div id="prog-select-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:400;overflow-y:auto;padding:40px 20px 60px;flex-direction:column;align-items:center">
   <div style="font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--yellow);margin-bottom:8px;text-align:center">16-Week Growth System</div>
@@ -5032,29 +5066,185 @@ function loadFromCloud(onDone) {
     .catch(e => { console.log('Load error:', e); onDone(); });
 }
 
+// ════════════════════════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════════════════════════
+function setAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  if (el) el.textContent = msg;
+}
+
+function signInWithGoogle() {
+  setAuthError('');
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(e => setAuthError(e.message));
+}
+
+function signInEmail() {
+  setAuthError('');
+  const email = document.getElementById('auth-email').value.trim();
+  const pw = document.getElementById('auth-password').value;
+  if (!email || !pw) { setAuthError('Enter email and password'); return; }
+  auth.signInWithEmailAndPassword(email, pw).catch(e => setAuthError(friendlyAuthError(e.code)));
+}
+
+function signUpEmail() {
+  setAuthError('');
+  const email = document.getElementById('auth-email').value.trim();
+  const pw = document.getElementById('auth-password').value;
+  if (!email || !pw) { setAuthError('Enter email and password'); return; }
+  if (pw.length < 6) { setAuthError('Password must be at least 6 characters'); return; }
+  auth.createUserWithEmailAndPassword(email, pw).catch(e => setAuthError(friendlyAuthError(e.code)));
+}
+
+function continueAsGuest() {
+  document.getElementById('login-overlay').style.display = 'none';
+  bootApp(false);
+}
+
+function friendlyAuthError(code) {
+  const map = {
+    'auth/user-not-found': 'No account found with that email.',
+    'auth/wrong-password': 'Incorrect password.',
+    'auth/email-already-in-use': 'An account with that email already exists.',
+    'auth/invalid-email': 'Invalid email address.',
+    'auth/too-many-requests': 'Too many attempts. Try again later.',
+    'auth/network-request-failed': 'Network error. Check your connection.',
+    'auth/popup-closed-by-user': 'Sign-in cancelled.'
+  };
+  return map[code] || 'Sign-in failed. Try again.';
+}
+
+function showAccountMenu() {
+  const user = auth.currentUser;
+  const existing = document.getElementById('account-menu-popup');
+  if (existing) { existing.remove(); return; }
+
+  const popup = document.createElement('div');
+  popup.id = 'account-menu-popup';
+  popup.style.cssText = 'position:fixed;top:56px;right:12px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;z-index:800;min-width:220px;box-shadow:0 8px 24px rgba(0,0,0,.5);';
+
+  if (user) {
+    popup.innerHTML = `
+      <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Signed in as</div>
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:16px;word-break:break-all;">${user.email || user.displayName || 'Google User'}</div>
+      <button onclick="syncToCloud(true);document.getElementById('account-menu-popup')?.remove();" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;">Force Sync ☁️</button>
+      <button onclick="showResetProgress()" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;">Fix My Progress 🔧</button>
+      <button onclick="auth.signOut()" style="width:100%;background:none;border:none;color:#ff6b6b;font-size:13px;font-weight:700;cursor:pointer;padding:8px;">Sign Out</button>`;
+  } else {
+    popup.innerHTML = `
+      <div style="font-size:13px;color:var(--text2);margin-bottom:12px;">Not signed in — progress saves locally only.</div>
+      <button onclick="document.getElementById('login-overlay').style.display='flex';document.getElementById('account-menu-popup')?.remove();" style="width:100%;background:var(--yellow);color:#000;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:800;cursor:pointer;">Sign In / Create Account</button>`;
+  }
+
+  document.body.appendChild(popup);
+  setTimeout(() => document.addEventListener('click', function dismiss(e) {
+    if (!popup.contains(e.target) && e.target.id !== 'account-btn') {
+      popup.remove(); document.removeEventListener('click', dismiss);
+    }
+  }), 100);
+}
+
+function showResetProgress() {
+  document.getElementById('account-menu-popup')?.remove();
+  const modal = document.createElement('div');
+  modal.id = 'reset-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:850;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;';
+  modal.innerHTML = `
+    <div style="width:100%;max-width:360px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;">
+      <div style="font-size:18px;font-weight:900;margin-bottom:8px;">Fix My Progress 🔧</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:20px;">If your progress is showing the wrong day or week, use these options to correct it. Your workout history and PRs will be kept.</div>
+
+      <div style="font-size:12px;font-weight:800;color:var(--yellow);letter-spacing:1px;margin-bottom:10px;">JUMP TO A SPECIFIC WEEK</div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;">
+        <select id="reset-program" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:9px;font-family:inherit;">
+          <option value="hc12">Level 1 (HC 1.2)</option>
+          <option value="growth">Level 2 (Growth)</option>
+          <option value="mansour">Level 3 (Mansour)</option>
+        </select>
+        <input id="reset-week" type="number" min="1" max="16" placeholder="Week #" style="width:80px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;padding:9px;font-family:inherit;outline:none;">
+        <button onclick="applyResetProgress()" style="background:var(--yellow);color:#000;border:none;border-radius:8px;font-size:13px;font-weight:800;padding:9px 14px;cursor:pointer;">Set</button>
+      </div>
+
+      <div style="font-size:12px;font-weight:800;color:#ff6b6b;letter-spacing:1px;margin-bottom:10px;">FULL RESET</div>
+      <button onclick="confirmFullReset()" style="width:100%;background:none;border:1px solid #ff6b6b;color:#ff6b6b;border-radius:8px;font-size:13px;font-weight:700;padding:10px;cursor:pointer;margin-bottom:16px;">Reset All Progress (keep history & PRs)</button>
+
+      <button onclick="document.getElementById('reset-modal').remove();" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;font-size:13px;padding:10px;cursor:pointer;">Cancel</button>
+    </div>`;
+  document.body.appendChild(modal);
+}
+
+function applyResetProgress() {
+  const prog = document.getElementById('reset-program').value;
+  const weekRaw = parseInt(document.getElementById('reset-week').value) || 1;
+  selectMensProgram(prog);
+  if (prog === 'hc12') {
+    const w = Math.min(Math.max(weekRaw, 1), 8);
+    state.currentWeek = w; state.currentDayIdx = 0; saveState();
+  } else if (prog === 'growth') {
+    const w = Math.min(Math.max(weekRaw - 8, 1), 4);
+    saveGrowthState({ week: w, day: `w${w}_d1` });
+  } else if (prog === 'mansour') {
+    const d = Math.min(Math.max((weekRaw - 12) * 3, 1), 15);
+    saveMansourDay(d);
+  }
+  syncToCloud();
+  document.getElementById('reset-modal')?.remove();
+  switchView('today');
+  showToast('Progress updated!');
+}
+
+function confirmFullReset() {
+  if (!confirm('Reset your current week/day position? History and PRs will be kept.')) return;
+  if (activeMensProgram === 'hc12' || !activeMensProgram) {
+    state.currentWeek = 1; state.currentDayIdx = 0; saveState();
+  } else if (activeMensProgram === 'growth') {
+    saveGrowthState({ week: 1, day: 'w1_d1' });
+  } else if (activeMensProgram === 'mansour') {
+    saveMansourDay(1);
+  }
+  syncToCloud();
+  document.getElementById('reset-modal')?.remove();
+  switchView('today');
+  showToast('Progress reset to Week 1 Day 1');
+}
+
+function bootApp(fromCloud) {
+  loadState();
+  activeMensProgram = localStorage.getItem('mens_program') || null;
+  if (!activeMensProgram) {
+    showProgSelect();
+  } else {
+    updateProgHeader();
+    updateHeader();
+    renderHome();
+    renderGoalCard();
+    switchView('today');
+  }
+  loadMassInputs();
+}
+
 function init() {
   applyTheme(ls('theme', 'dark'));
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
-  loadFromCloud(() => {
-    loadState();
-    activeMensProgram = localStorage.getItem('mens_program') || null;
-    if (!activeMensProgram) {
-      showProgSelect();
+
+  // Auth state listener — fires on every page load with persisted session
+  auth.onAuthStateChanged(user => {
+    const loginOverlay = document.getElementById('login-overlay');
+    if (user) {
+      // Signed in — hide login, load cloud data, start app
+      if (loginOverlay) loginOverlay.style.display = 'none';
+      const btn = document.getElementById('account-btn');
+      if (btn) btn.title = user.email || user.displayName || 'Account';
+      loadFromCloud(() => bootApp(true));
     } else {
-      updateProgHeader();
-      updateHeader();
-      renderHome();
-      renderGoalCard();
-      switchView('home');
+      // Not signed in — show login screen
+      if (loginOverlay) loginOverlay.style.display = 'flex';
     }
-    loadMassInputs();
   });
 }
-
-// Call updateHeader + renderToday after init (always needed for non-first-launch)
-// (both are called inside init already)
 
 init();
 </script>
