@@ -5167,6 +5167,12 @@ function continueAsGuest() {
   bootApp(false);
 }
 
+function doSignOut() {
+  document.getElementById('account-menu-popup')?.remove();
+  auth.signOut().catch(() => {});
+  // onAuthStateChanged(null) will show login overlay automatically
+}
+
 function friendlyAuthError(code) {
   const map = {
     'auth/user-not-found': 'No account found with that email.',
@@ -5198,7 +5204,7 @@ function showAccountMenu() {
       <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:16px;word-break:break-all;">${user.email || user.displayName || 'Google User'}</div>
       <button onclick="syncToCloud(true);document.getElementById('account-menu-popup')?.remove();" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;">Force Sync ☁️</button>
       <button onclick="showResetProgress()" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;">Fix My Progress 🔧</button>
-      <button onclick="auth.signOut()" style="width:100%;background:none;border:none;color:#ff6b6b;font-size:13px;font-weight:700;cursor:pointer;padding:8px;">Sign Out</button>`;
+      <button onclick="doSignOut()" style="width:100%;background:none;border:none;color:#ff6b6b;font-size:13px;font-weight:700;cursor:pointer;padding:8px;">Sign Out</button>`;
   } else {
     popup.innerHTML = `
       <div style="font-size:13px;color:var(--text2);margin-bottom:12px;">Not signed in — progress saves locally only.</div>
@@ -5298,26 +5304,37 @@ function init() {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
 
-  // Handle Google redirect result (fires after returning from Google sign-in page)
-  auth.getRedirectResult()
-    .then(result => { /* onAuthStateChanged handles the rest */ })
-    .catch(e => {
-      if (e.code && e.code !== 'auth/no-current-user') {
-        const el = document.getElementById('auth-error');
-        if (el) el.textContent = friendlyAuthError(e.code);
-      }
-    });
+  let appRunning = false;
 
-  // Auth state listener — fires on every page load with persisted session
+  // onAuthStateChanged fires once immediately on page load:
+  //   null  → no session, show login screen
+  //   user  → persisted session, skip login and boot
+  // It fires again whenever the user signs in or out.
   auth.onAuthStateChanged(user => {
     const loginOverlay = document.getElementById('login-overlay');
+
     if (user) {
       if (loginOverlay) loginOverlay.style.display = 'none';
       const btn = document.getElementById('account-btn');
       if (btn) btn.title = user.email || user.displayName || 'Account';
-      loadFromCloud(() => bootApp(true));
+
+      if (!appRunning) {
+        appRunning = true;
+        loadFromCloud(() => bootApp(true));
+      }
+      // If already running (e.g. token refresh), do nothing extra
     } else {
+      // Signed out — reset flag and show login so they can sign back in
+      appRunning = false;
       if (loginOverlay) loginOverlay.style.display = 'flex';
+    }
+  });
+
+  // Catch errors from Google redirect sign-in returning to the page
+  auth.getRedirectResult().catch(e => {
+    if (e.code && e.code !== 'auth/no-current-user') {
+      const el = document.getElementById('auth-error');
+      if (el) el.textContent = friendlyAuthError(e.code);
     }
   });
 }
