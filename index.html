@@ -11,7 +11,6 @@
 <link rel="manifest" href="manifest.json">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script>
   firebase.initializeApp({
     apiKey: "AIzaSyCS6hfr0jIxDrn6IiTVXDtNI5y2huR7AiE",
@@ -22,11 +21,9 @@
     appId: "1:93802465651:web:e5453d53128bf6b8d25d06"
   });
   const db = firebase.firestore();
-  const auth = firebase.auth();
 
   function getUID() {
-    const user = auth.currentUser;
-    return user ? user.uid : (localStorage.getItem('wapp_uid') || 'local');
+    return localStorage.getItem('wapp_uid') || null;
   }
 </script>
 <title>16-Week Growth System</title>
@@ -784,37 +781,25 @@
 </header>
 
 <!-- LOGIN OVERLAY -->
-<div id="login-overlay" style="display:flex;position:fixed;inset:0;background:var(--bg);z-index:900;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;">
+<div id="login-overlay" style="display:flex;position:fixed;inset:0;background:var(--bg);z-index:900;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;overflow-y:auto;">
   <div style="width:100%;max-width:360px;">
     <div style="text-align:center;margin-bottom:32px;">
       <div style="font-size:40px;margin-bottom:10px;">⚡</div>
       <div style="font-size:24px;font-weight:900;color:var(--yellow);">16-Week Growth</div>
-      <div style="font-size:13px;color:var(--text2);margin-top:6px;">Sign in to save your progress across devices</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.5;">Pick a username and 4-digit PIN.<br>Use the same ones on any device to restore your progress.</div>
     </div>
 
-    <!-- Google Sign-In -->
-    <button onclick="signInWithGoogle()" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#fff;color:#222;border:none;border-radius:12px;font-size:15px;font-weight:700;padding:14px;cursor:pointer;margin-bottom:12px;">
-      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
-      Continue with Google
-    </button>
+    <input id="auth-username" type="text" placeholder="Username (e.g. jeff_lifts)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+      style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:16px;padding:14px;outline:none;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">
+    <input id="auth-pin" type="number" placeholder="4-digit PIN" inputmode="numeric" maxlength="4"
+      style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:22px;padding:14px;outline:none;box-sizing:border-box;margin-bottom:6px;font-family:inherit;letter-spacing:8px;">
+    <div id="auth-error" style="font-size:13px;color:#ff6b6b;min-height:20px;margin-bottom:10px;text-align:center;"></div>
 
-    <div style="display:flex;align-items:center;gap:10px;margin:16px 0;">
-      <div style="flex:1;height:1px;background:var(--border);"></div>
-      <span style="font-size:12px;color:var(--text3);">or use email</span>
-      <div style="flex:1;height:1px;background:var(--border);"></div>
-    </div>
+    <button onclick="doLogin()" style="width:100%;background:var(--yellow);color:#000;border:none;border-radius:12px;font-size:16px;font-weight:900;padding:16px;cursor:pointer;margin-bottom:12px;">Enter →</button>
 
-    <!-- Email/Password -->
-    <input id="auth-email" type="email" placeholder="Email address" autocomplete="email"
-      style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;outline:none;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">
-    <input id="auth-password" type="password" placeholder="Password" autocomplete="current-password"
-      style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px;outline:none;box-sizing:border-box;margin-bottom:6px;font-family:inherit;">
-    <div id="auth-error" style="font-size:12px;color:#ff6b6b;min-height:18px;margin-bottom:8px;text-align:center;"></div>
+    <div style="font-size:11px;color:var(--text3);text-align:center;line-height:1.6;margin-bottom:16px;">First time? Just enter a username and PIN — your account is created automatically.<br>Returning? Use the same username and PIN to pick up where you left off.</div>
 
-    <button onclick="signInEmail()" style="width:100%;background:var(--yellow);color:#000;border:none;border-radius:12px;font-size:15px;font-weight:800;padding:14px;cursor:pointer;margin-bottom:10px;">Sign In</button>
-    <button onclick="signUpEmail()" style="width:100%;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:12px;font-size:15px;font-weight:700;padding:14px;cursor:pointer;margin-bottom:16px;">Create Account</button>
-
-    <button onclick="continueAsGuest()" style="width:100%;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;padding:8px;">Continue without account (progress won't sync)</button>
+    <button onclick="continueAsGuest()" style="width:100%;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;padding:8px;text-decoration:underline;">Skip — save locally only</button>
   </div>
 </div>
 
@@ -5134,32 +5119,48 @@ function setAuthError(msg) {
   if (el) el.textContent = msg;
 }
 
-function signInWithGoogle() {
-  setAuthError('');
-  const provider = new firebase.auth.GoogleAuthProvider();
-  // Use redirect on mobile/PWA — popups are blocked by iOS Safari and many Android browsers
-  auth.signInWithRedirect(provider).catch(e => setAuthError(friendlyAuthError(e.code)));
+// ── Username / PIN auth ──
+function setAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  if (el) el.textContent = msg;
 }
 
-function signInEmail() {
-  setAuthError('Signing in...');
-  const email = document.getElementById('auth-email').value.trim();
-  const pw = document.getElementById('auth-password').value;
-  if (!email || !pw) { setAuthError('Enter email and password'); return; }
-  auth.signInWithEmailAndPassword(email, pw)
-    .then(() => setAuthError(''))
-    .catch(e => setAuthError(friendlyAuthError(e.code)));
-}
+function doLogin() {
+  const username = (document.getElementById('auth-username').value || '').trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
+  const pin = (document.getElementById('auth-pin').value || '').trim();
 
-function signUpEmail() {
-  setAuthError('Creating account...');
-  const email = document.getElementById('auth-email').value.trim();
-  const pw = document.getElementById('auth-password').value;
-  if (!email || !pw) { setAuthError('Enter email and password'); return; }
-  if (pw.length < 6) { setAuthError('Password must be at least 6 characters'); return; }
-  auth.createUserWithEmailAndPassword(email, pw)
-    .then(() => setAuthError(''))
-    .catch(e => setAuthError(friendlyAuthError(e.code)));
+  if (!username) { setAuthError('Enter a username'); return; }
+  if (username.length < 3) { setAuthError('Username must be at least 3 characters'); return; }
+  if (!/^\d{4}$/.test(pin)) { setAuthError('PIN must be exactly 4 digits'); return; }
+
+  setAuthError('Checking...');
+
+  const uid = 'u_' + username;
+  const metaRef = db.collection('users').doc(uid).collection('meta').doc('account');
+
+  metaRef.get().then(doc => {
+    if (doc.exists) {
+      // Account exists — verify PIN
+      const stored = doc.data();
+      if (stored.pin !== pin) {
+        setAuthError('Wrong PIN for that username');
+        return;
+      }
+      // PIN correct — log in
+      localStorage.setItem('wapp_uid', uid);
+      localStorage.setItem('wapp_username', username);
+      document.getElementById('login-overlay').style.display = 'none';
+      loadFromCloud(() => bootApp(true));
+    } else {
+      // New account — create it
+      metaRef.set({ pin, username, created: Date.now() }).then(() => {
+        localStorage.setItem('wapp_uid', uid);
+        localStorage.setItem('wapp_username', username);
+        document.getElementById('login-overlay').style.display = 'none';
+        bootApp(true);
+      }).catch(e => setAuthError('Could not create account. Check connection.'));
+    }
+  }).catch(e => setAuthError('Connection error. Check your internet and try again.'));
 }
 
 function continueAsGuest() {
@@ -5169,28 +5170,14 @@ function continueAsGuest() {
 
 function doSignOut() {
   document.getElementById('account-menu-popup')?.remove();
-  auth.signOut().catch(() => {});
-  // onAuthStateChanged(null) will show login overlay automatically
-}
-
-function friendlyAuthError(code) {
-  const map = {
-    'auth/user-not-found': 'No account found with that email.',
-    'auth/wrong-password': 'Incorrect password.',
-    'auth/invalid-credential': 'Incorrect email or password.',
-    'auth/email-already-in-use': 'An account with that email already exists.',
-    'auth/invalid-email': 'Invalid email address.',
-    'auth/too-many-requests': 'Too many attempts. Try again later.',
-    'auth/network-request-failed': 'Network error. Check your connection.',
-    'auth/popup-closed-by-user': 'Sign-in cancelled.',
-    'auth/redirect-cancelled-by-user': 'Sign-in cancelled.',
-    'auth/operation-not-allowed': 'This sign-in method is not enabled. Enable it in Firebase Console.'
-  };
-  return map[code] || `Sign-in failed (${code}). Try again.`;
+  localStorage.removeItem('wapp_uid');
+  localStorage.removeItem('wapp_username');
+  document.getElementById('login-overlay').style.display = 'flex';
 }
 
 function showAccountMenu() {
-  const user = auth.currentUser;
+  const uid = localStorage.getItem('wapp_uid');
+  const username = localStorage.getItem('wapp_username');
   const existing = document.getElementById('account-menu-popup');
   if (existing) { existing.remove(); return; }
 
@@ -5198,17 +5185,17 @@ function showAccountMenu() {
   popup.id = 'account-menu-popup';
   popup.style.cssText = 'position:fixed;top:56px;right:12px;left:12px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;z-index:800;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:340px;margin-left:auto;';
 
-  if (user) {
+  if (uid) {
     popup.innerHTML = `
       <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Signed in as</div>
-      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:16px;word-break:break-all;">${user.email || user.displayName || 'Google User'}</div>
+      <div style="font-size:15px;font-weight:800;color:var(--yellow);margin-bottom:16px;">@${username || uid}</div>
       <button onclick="syncToCloud(true);document.getElementById('account-menu-popup')?.remove();" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;">Force Sync ☁️</button>
       <button onclick="showResetProgress()" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;">Fix My Progress 🔧</button>
       <button onclick="doSignOut()" style="width:100%;background:none;border:none;color:#ff6b6b;font-size:13px;font-weight:700;cursor:pointer;padding:8px;">Sign Out</button>`;
   } else {
     popup.innerHTML = `
       <div style="font-size:13px;color:var(--text2);margin-bottom:12px;">Not signed in — progress saves locally only.</div>
-      <button onclick="document.getElementById('login-overlay').style.display='flex';document.getElementById('account-menu-popup')?.remove();" style="width:100%;background:var(--yellow);color:#000;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:800;cursor:pointer;">Sign In / Create Account</button>`;
+      <button onclick="document.getElementById('login-overlay').style.display='flex';document.getElementById('account-menu-popup')?.remove();" style="width:100%;background:var(--yellow);color:#000;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:800;cursor:pointer;">Sign In</button>`;
   }
 
   document.body.appendChild(popup);
@@ -5304,39 +5291,15 @@ function init() {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
 
-  let appRunning = false;
-
-  // onAuthStateChanged fires once immediately on page load:
-  //   null  → no session, show login screen
-  //   user  → persisted session, skip login and boot
-  // It fires again whenever the user signs in or out.
-  auth.onAuthStateChanged(user => {
-    const loginOverlay = document.getElementById('login-overlay');
-
-    if (user) {
-      if (loginOverlay) loginOverlay.style.display = 'none';
-      const btn = document.getElementById('account-btn');
-      if (btn) btn.title = user.email || user.displayName || 'Account';
-
-      if (!appRunning) {
-        appRunning = true;
-        loadFromCloud(() => bootApp(true));
-      }
-      // If already running (e.g. token refresh), do nothing extra
-    } else {
-      // Signed out — reset flag and show login so they can sign back in
-      appRunning = false;
-      if (loginOverlay) loginOverlay.style.display = 'flex';
-    }
-  });
-
-  // Catch errors from Google redirect sign-in returning to the page
-  auth.getRedirectResult().catch(e => {
-    if (e.code && e.code !== 'auth/no-current-user') {
-      const el = document.getElementById('auth-error');
-      if (el) el.textContent = friendlyAuthError(e.code);
-    }
-  });
+  const uid = localStorage.getItem('wapp_uid');
+  if (uid) {
+    // Already logged in — load cloud data and go
+    document.getElementById('login-overlay').style.display = 'none';
+    loadFromCloud(() => bootApp(true));
+  } else {
+    // No saved session — show login
+    document.getElementById('login-overlay').style.display = 'flex';
+  }
 }
 
 init();
