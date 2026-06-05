@@ -116,20 +116,25 @@
   }
   .nav-tab {
     flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 4px; cursor: pointer; color: var(--text3);
-    font-size: 10px; font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase;
-    padding: 8px 4px; position: relative; transition: color 0.2s;
+    gap: 3px; cursor: pointer; color: var(--text3);
+    font-size: 10px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
+    padding: 6px 4px; position: relative;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
   }
-  .nav-tab.active { color: var(--yellow); }
-  .nav-tab.active::before {
-    content: '';
-    position: absolute; top: 0; left: 20%; right: 20%; height: 2px;
-    background: var(--yellow); border-radius: 0 0 3px 3px;
+  .nav-tab .nav-icon-wrap {
+    width: 44px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 14px;
+    transition: background 0.18s, color 0.18s;
   }
-  .nav-tab svg { width: 24px; height: 24px; }
-  .nav-tab:active { opacity: 0.7; }
+  .nav-tab svg { width: 22px; height: 22px; transition: stroke-width 0.18s; }
+  .nav-tab.active { color: var(--yellow); }
+  .nav-tab.active .nav-icon-wrap {
+    background: rgba(245,200,66,0.15);
+  }
+  .nav-tab.active svg { stroke-width: 2.5; }
+  .nav-tab:active { opacity: 0.6; }
 
   /* ── MAIN CONTENT ── */
   #app-main {
@@ -472,11 +477,6 @@
   body.light #app-header { background: rgba(245,245,245,0.95); }
   body.light #app-nav { background: rgba(245,245,245,0.97); }
 
-  /* ── THEME TOGGLE ── */
-  #theme-toggle {
-    background: none; border: none; cursor: pointer; font-size: 20px;
-    padding: 4px; line-height: 1; color: var(--text2);
-  }
 
   /* ── NUTRITION BANNER ── */
   #nutrition-card {
@@ -811,15 +811,15 @@
       <text x="105" y="62" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',system-ui,sans-serif" font-size="36" font-weight="800" letter-spacing="6" fill="currentColor" text-anchor="start" dominant-baseline="auto">TAKEOVER</text>
     </svg>
   </div>
-  <div style="display:flex;align-items:center;gap:8px;">
-    <div style="text-align:right">
-      <div id="header-week" style="font-size:13px;font-weight:700;"></div>
-      <div id="header-day" style="font-size:11px;color:var(--text3);margin-top:1px;"></div>
-    </div>
-    <button id="switch-prog-btn" onclick="showProgSelect()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;">Levels ↕</button>
-    <span id="sync-status" style="font-size:13px;color:var(--text3);font-weight:600;cursor:pointer;" onclick="syncToCloud(true)" title="Sync">☁️</span>
-    <button id="account-btn" onclick="showAccountMenu()" title="Account" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:20px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">👤</button>
-    <button id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:none;font-size:16px;cursor:pointer;padding:4px;">☀️</button>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div id="header-week" style="font-size:12px;font-weight:700;color:var(--text2);"></div>
+    <span id="sync-status" style="font-size:13px;color:var(--text3);cursor:pointer;" onclick="syncToCloud(true)" title="Sync">☁️</span>
+    <button id="account-btn" onclick="showAccountMenu()" title="Account"
+      style="width:36px;height:36px;background:var(--bg3);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;color:var(--text2);">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+      </svg>
+    </button>
   </div>
 </header>
 
@@ -1056,27 +1056,35 @@
 <!-- BOTTOM NAV -->
 <nav id="app-nav">
   <div class="nav-tab active" data-view="home" onclick="switchView('home')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/>
-    </svg>
+    <div class="nav-icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/>
+      </svg>
+    </div>
     Home
   </div>
   <div class="nav-tab" data-view="today" onclick="switchView('today')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-    </svg>
+    <div class="nav-icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+    </div>
     Today
   </div>
   <div class="nav-tab" data-view="program" onclick="switchView('program')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-    </svg>
+    <div class="nav-icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+      </svg>
+    </div>
     Program
   </div>
   <div class="nav-tab" data-view="tools" onclick="switchView('tools')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
-    </svg>
+    <div class="nav-icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+    </div>
     Tools
   </div>
 </nav>
@@ -2656,22 +2664,15 @@ function updateHeader() {
   const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   if (activeMensProgram === 'growth') {
     const gs = getGrowthState();
-    const dayData = GROWTH_PLAN.days[gs.day];
-    setEl('header-week', `P2 · Week ${gs.week}`);
-    setEl('header-day', dayData ? dayData.name : '');
+    setEl('header-week', `P2 · Wk ${gs.week}`);
     return;
   }
   if (activeMensProgram === 'mansour') {
     const d = getMansourDay();
-    const dayData = getMansourDayData(d);
-    setEl('header-week', `P3 · Day ${d}/15`);
-    setEl('header-day', dayData ? dayData.name : '');
+    setEl('header-week', `P3 · Day ${d}`);
     return;
   }
-  const phase = getPhaseForWeek(state.currentWeek);
-  const dayData = getCurrentDayData();
-  setEl('header-week', `P1 · Week ${state.currentWeek}`);
-  setEl('header-day', dayData ? `${dayData.label} ${dayData.name}` : '');
+  setEl('header-week', `P1 · Wk ${state.currentWeek}`);
 }
 
 // ════════════════════════════════════════════════════════════
@@ -4289,10 +4290,8 @@ function showToast(msg) {
 function applyTheme(theme) {
   if (theme === 'light') {
     document.body.classList.add('light');
-    document.getElementById('theme-toggle').textContent = '🌙';
   } else {
     document.body.classList.remove('light');
-    document.getElementById('theme-toggle').textContent = '☀️';
   }
 }
 
@@ -5292,17 +5291,28 @@ function showAccountMenu() {
   popup.id = 'account-menu-popup';
   popup.style.cssText = 'position:fixed;top:56px;right:12px;left:12px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;z-index:800;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:340px;margin-left:auto;';
 
+  const menuBtn = (label, onclick, extra='') => `<button onclick="${onclick}" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px 14px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;text-align:left;font-family:inherit;${extra}">${label}</button>`;
+  const themeLabel = ls('theme','dark') === 'dark' ? '☀️  Light Mode' : '🌙  Dark Mode';
+
   if (user) {
     popup.innerHTML = `
-      <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Signed in as</div>
-      <div style="font-size:15px;font-weight:800;color:var(--yellow);margin-bottom:16px;">@${username || 'user'}</div>
-      <button onclick="syncToCloud(true);document.getElementById('account-menu-popup')?.remove();" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;">Force Sync ☁️</button>
-      <button onclick="showResetProgress()" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;">Fix My Progress 🔧</button>
-      <button onclick="doSignOut()" style="width:100%;background:none;border:none;color:#ff6b6b;font-size:13px;font-weight:700;cursor:pointer;padding:8px;">Sign Out</button>`;
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border);">
+        <div style="width:38px;height:38px;background:var(--yellow);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#000;flex-shrink:0;">${(username||'U')[0].toUpperCase()}</div>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:var(--text);">@${username || 'user'}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:1px;">Synced to cloud</div>
+        </div>
+      </div>
+      ${menuBtn('Switch Phase ↕', "document.getElementById('account-menu-popup')?.remove();showProgSelect();")}
+      ${menuBtn(themeLabel, "document.getElementById('account-menu-popup')?.remove();toggleTheme();")}
+      ${menuBtn('Sync Now ☁️', "syncToCloud(true);document.getElementById('account-menu-popup')?.remove();")}
+      ${menuBtn('Fix My Progress 🔧', "showResetProgress();")}
+      <button onclick="doSignOut()" style="width:100%;background:none;border:none;color:#ff6b6b;font-size:13px;font-weight:700;cursor:pointer;padding:10px;font-family:inherit;">Sign Out</button>`;
   } else {
     popup.innerHTML = `
-      <div style="font-size:13px;color:var(--text2);margin-bottom:12px;">Not signed in — progress saves locally only.</div>
-      <button onclick="document.getElementById('login-overlay').style.display='flex';document.getElementById('account-menu-popup')?.remove();" style="width:100%;background:var(--yellow);color:#000;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:800;cursor:pointer;">Sign In</button>`;
+      <div style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.5;">Not signed in — progress saves locally only.</div>
+      ${menuBtn(themeLabel, "document.getElementById('account-menu-popup')?.remove();toggleTheme();")}
+      <button onclick="document.getElementById('login-overlay').style.display='flex';document.getElementById('account-menu-popup')?.remove();" style="width:100%;background:var(--yellow);color:#000;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">Sign In</button>`;
   }
 
   document.body.appendChild(popup);
