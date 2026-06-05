@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0f0f0f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="12-Week Growth">
+<meta name="apple-mobile-web-app-title" content="16-Week Growth">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -31,7 +31,7 @@
     return uid;
   }
 </script>
-<title>12-Week Growth System</title>
+<title>16-Week Growth System</title>
 <style>
   :root {
     --bg: #0f0f0f;
@@ -88,19 +88,28 @@
   #app-nav {
     position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
     height: var(--nav-h);
-    background: rgba(15,15,15,0.97);
-    backdrop-filter: blur(12px);
+    background: rgba(15,15,15,0.98);
+    backdrop-filter: blur(16px);
     border-top: 1px solid var(--border);
     display: flex;
+    padding-bottom: env(safe-area-inset-bottom, 0);
   }
   .nav-tab {
     flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 3px; cursor: pointer; transition: color 0.15s; color: var(--text3);
-    font-size: 10px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase;
-    padding-bottom: env(safe-area-inset-bottom, 0);
+    gap: 4px; cursor: pointer; color: var(--text3);
+    font-size: 10px; font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase;
+    padding: 8px 4px; position: relative; transition: color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
   }
   .nav-tab.active { color: var(--yellow); }
-  .nav-tab svg { width: 22px; height: 22px; }
+  .nav-tab.active::before {
+    content: '';
+    position: absolute; top: 0; left: 20%; right: 20%; height: 2px;
+    background: var(--yellow); border-radius: 0 0 3px 3px;
+  }
+  .nav-tab svg { width: 24px; height: 24px; }
+  .nav-tab:active { opacity: 0.7; }
 
   /* ── MAIN CONTENT ── */
   #app-main {
@@ -584,55 +593,68 @@
 
   /* ── SUPERSET BADGE ── */
   .superset-badge{font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:rgba(74,158,255,.15);color:var(--blue);margin-left:6px}
+
+  /* Touch feedback */
+  .day-btn:active, .week-btn:active, .prog-sel-card:active, .ex-card:active { opacity: 0.75; transform: scale(0.98); }
+  .start-btn:active { transform: scale(0.97); }
+
+  /* Bigger tap targets */
+  .day-btn { min-height: 52px; }
+  .week-btn { min-height: 44px; padding: 10px 6px; }
+
+  /* Section header spacing */
+  .section-header { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); margin-bottom: 10px; margin-top: 4px; }
 </style>
 </head>
 <body>
 
 <header id="app-header">
-  <div>
-    <div id="header-title">12-Week Growth</div>
-    <div id="header-phase">Loading...</div>
-  </div>
   <div style="display:flex;align-items:center;gap:10px;">
+    <div>
+      <div id="header-title" style="font-size:15px;font-weight:800;letter-spacing:-0.3px;">16-Week Growth</div>
+      <div id="header-phase" style="font-size:11px;color:var(--yellow);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;margin-top:1px;">Loading...</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;">
     <div style="text-align:right">
       <div id="header-week" style="font-size:13px;font-weight:700;"></div>
       <div id="header-day" style="font-size:11px;color:var(--text3);margin-top:1px;"></div>
     </div>
-    <button id="switch-prog-btn" onclick="showProgSelect()" style="background:none;border:none;color:var(--text3);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.5px;text-transform:uppercase">Levels</button>
-    <span id="sync-status" style="font-size:10px;color:var(--text3);font-weight:600">☁️</span>
-    <button id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">☀️</button>
+    <button id="switch-prog-btn" onclick="showProgSelect()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;">Levels ↕</button>
+    <span id="sync-status" style="font-size:13px;color:var(--text3);font-weight:600;cursor:pointer;" onclick="syncToCloud(true)" title="Sync">☁️</span>
+    <button id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:none;font-size:16px;cursor:pointer;padding:4px;">☀️</button>
   </div>
 </header>
 
 <div id="prog-select-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:400;overflow-y:auto;padding:40px 20px 60px;flex-direction:column;align-items:center">
-  <div style="font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--yellow);margin-bottom:8px;text-align:center">12-Week Growth System</div>
+  <div style="font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--yellow);margin-bottom:8px;text-align:center">16-Week Growth System</div>
   <div style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px;text-align:center">Three levels. One program. Built to get results.</div>
   <div style="font-size:13px;color:var(--text2);text-align:center;margin-bottom:28px">Pick where you are now — you can switch anytime</div>
   <div class="prog-sel-card" onclick="selectMensProgram('hc12')" id="psc-hc12">
     <div style="font-size:28px;margin-bottom:10px">⚡</div>
     <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">Level 1 — Foundation</div>
-    <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Weeks 1–4</div>
+    <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Weeks 1–8</div>
     <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">Hypertrophy Clusters. Heavy compound movements, cluster-style loading, 4 days/week. Build the base everything else is built on.</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px">
-      <span class="prog-tag-y">Strength + Size</span><span class="prog-tag">Weeks 1–4</span><span class="prog-tag">4 Days/Week</span>
+      <span class="prog-tag-y">Strength + Size</span><span class="prog-tag">Weeks 1–8</span><span class="prog-tag">4 Days/Week</span>
     </div>
   </div>
   <div class="prog-sel-card" onclick="selectMensProgram('growth')" id="psc-growth">
     <div style="font-size:28px;margin-bottom:10px">🔥</div>
     <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">Level 2 — Volume Shock</div>
-    <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Weeks 5–8</div>
+    <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Weeks 9–12</div>
     <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">High volume muscle overload. 5–6 days/week, every muscle from every angle. Run this when Level 1 is done to break through plateaus.</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px">
-      <span class="prog-tag-o">High Volume</span><span class="prog-tag">Weeks 5–8</span><span class="prog-tag">5-6 Days/Week</span>
+      <span class="prog-tag-o">High Volume</span><span class="prog-tag">Weeks 9–12</span><span class="prog-tag">5-6 Days/Week</span>
     </div>
   </div>
   <div class="prog-sel-card" onclick="selectMensProgram('mansour')" id="psc-mansour">
     <div style="font-size:28px;margin-bottom:10px">🏆</div>
     <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">Level 3 — Peak Performance</div>
-    <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Weeks 9–12</div>
+    <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Weeks 13–16</div>
     <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">Advanced periodization. Alternating strength and hypertrophy days, superset pairs, forearm maintenance on off days. The hardest block.</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px">
-      <span class="prog-tag-b">Advanced</span><span class="prog-tag">Weeks 9–12</span><span class="prog-tag">Periodized</span>
+      <span class="prog-tag-b">Advanced</span><span class="prog-tag">Weeks 13–16</span><span class="prog-tag">Periodized</span>
     </div>
   </div>
   <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:8px">Complete each level in order for best results — or jump to where you are now.</div>
@@ -645,15 +667,15 @@
     <div class="today-hero" id="today-hero-card">
       <div style="margin-bottom:14px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">12-Week Progress</span>
-          <span style="font-size:12px;font-weight:700;color:var(--yellow)" id="progress-week-label">Week 1 of 12</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">16-Week Progress</span>
+          <span style="font-size:12px;font-weight:700;color:var(--yellow)" id="progress-week-label">Week 1 of 16</span>
         </div>
         <div style="height:6px;background:var(--bg3);border-radius:3px;overflow:hidden">
           <div id="progress-bar-fill" style="height:100%;background:linear-gradient(90deg,var(--yellow),var(--orange));border-radius:3px;transition:width .4s ease;width:0%"></div>
         </div>
         <div style="display:flex;justify-content:space-between;margin-top:6px">
           <span style="font-size:10px;color:var(--text3)" id="prog-level-label">Level 1</span>
-          <span style="font-size:10px;color:var(--text3)">12 Weeks Total</span>
+          <span style="font-size:10px;color:var(--text3)">16 Weeks Total</span>
         </div>
       </div>
       <div class="phase-badge" id="hero-phase">Phase 1</div>
@@ -670,6 +692,21 @@
       <div class="rest-tip" id="rest-day-tip"></div>
       <div id="streak-display-rest" style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:16px;align-items:center;flex-wrap:wrap;"></div>
     </div>
+
+    <!-- Level nav -->
+    <div id="level-nav-row" style="display:flex;gap:8px;margin-bottom:16px;"></div>
+
+    <!-- Day + Week selectors in one card -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 14px 10px;margin-bottom:12px;">
+      <div class="section-header" style="margin-top:0;margin-bottom:8px;">Select Day</div>
+      <div class="day-selector" id="day-selector"></div>
+      <div class="section-header" style="margin-bottom:8px;">Select Week</div>
+      <div class="week-selector" id="week-selector"></div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="section-header">Quick Stats</div>
+    <div id="quick-stats" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;"></div>
 
     <!-- Nutrition Target Card -->
     <div id="nutrition-card">
@@ -690,23 +727,13 @@
         <button id="nutrition-edit-btn" onclick="editNutrition()">Edit</button>
       </div>
     </div>
-
-    <div class="section-header">Select Day</div>
-    <div class="day-selector" id="day-selector"></div>
-
-    <div class="section-header">Select Week</div>
-    <div class="week-selector" id="week-selector"></div>
-
-    <div class="section-header">Quick Stats</div>
-    <div id="quick-stats" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;"></div>
-
-    <div id="level-nav-row" style="display:flex;gap:8px;margin-bottom:16px;"></div>
   </div>
 
   <!-- WORKOUT VIEW -->
   <div id="view-workout" class="view">
-    <button onclick="switchView('today')" style="display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:12px;">
-      ← Back
+    <button onclick="switchView('today')" style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px 16px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:16px;width:100%;-webkit-tap-highlight-color:transparent;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Today
     </button>
     <div id="workout-content"></div>
   </div>
@@ -1595,7 +1622,7 @@ function showProgSelect() {
 function updateProgHeader() {
   const names = { hc12: 'Level 1 — Foundation', growth: 'Level 2 — Volume Shock', mansour: 'Level 3 — Peak' };
   const el = document.getElementById('header-title');
-  if (el) el.textContent = activeMensProgram ? (names[activeMensProgram] || '12-Week Growth') : '12-Week Growth';
+  if (el) el.textContent = activeMensProgram ? (names[activeMensProgram] || '16-Week Growth') : '16-Week Growth';
 }
 
 function updateProgressBar() {
@@ -1606,19 +1633,19 @@ function updateProgressBar() {
     levelLabel = 'Level 1 · Foundation';
   } else if (activeMensProgram === 'growth') {
     const gs = getGrowthState();
-    overallWeek = 4 + gs.week;
+    overallWeek = 8 + gs.week;
     levelLabel = 'Level 2 · Volume Shock';
   } else if (activeMensProgram === 'mansour') {
     const md = getMansourDay();
     const mansourWeek = Math.ceil(md / 4);
-    overallWeek = 8 + mansourWeek;
+    overallWeek = 12 + mansourWeek;
     levelLabel = 'Level 3 · Peak';
   }
   const weekLabel = document.getElementById('progress-week-label');
   const barFill = document.getElementById('progress-bar-fill');
   const levelEl = document.getElementById('prog-level-label');
-  if (weekLabel) weekLabel.textContent = `Week ${overallWeek} of 12`;
-  if (barFill) barFill.style.width = `${(overallWeek / 12) * 100}%`;
+  if (weekLabel) weekLabel.textContent = `Week ${overallWeek} of 16`;
+  if (barFill) barFill.style.width = `${(overallWeek / 16) * 100}%`;
   if (levelEl) levelEl.textContent = levelLabel;
 }
 
@@ -1774,7 +1801,7 @@ function updateHeader() {
   }
   const phase = getPhaseForWeek(state.currentWeek);
   const dayData = getCurrentDayData();
-  document.getElementById('header-title').textContent = activeMensProgram ? 'Level 1 — Foundation' : '12-Week Growth';
+  document.getElementById('header-title').textContent = activeMensProgram ? 'Level 1 — Foundation' : '16-Week Growth';
   document.getElementById('header-phase').textContent = `${phase.name} · ${phase.scheme}`;
   document.getElementById('header-week').textContent = `Week ${state.currentWeek}`;
   document.getElementById('header-day').textContent = dayData ? `${dayData.label} ${dayData.name}` : '';
@@ -2367,8 +2394,8 @@ function completeWorkoutMansour() {
   switchView('today');
   if (wasLastDay) {
     showLevelUpBanner(
-      '12 Weeks Complete! 🎉',
-      "You finished the entire 12-Week Growth System. That's elite. Start over at Level 1 with heavier weights, or stay at Level 3.",
+      '16 Weeks Complete! 🎉',
+      "You finished the entire 16-Week Growth System. That's elite. Start over at Level 1 with heavier weights, or stay at Level 3.",
       'Restart from Level 1'
     );
   }
@@ -2736,14 +2763,14 @@ function renderLevelNav() {
   const nextProg = hasNext ? levels[current + 1] : '';
   row.innerHTML = `
     <button onclick="${hasPrev ? `selectMensProgram('${prevProg}')` : ''}"
-      style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:${hasPrev ? 'var(--text2)' : 'var(--text3)'};font-size:12px;font-weight:700;cursor:${hasPrev ? 'pointer' : 'default'};font-family:inherit;opacity:${hasPrev ? '1' : '.35'}">
+      style="flex:1;padding:12px 16px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:14px;font-weight:700;font-family:inherit;${hasPrev ? 'cursor:pointer;' : 'opacity:0.3;pointer-events:none;'}">
       ← ${hasPrev ? labels[current - 1] : 'Back'}
     </button>
-    <div style="flex:2;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--yellow);text-align:center;padding:0 4px">
+    <button style="flex:1;padding:12px 16px;border-radius:10px;border:none;background:var(--yellow);color:#000;font-size:14px;font-weight:700;font-family:inherit;text-align:center;">
       ${labels[current] || ''}
-    </div>
+    </button>
     <button onclick="${hasNext ? `selectMensProgram('${nextProg}')` : ''}"
-      style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:${hasNext ? 'var(--text2)' : 'var(--text3)'};font-size:12px;font-weight:700;cursor:${hasNext ? 'pointer' : 'default'};font-family:inherit;opacity:${hasNext ? '1' : '.35'}">
+      style="flex:1;padding:12px 16px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:14px;font-weight:700;font-family:inherit;${hasNext ? 'cursor:pointer;' : 'opacity:0.3;pointer-events:none;'}">
       ${hasNext ? labels[current + 1] : 'Next'} →
     </button>
   `;
@@ -2787,8 +2814,8 @@ function checkLevelComplete() {
     const md = getMansourDay();
     if (md === 15) {
       showLevelUpBanner(
-        '12 Weeks Complete! 🎉',
-        "You finished the entire 12-Week Growth System. That's elite. Start over at Level 1 with heavier weights, or stay at Level 3.",
+        '16 Weeks Complete! 🎉',
+        "You finished the entire 16-Week Growth System. That's elite. Start over at Level 1 with heavier weights, or stay at Level 3.",
         'Restart from Level 1'
       );
     }
