@@ -4063,8 +4063,9 @@ function renderProgramSchedule(container) {
     <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.5;">
       The app syncs your current week and workout day automatically based on this date. Week 1 starts on the Monday of your start week.
     </div>
+    <div style="border:1px solid var(--border);border-radius:8px;background:var(--bg3);overflow:hidden;">
     <input type="date" id="prog-start-input" value="${startISO}"
-      style="width:100%;max-width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;box-sizing:border-box;display:block;min-width:0;"
+      style="width:100%;padding:10px 12px;border:none;background:transparent;color:var(--text);font-size:14px;box-sizing:border-box;display:block;outline:none;-webkit-appearance:none;appearance:none;color-scheme:dark;"
       onchange="
         const val = this.value;
         if (val) {
@@ -4077,6 +4078,7 @@ function renderProgramSchedule(container) {
         }
       "
     />
+    </div>
     ${startISO ? `<div style="font-size:11px;color:var(--text3);margin-top:6px;">Week ${Math.min(16, Math.max(1, weeksElapsed(startISO)+1))} of 16 · Today is ${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()]}</div>` : ''}
   </div>
   <div style="font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.5;">Use these selectors to manually override the current position or preview a specific week.</div>`;
