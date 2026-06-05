@@ -889,36 +889,36 @@
     </svg>
   </div>
   <div style="font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--yellow);margin-bottom:8px;text-align:center">TAKEOVER</div>
-  <div style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px;text-align:center">Three levels. One program. Built to get results.</div>
-  <div style="font-size:13px;color:var(--text2);text-align:center;margin-bottom:28px">Pick where you are now — you can switch anytime</div>
+  <div style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px;text-align:center">16 weeks. Three phases. One takeover.</div>
+  <div style="font-size:13px;color:var(--text2);text-align:center;margin-bottom:28px">Pick your phase — you can switch anytime</div>
   <div class="prog-sel-card" onclick="selectMensProgram('hc12')" id="psc-hc12">
     <div style="font-size:28px;margin-bottom:10px">⚡</div>
-    <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">Level 1 — Foundation</div>
+    <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">Phase 1 — The Grind</div>
     <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Weeks 1–8</div>
-    <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">Hypertrophy Clusters. Heavy compound movements, cluster-style loading, 4 days/week. Build the base everything else is built on.</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">Heavy cluster loading. 4 days/week, Mon/Tue/Thu/Fri. This is where the foundation gets built. Show up, do the work, get stronger every week.</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px">
       <span class="prog-tag-y">Strength + Size</span><span class="prog-tag">Weeks 1–8</span><span class="prog-tag">4 Days/Week</span>
     </div>
   </div>
   <div class="prog-sel-card" onclick="selectMensProgram('growth')" id="psc-growth">
     <div style="font-size:28px;margin-bottom:10px">🔥</div>
-    <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">Level 2 — Volume Shock</div>
+    <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">Phase 2 — The Surge</div>
     <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Weeks 9–12</div>
-    <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">High volume muscle overload. 5–6 days/week, every muscle from every angle. Run this when Level 1 is done to break through plateaus.</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">High volume overload. 5–6 days/week, every muscle from every angle. Run this after Phase 1 to break through size plateaus.</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px">
       <span class="prog-tag-o">High Volume</span><span class="prog-tag">Weeks 9–12</span><span class="prog-tag">5-6 Days/Week</span>
     </div>
   </div>
   <div class="prog-sel-card" onclick="selectMensProgram('mansour')" id="psc-mansour">
     <div style="font-size:28px;margin-bottom:10px">🏆</div>
-    <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">Level 3 — Peak Performance</div>
+    <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">Phase 3 — The Takeover</div>
     <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Weeks 13–16</div>
-    <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">Advanced periodization. Alternating strength and hypertrophy days, superset pairs, forearm maintenance on off days. The hardest block.</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">Advanced periodization. Alternating strength and hypertrophy days. This is the peak. Everything you built gets put to use.</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px">
-      <span class="prog-tag-b">Advanced</span><span class="prog-tag">Weeks 13–16</span><span class="prog-tag">Periodized</span>
+      <span class="prog-tag-b">Peak Performance</span><span class="prog-tag">Weeks 13–16</span><span class="prog-tag">Periodized</span>
     </div>
   </div>
-  <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:8px">Complete each level in order for best results — or jump to where you are now.</div>
+  <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:8px">Complete each phase in order for best results — or jump to where you are now.</div>
 </div>
 
 <main id="app-main">
@@ -1031,9 +1031,9 @@
 <!-- LEVEL UP BANNER -->
 <div id="level-up-banner" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:600;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center">
   <div style="font-size:48px;margin-bottom:16px">🏆</div>
-  <div style="font-size:22px;font-weight:800;color:var(--yellow);margin-bottom:8px" id="level-up-title">Level 1 Complete!</div>
-  <div style="font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:24px;max-width:300px" id="level-up-desc">You've finished 4 weeks of foundation training. Time to level up.</div>
-  <button onclick="advanceToNextLevel()" style="background:var(--yellow);color:#000;border:none;border-radius:12px;font-size:16px;font-weight:800;padding:16px 32px;cursor:pointer;width:100%;max-width:300px;margin-bottom:12px" id="level-up-btn">Start Level 2 →</button>
+  <div style="font-size:22px;font-weight:800;color:var(--yellow);margin-bottom:8px" id="level-up-title">Phase 1 Complete!</div>
+  <div style="font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:24px;max-width:300px" id="level-up-desc">You've finished The Grind. Time to surge.</div>
+  <button onclick="advanceToNextLevel()" style="background:var(--yellow);color:#000;border:none;border-radius:12px;font-size:16px;font-weight:800;padding:16px 32px;cursor:pointer;width:100%;max-width:300px;margin-bottom:12px" id="level-up-btn">Start Phase 2 →</button>
   <button onclick="document.getElementById('level-up-banner').style.display='none'" style="background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer">Stay on current level</button>
 </div>
 
@@ -1840,19 +1840,19 @@ function updateProgHeader() {
 
 function updateProgressBar() {
   let overallWeek = 1;
-  let levelLabel = 'Level 1 · Foundation';
+  let levelLabel = 'Phase 1 · The Grind';
   if (!activeMensProgram || activeMensProgram === 'hc12') {
     overallWeek = state.currentWeek;
-    levelLabel = 'Level 1 · Foundation';
+    levelLabel = 'Phase 1 · The Grind';
   } else if (activeMensProgram === 'growth') {
     const gs = getGrowthState();
     overallWeek = 8 + gs.week;
-    levelLabel = 'Level 2 · Volume Shock';
+    levelLabel = 'Phase 2 · The Surge';
   } else if (activeMensProgram === 'mansour') {
     const md = getMansourDay();
     const mansourWeek = Math.ceil(md / 4);
     overallWeek = 12 + mansourWeek;
-    levelLabel = 'Level 3 · Peak';
+    levelLabel = 'Phase 3 · The Takeover';
   }
   const weekLabel = document.getElementById('progress-week-label');
   const barFill = document.getElementById('progress-bar-fill');
@@ -2473,8 +2473,8 @@ function renderHome() {
   const pct = Math.round((overallWeek - 1) / 16 * 100);
 
   // Current level label
-  const levelLabels = { hc12: 'Level 1 — Foundation', growth: 'Level 2 — Volume Shock', mansour: 'Level 3 — Peak Performance' };
-  const currentLevel = levelLabels[activeMensProgram] || 'Level 1 — Foundation';
+  const levelLabels = { hc12: 'Phase 1 — The Grind', growth: 'Phase 2 — The Surge', mansour: 'Phase 3 — The Takeover' };
+  const currentLevel = levelLabels[activeMensProgram] || 'Phase 1 — The Grind';
   const levelNum = activeMensProgram === 'mansour' ? 3 : activeMensProgram === 'growth' ? 2 : 1;
 
   // PRs
@@ -2657,20 +2657,20 @@ function updateHeader() {
   if (activeMensProgram === 'growth') {
     const gs = getGrowthState();
     const dayData = GROWTH_PLAN.days[gs.day];
-    setEl('header-week', `L2 · Week ${gs.week}`);
+    setEl('header-week', `P2 · Week ${gs.week}`);
     setEl('header-day', dayData ? dayData.name : '');
     return;
   }
   if (activeMensProgram === 'mansour') {
     const d = getMansourDay();
     const dayData = getMansourDayData(d);
-    setEl('header-week', `L3 · Day ${d}/15`);
+    setEl('header-week', `P3 · Day ${d}/15`);
     setEl('header-day', dayData ? dayData.name : '');
     return;
   }
   const phase = getPhaseForWeek(state.currentWeek);
   const dayData = getCurrentDayData();
-  setEl('header-week', `L1 · Week ${state.currentWeek}`);
+  setEl('header-week', `P1 · Week ${state.currentWeek}`);
   setEl('header-day', dayData ? `${dayData.label} ${dayData.name}` : '');
 }
 
@@ -2729,7 +2729,7 @@ function renderToday() {
   } else {
     heroCard.style.display = '';
     restCard.style.display = 'none';
-    document.getElementById('hero-phase').textContent = `LEVEL 1 · WEEK ${state.currentWeek} OF 4`;
+    document.getElementById('hero-phase').textContent = `PHASE 1 · WEEK ${state.currentWeek} OF 8`;
     document.getElementById('hero-day').textContent = `${dayData.label} ${dayData.name}`;
     document.getElementById('hero-sub').textContent = `Week ${state.currentWeek} · ${phase.scheme} Cluster`;
     
@@ -2762,7 +2762,7 @@ function renderTodayGrowth() {
 
   const gs = getGrowthState();
   const currentDay = GROWTH_PLAN.days[gs.day];
-  document.getElementById('hero-phase').textContent = `LEVEL 2 · WEEK ${gs.week} OF 4`;
+  document.getElementById('hero-phase').textContent = `PHASE 2 · WEEK ${gs.week} OF 4`;
   document.getElementById('hero-day').textContent = currentDay ? currentDay.name : '';
   document.getElementById('hero-sub').textContent = currentDay ? `Week ${gs.week} · ${currentDay.label}` : '';
   
@@ -2798,7 +2798,7 @@ function renderTodayMansour() {
   if (isOffDay) {
     heroCard.style.display = '';
     restCard.style.display = 'none';
-    document.getElementById('hero-phase').textContent = `LEVEL 3 · WEEK ${mansourWeek} OF 4`;
+    document.getElementById('hero-phase').textContent = `PHASE 3 · WEEK ${mansourWeek} OF 4`;
     document.getElementById('hero-day').textContent = 'Active Recovery Day';
     document.getElementById('hero-sub').textContent = `Cycle Day ${currentMansourDay} · Chest & Forearm Maintenance`;
     
@@ -2806,7 +2806,7 @@ function renderTodayMansour() {
     heroCard.style.display = '';
     restCard.style.display = 'none';
     const dayData = getMansourDayData(currentMansourDay);
-    document.getElementById('hero-phase').textContent = `LEVEL 3 · WEEK ${mansourWeek} OF 4`;
+    document.getElementById('hero-phase').textContent = `PHASE 3 · WEEK ${mansourWeek} OF 4`;
     document.getElementById('hero-day').textContent = dayData.name;
     document.getElementById('hero-sub').textContent = `Cycle Day ${currentMansourDay} · ${dayData.label}`;
     
@@ -3142,18 +3142,18 @@ function renderWorkoutGrowth() {
   let html = `
     <div style="margin-bottom:14px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-        <span style="background:var(--orange);color:#000;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;">Level 2</span>
+        <span style="background:var(--orange);color:#000;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;">Phase 2</span>
         <span style="font-size:12px;color:var(--text3);">High Volume Overload</span>
       </div>
       <h2 style="font-size:22px;font-weight:800;">${dayData.name}</h2>
       <p style="font-size:13px;color:var(--text2);margin-top:2px;">Week ${gs.week} · ${dayData.label}</p>
     </div>
     <div style="background:var(--bg2);border:1px solid var(--orange-border);border-left:3px solid var(--orange);border-radius:8px;padding:12px 14px;margin-bottom:16px;">
-      <div style="font-size:11px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">🎯 Level 2 — Volume Shock</div>
+      <div style="font-size:11px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">🎯 Phase 2 — The Surge</div>
       <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">Hit every muscle from every angle. High frequency, maximum pump.</div>
       <details style="margin:0;">
         <summary style="font-size:12px;color:var(--text3);cursor:pointer;user-select:none;">More details</summary>
-        <div style="font-size:12px;color:var(--text2);line-height:1.55;margin-top:8px;">5–6 days/week of targeted muscle overload. Each session focuses on a muscle group with multiple angles and rep ranges. Run this when Level 1 is done to break through size plateaus.</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.55;margin-top:8px;">5–6 days/week of targeted muscle overload. Each session hits a muscle group from multiple angles. Run this after Phase 1 to break through size plateaus.</div>
         <div style="font-size:11px;color:var(--text3);background:var(--bg3);border-radius:6px;padding:8px 10px;margin-top:8px;line-height:1.5;"><strong style="color:var(--text2);">Loads & Rest:</strong> Yellow: 6-7 reps at 80-85% 1RM, 2-3 min rest. Orange: 8-12 reps, 90 sec rest. Red: pump sets, 60 sec rest.</div>
       </details>
     </div>
@@ -3209,7 +3209,7 @@ function completeWorkoutGrowth() {
   addHistory({
     date: new Date().toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}),
     dateRaw: Date.now(),
-    phase: 'Growth Plan',
+    phase: 'Phase 2 — The Surge',
     week: gs.week,
     dayId: gs.day,
     day: dayData ? dayData.name : gs.day,
@@ -3229,9 +3229,9 @@ function completeWorkoutGrowth() {
   switchView('today');
   if (wasLastDay) {
     showLevelUpBanner(
-      'Level 2 Complete!',
-      "8 weeks done. You've built serious volume. Now it's time for advanced periodization.",
-      'Start Level 3 →'
+      'Phase 2 Complete!',
+      "The Surge is done. Volume built, size added. Now it's time to take over.",
+      'Start Phase 3 →'
     );
   }
 }
@@ -3252,14 +3252,14 @@ function renderWorkoutMansour() {
   let html = `
     <div style="margin-bottom:14px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-        <span style="background:var(--blue);color:#000;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;">Level 3</span>
+        <span style="background:var(--blue);color:#000;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;">Phase 3</span>
         <span style="font-size:12px;color:var(--text3);">${phaseLabel}</span>
       </div>
       <h2 style="font-size:22px;font-weight:800;">${dayData.name}</h2>
       <p style="font-size:13px;color:var(--text2);margin-top:2px;">Cycle Day ${currentDay} · ${dayData.label}</p>
     </div>
     <div style="background:var(--bg2);border:1px solid var(--blue);border-left:3px solid var(--blue);border-radius:8px;padding:12px 14px;margin-bottom:16px;opacity:0.85;">
-      <div style="font-size:11px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">🎯 ${isOffDay ? 'Active Recovery Day' : 'Level 3 — Mansour Method'}</div>
+      <div style="font-size:11px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">🎯 ${isOffDay ? 'Active Recovery Day' : 'Phase 3 — The Takeover'}</div>
       <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">${isOffDay ? 'Keep it light — recovery is where growth happens.' : 'Advanced periodization: alternating strength and hypertrophy blocks.'}</div>
       <details style="margin:0;">
         <summary style="font-size:12px;color:var(--text3);cursor:pointer;user-select:none;">More details</summary>
@@ -3317,7 +3317,7 @@ function completeWorkoutMansour() {
   addHistory({
     date: new Date().toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}),
     dateRaw: Date.now(),
-    phase: 'Mansour Method',
+    phase: 'Phase 3 — The Takeover',
     week: currentDay,
     dayId: `mansour_d${currentDay}`,
     day: dayData.name,
@@ -3333,8 +3333,8 @@ function completeWorkoutMansour() {
   if (wasLastDay) {
     showLevelUpBanner(
       '16 Weeks Complete! 🎉',
-      "You finished the entire 16-Week Growth System. That's elite. Start over at Level 1 with heavier weights, or stay at Level 3.",
-      'Restart from Level 1'
+      "16 weeks. Three phases. You took over. Run it again with heavier weight — or stay at Phase 3.",
+      'Restart from Phase 1'
     );
   }
 }
@@ -3776,7 +3776,7 @@ function renderLevelNav() {
   const row = document.getElementById('level-nav-row');
   if (!row) return;
   const levels = ['hc12', 'growth', 'mansour'];
-  const labels = ['L1: Foundation', 'L2: Volume', 'L3: Peak'];
+  const labels = ['P1: Grind', 'P2: Surge', 'P3: Takeover'];
   const current = levels.indexOf(activeMensProgram);
   const hasPrev = current > 0;
   const hasNext = current < levels.length - 1;
@@ -3816,9 +3816,9 @@ function checkLevelComplete() {
     }
     if (allDone) {
       showLevelUpBanner(
-        'Level 1 Complete!',
-        "You've finished 4 weeks of foundation training. Time to level up.",
-        'Start Level 2 →'
+        'Phase 1 Complete!',
+        "The Grind is done. Foundation built. Time to surge.",
+        'Start Phase 2 →'
       );
     }
   } else if (activeMensProgram === 'growth') {
@@ -3826,7 +3826,7 @@ function checkLevelComplete() {
     // After completing w4_d6 the state will have advanced, so check if we just completed it
     if (gs.day === 'w4_d6' || !GROWTH_PLAN.days[gs.day]) {
       showLevelUpBanner(
-        'Level 2 Complete!',
+        'Phase 2 Complete!',
         "8 weeks done. You've built serious volume. Now it's time for advanced periodization.",
         'Start Level 3 →'
       );
@@ -3835,9 +3835,9 @@ function checkLevelComplete() {
     const md = getMansourDay();
     if (md === 15) {
       showLevelUpBanner(
-        '16 Weeks Complete! 🎉',
-        "You finished the entire 16-Week Growth System. That's elite. Start over at Level 1 with heavier weights, or stay at Level 3.",
-        'Restart from Level 1'
+        'The Takeover is Complete. 🎉',
+        "16 weeks. Three phases. You took over. Run it again with heavier weight — or stay at Phase 3.",
+        'Restart from Phase 1'
       );
     }
   }
@@ -3950,9 +3950,9 @@ function renderProgramOverview(container) {
   let html = '';
   // Level nav for quick switching
   const levels = [
-    { id:'hc12', label:'Level 1 — Foundation', weeks:'Weeks 1–8', color:'var(--yellow)', desc:'8×5 cluster loading. 4 days/week. Build the base.' },
-    { id:'growth', label:'Level 2 — Volume Shock', weeks:'Weeks 9–12', color:'var(--orange)', desc:'High volume. 5–6 days/week. Break through plateaus.' },
-    { id:'mansour', label:'Level 3 — Peak Performance', weeks:'Weeks 13–16', color:'var(--blue)', desc:'Advanced periodization. Strength + hypertrophy days.' },
+    { id:'hc12', label:'Phase 1 — The Grind', weeks:'Weeks 1–8', color:'var(--yellow)', desc:'Heavy cluster loading. 4 days/week. Build the base.' },
+    { id:'growth', label:'Phase 2 — The Surge', weeks:'Weeks 9–12', color:'var(--orange)', desc:'High volume overload. 5–6 days/week. Break through size plateaus.' },
+    { id:'mansour', label:'Phase 3 — The Takeover', weeks:'Weeks 13–16', color:'var(--blue)', desc:'Advanced periodization. Strength + hypertrophy. The peak.' },
   ];
   levels.forEach(lv => {
     const isActive = activeMensProgram === lv.id;
@@ -5326,9 +5326,9 @@ function showResetProgress() {
       <div style="font-size:12px;font-weight:800;color:var(--yellow);letter-spacing:1px;margin-bottom:10px;">JUMP TO A SPECIFIC WEEK</div>
       <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;">
         <select id="reset-program" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:9px;font-family:inherit;">
-          <option value="hc12">Level 1 (HC 1.2)</option>
-          <option value="growth">Level 2 (Growth)</option>
-          <option value="mansour">Level 3 (Mansour)</option>
+          <option value="hc12">Phase 1 — The Grind</option>
+          <option value="growth">Phase 2 — The Surge</option>
+          <option value="mansour">Phase 3 — The Takeover</option>
         </select>
         <input id="reset-week" type="number" min="1" max="16" placeholder="Week #" style="width:80px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;padding:9px;font-family:inherit;outline:none;">
         <button onclick="applyResetProgress()" style="background:var(--yellow);color:#000;border:none;border-radius:8px;font-size:13px;font-weight:800;padding:9px 14px;cursor:pointer;">Set</button>
