@@ -38,11 +38,11 @@
 <title>Takeover</title>
 <style>
   :root {
-    --bg: #0f0f0f;
-    --bg2: #1a1a1a;
-    --bg3: #242424;
-    --bg4: #2e2e2e;
-    --border: #333;
+    --bg: rgba(10,10,10,0.0);
+    --bg2: rgba(20,20,20,0.82);
+    --bg3: rgba(30,30,30,0.88);
+    --bg4: rgba(40,40,40,0.9);
+    --border: rgba(80,80,80,0.4);
     --text: #f0f0f0;
     --text2: #aaa;
     --text3: #666;
@@ -75,7 +75,6 @@
   }
 
   body {
-    background: var(--bg);
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
     min-height: 100vh;
@@ -83,7 +82,53 @@
     width: 100%;
     max-width: 100vw;
     position: relative;
+
+    /* ── Dark gym photo base ── */
+    background-color: #0a0a0a;
+    background-image:
+      /* Carbon fiber weave — top layer */
+      repeating-linear-gradient(
+        45deg,
+        rgba(255,255,255,0.015) 0px,
+        rgba(255,255,255,0.015) 1px,
+        transparent 1px,
+        transparent 4px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        rgba(255,255,255,0.015) 0px,
+        rgba(255,255,255,0.015) 1px,
+        transparent 1px,
+        transparent 4px
+      ),
+      /* Dark vignette over the photo */
+      radial-gradient(ellipse at center, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.82) 100%),
+      /* Gym photo from Unsplash */
+      url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=60&auto=format&fit=crop');
+
+    background-size:
+      8px 8px,
+      8px 8px,
+      100% 100%,
+      cover;
+    background-position:
+      0 0,
+      0 0,
+      center,
+      center top;
+    background-attachment: fixed;
+    background-repeat:
+      repeat,
+      repeat,
+      no-repeat,
+      no-repeat;
   }
+
+  /* Keep cards/panels readable over the textured bg */
+  #app-header { background: rgba(10,10,10,0.92) !important; }
+  #app-nav    { background: rgba(10,10,10,0.96) !important; }
+  .view { background: transparent; }
+  #app-main { background: transparent; }
 
   /* ── HEADER ── */
   #app-header {
@@ -159,11 +204,13 @@
     justify-content: center;
   }
   .today-hero {
-    background: linear-gradient(135deg, #1a1500 0%, #2a1a00 100%);
+    background: linear-gradient(135deg, rgba(26,21,0,0.88) 0%, rgba(42,26,0,0.92) 100%);
     border: 1px solid var(--yellow-border);
     border-radius: var(--radius);
     padding: 24px;
     margin-bottom: 16px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
   .today-hero .phase-badge {
     display: inline-block;
@@ -229,6 +276,8 @@
     border-radius: var(--radius);
     border: 1px solid var(--border);
     background: var(--bg2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     padding: 14px;
     margin-bottom: 8px;
     position: relative;
