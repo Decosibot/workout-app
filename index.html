@@ -302,6 +302,8 @@
   }
   #rest-skip:active { background: var(--bg4); }
   #rest-next { font-size: 13px; color: var(--text3); text-align: center; }
+  #rest-goto { font-size: 14px; font-weight: 700; color: var(--yellow); text-align: center; opacity: 0; transition: opacity .3s; }
+  #rest-goto.show { opacity: 1; }
 
   /* ── PROGRAM VIEW ── */
   .phase-card {
@@ -908,6 +910,7 @@
     <div id="rest-count">0</div>
   </div>
   <div id="rest-next"></div>
+  <div id="rest-goto"></div>
   <button id="rest-skip" onclick="skipRest()">Skip Rest</button>
 </div>
 
@@ -1799,36 +1802,88 @@ function set1RM(name, val) { lsSet(`orm_${name}`, val); }
 let restTimer = null;
 let restRemaining = 0;
 let restTotal = 0;
+let restEndTime = 0;       // absolute timestamp when rest ends
+let restCallback = null;   // called when rest finishes or is skipped
 
-const CIRCUMFERENCE = 2 * Math.PI * 80; // r=80
+const CIRCUMFERENCE = 2 * Math.PI * 80;
 
-function startRest(seconds, exerciseName, nextInfo) {
+// ── Soft alarm using Web Audio API ──
+function playAlarm() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const play = (freq, start, dur, vol) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, ctx.currentTime + start);
+      gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + start + 0.05);
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + start + dur);
+      osc.start(ctx.currentTime + start);
+      osc.stop(ctx.currentTime + start + dur + 0.05);
+    };
+    play(880, 0,    0.18, 0.25);
+    play(880, 0.22, 0.18, 0.25);
+    play(1100, 0.44, 0.28, 0.3);
+  } catch(e) {}
+}
+
+function startRest(seconds, exerciseName, nextInfo, onDone) {
   clearInterval(restTimer);
   restTotal = seconds;
   restRemaining = seconds;
+  restEndTime = Date.now() + seconds * 1000;
+  restCallback = onDone || null;
   document.getElementById('rest-arc').style.strokeDasharray = CIRCUMFERENCE;
   document.getElementById('rest-exercise').textContent = exerciseName;
   document.getElementById('rest-next').textContent = nextInfo || '';
+  const gotoEl = document.getElementById('rest-goto');
+  gotoEl.textContent = '';
+  gotoEl.classList.remove('show');
   updateRestDisplay();
   document.getElementById('rest-overlay').classList.add('show');
-  restTimer = setInterval(() => {
-    restRemaining--;
-    updateRestDisplay();
-    if (restRemaining <= 0) {
-      clearInterval(restTimer);
-      document.getElementById('rest-overlay').classList.remove('show');
-      // vibrate
-      if (navigator.vibrate) navigator.vibrate([200,100,200]);
-    }
-  }, 1000);
+  restTimer = setInterval(tickRest, 250);
 }
+
+function tickRest() {
+  const remaining = Math.max(0, Math.ceil((restEndTime - Date.now()) / 1000));
+  if (remaining !== restRemaining) {
+    restRemaining = remaining;
+    updateRestDisplay();
+  }
+  if (restRemaining <= 0) {
+    clearInterval(restTimer);
+    playAlarm();
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    const gotoEl = document.getElementById('rest-goto');
+    if (restCallback) {
+      gotoEl.textContent = '→ Go to next set';
+      gotoEl.classList.add('show');
+      setTimeout(() => {
+        document.getElementById('rest-overlay').classList.remove('show');
+        gotoEl.classList.remove('show');
+        if (restCallback) { restCallback(); restCallback = null; }
+      }, 1200);
+    } else {
+      setTimeout(() => document.getElementById('rest-overlay').classList.remove('show'), 1200);
+    }
+  }
+}
+
+// Keep timer accurate when app is backgrounded
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && restTimer && restRemaining > 0) {
+    restRemaining = Math.max(0, Math.ceil((restEndTime - Date.now()) / 1000));
+    updateRestDisplay();
+  }
+});
 
 function updateRestDisplay() {
   document.getElementById('rest-count').textContent = restRemaining;
-  const progress = restRemaining / restTotal;
+  const progress = restTotal > 0 ? restRemaining / restTotal : 0;
   const offset = CIRCUMFERENCE * (1 - progress);
   document.getElementById('rest-arc').style.strokeDashoffset = offset;
-  // Color shift
   const arc = document.getElementById('rest-arc');
   if (restRemaining <= 10) arc.style.stroke = '#f54242';
   else if (restRemaining <= 20) arc.style.stroke = '#f5922a';
@@ -1837,7 +1892,10 @@ function updateRestDisplay() {
 
 function skipRest() {
   clearInterval(restTimer);
+  restRemaining = 0;
   document.getElementById('rest-overlay').classList.remove('show');
+  document.getElementById('rest-goto').classList.remove('show');
+  if (restCallback) { restCallback(); restCallback = null; }
 }
 
 // ════════════════════════════════════════════════════════════
@@ -2650,11 +2708,11 @@ function renderWorkout() {
       html += `<div class="superset-group">`;
       group.forEach((ex, gi) => {
         if (gi > 0) html += `<div class="superset-label">+ SUPERSET</div>`;
-        html += renderExCard(ex, wi);
+        html += renderExCard(ex, wi, state.currentWeek);
       });
       html += `</div>`;
     } else {
-      html += renderExCard(group[0], wi);
+      html += renderExCard(group[0], wi, state.currentWeek);
     }
   });
 
@@ -2745,6 +2803,7 @@ function renderWorkoutGrowth() {
 
   const sectionLabels = {cns:'Activation', yellow:'Primary Lifts', orange:'Accessory Work', red:'Pump / Finishers'};
   let lastSection = null;
+  const growthPrevWeek = gs.week > 1 ? gs.week - 1 : null;
   groups.forEach(group => {
     const firstType = group[0].type;
     if (firstType !== lastSection) {
@@ -2755,11 +2814,11 @@ function renderWorkoutGrowth() {
       html += `<div class="superset-group">`;
       group.forEach((ex, gi) => {
         if (gi > 0) html += `<div class="superset-label">+ SUPERSET</div>`;
-        html += renderExCardSimple(ex);
+        html += renderExCardSimple(ex, growthPrevWeek);
       });
       html += `</div>`;
     } else {
-      html += renderExCardSimple(group[0]);
+      html += renderExCardSimple(group[0], growthPrevWeek);
     }
   });
 
@@ -2847,6 +2906,7 @@ function renderWorkoutMansour() {
     </div>`;
   }
 
+  const mansourPrevDay = currentDay > 2 ? currentDay - 2 : null;
   const sectionLabels = {cns:'Activation / Warmup', yellow:'Main Work', orange:'Accessory Work', red:'Finishers / Forearms'};
   let lastSection = null;
   groups.forEach(group => {
@@ -2859,11 +2919,11 @@ function renderWorkoutMansour() {
       html += `<div class="superset-group">`;
       group.forEach((ex, gi) => {
         if (gi > 0) html += `<div class="superset-label">+ SUPERSET</div>`;
-        html += renderExCardSimple(ex);
+        html += renderExCardSimple(ex, mansourPrevDay);
       });
       html += `</div>`;
     } else {
-      html += renderExCardSimple(group[0]);
+      html += renderExCardSimple(group[0], mansourPrevDay);
     }
   });
 
@@ -2942,7 +3002,7 @@ function groupExercisesNew(exercises) {
   return groups;
 }
 
-function renderExCardSimple(ex) {
+function renderExCardSimple(ex, prevWeekKey) {
   const typeLabels = {cns:'Activation', yellow:'Main', orange:'Accessory', red:'Finisher'};
   const colorMap = {cns:'var(--text3)', yellow:'var(--yellow)', orange:'var(--orange)', red:'var(--red)'};
 
@@ -2959,12 +3019,19 @@ function renderExCardSimple(ex) {
     </div>
     <div class="ex-notes-body">${ex.notes}</div>` : '';
 
+  let prevHint = '';
+  if (ex.type !== 'cns' && prevWeekKey != null) {
+    const prevW = getWeight(ex.id, prevWeekKey);
+    if (prevW) prevHint = `<div style="font-size:11px;color:var(--text3);margin-top:4px;">Last session: <strong style="color:var(--text2);">${prevW} lbs</strong></div>`;
+  }
+
   const weightSection = ex.type !== 'cns' ? `
     <div class="ex-weight">
       <label>Weight used:</label>
       <input type="number" id="weight-${ex.id}" placeholder="lbs" step="2.5" min="0">
       <span class="weight-unit">lbs</span>
-    </div>` : '';
+    </div>
+    ${prevHint}` : '';
 
   return `
     <div class="ex-card ${ex.type}" id="card-${ex.id}">
@@ -3010,7 +3077,8 @@ function bindExerciseCards(exercises, noteKey) {
             else if (ex.type === 'yellow') restSecs = REST_TIMES.yellow_upper;
             else if (ex.type === 'red') restSecs = REST_TIMES.red;
             if (i < ex.sets - 1) {
-              startRest(restSecs, ex.name, `Next: Set ${i+2} of ${ex.sets}`);
+              const nextSetEl = document.getElementById(`set-${ex.id}-${i+1}`);
+              startRest(restSecs, ex.name, `Next: Set ${i+2} of ${ex.sets}`, () => { if (nextSetEl) nextSetEl.scrollIntoView({behavior:'smooth', block:'center'}); });
             }
           }
         });
@@ -3036,7 +3104,7 @@ function bindExerciseCards(exercises, noteKey) {
   }
 }
 
-function renderExCard(ex, weekIdx) {
+function renderExCard(ex, weekIdx, currentWeekNum) {
   const weekLoad = ex.weekLoads ? (ex.weekLoads[weekIdx] || ex.weekLoads[ex.weekLoads.length-1]) : null;
   const loadStr = weekLoad || ex.load || '';
 
@@ -3051,12 +3119,20 @@ function renderExCard(ex, weekIdx) {
     ? `<div class="po-nudge none" id="po-${ex.id}">First time — establish your baseline</div>`
     : '';
 
+  // Previous week weight hint
+  let prevHint = '';
+  if (ex.type !== 'cns' && currentWeekNum && currentWeekNum > 1) {
+    const prevW = getWeight(ex.id, currentWeekNum - 1);
+    if (prevW) prevHint = `<div style="font-size:11px;color:var(--text3);margin-top:4px;">Last week: <strong style="color:var(--text2);">${prevW} lbs</strong></div>`;
+  }
+
   const weightSection = ex.type !== 'cns' ? `
     <div class="ex-weight">
       <label>Weight used:</label>
       <input type="number" id="weight-${ex.id}" placeholder="lbs" step="2.5" min="0">
       <span class="weight-unit">lbs</span>
     </div>
+    ${prevHint}
     ${poNudge}` : '';
 
   const notesSection = ex.notes ? `
@@ -3246,11 +3322,12 @@ function handleSetClick(ex, setIdx, dayName) {
     restSecs = (dayName === 'Lower' || dayName === 'Total') ? REST_TIMES.yellow_lower : REST_TIMES.yellow_upper;
   } else if (ex.type === 'red') restSecs = REST_TIMES.red;
 
-  // Don't start rest after last set
+  // Don't start rest after last set (unless yellow cluster — always rest between)
   if (setIdx < ex.sets - 1 || ex.type === 'yellow') {
     const nextSet = setIdx + 1;
     const nextInfo = nextSet < ex.sets ? `Next: Set ${nextSet + 1} of ${ex.sets}` : 'Last set done!';
-    startRest(restSecs, ex.name, nextInfo);
+    const nextSetEl = nextSet < ex.sets ? document.getElementById(`set-${ex.id}-${nextSet}`) : null;
+    startRest(restSecs, ex.name, nextInfo, nextSetEl ? () => nextSetEl.scrollIntoView({behavior:'smooth', block:'center'}) : null);
   }
 }
 
