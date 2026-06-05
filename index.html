@@ -3074,15 +3074,24 @@ function renderWorkoutGrowth() {
   let html = `
     <div style="margin-bottom:14px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-        <span style="background:var(--orange);color:#000;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;">Growth Plan</span>
-        <span style="font-size:12px;color:var(--text3);">High Volume</span>
+        <span style="background:var(--orange);color:#000;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;">Level 2</span>
+        <span style="font-size:12px;color:var(--text3);">High Volume Overload</span>
       </div>
       <h2 style="font-size:22px;font-weight:800;">${dayData.name}</h2>
-      <p style="font-size:13px;color:var(--text2);margin-top:2px;">${dayData.label} — Week ${gs.week}</p>
+      <p style="font-size:13px;color:var(--text2);margin-top:2px;">Week ${gs.week} · ${dayData.label}</p>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--orange-border);border-left:3px solid var(--orange);border-radius:8px;padding:12px 14px;margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">🎯 Level 2 — Volume Shock</div>
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">Hit every muscle from every angle. High frequency, maximum pump.</div>
+      <details style="margin:0;">
+        <summary style="font-size:12px;color:var(--text3);cursor:pointer;user-select:none;">More details</summary>
+        <div style="font-size:12px;color:var(--text2);line-height:1.55;margin-top:8px;">5–6 days/week of targeted muscle overload. Each session focuses on a muscle group with multiple angles and rep ranges. Run this when Level 1 is done to break through size plateaus.</div>
+        <div style="font-size:11px;color:var(--text3);background:var(--bg3);border-radius:6px;padding:8px 10px;margin-top:8px;line-height:1.5;"><strong style="color:var(--text2);">Loads & Rest:</strong> Yellow: 6-7 reps at 80-85% 1RM, 2-3 min rest. Orange: 8-12 reps, 90 sec rest. Red: pump sets, 60 sec rest.</div>
+      </details>
     </div>
   `;
 
-  const sectionLabels = {cns:'Activation', yellow:'Primary Lifts', orange:'Accessory Work', red:'Pump / Finishers'};
+  const sectionLabels = {cns:'CNS Activation', yellow:'Primary Cluster Sets', orange:'Accessory Work', red:'Pump / Finishers'};
   let lastSection = null;
   const growthPrevWeek = gs.week > 1 ? gs.week - 1 : null;
   groups.forEach(group => {
@@ -3170,26 +3179,30 @@ function renderWorkoutMansour() {
 
   const groups = groupExercisesNew(dayData.exercises);
 
+  const phaseLabel = isOffDay ? 'Active Recovery' : (dayData.phase === 'strength' ? 'Strength Phase' : 'Hypertrophy Phase');
+
   let html = `
     <div style="margin-bottom:14px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-        <span style="background:var(--blue);color:#000;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;">Mansour Method</span>
-        <span style="font-size:12px;color:var(--text3);">${isOffDay ? 'Active Recovery' : (dayData.phase === 'strength' ? 'Strength Phase' : 'Hypertrophy Phase')}</span>
+        <span style="background:var(--blue);color:#000;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;">Level 3</span>
+        <span style="font-size:12px;color:var(--text3);">${phaseLabel}</span>
       </div>
       <h2 style="font-size:22px;font-weight:800;">${dayData.name}</h2>
       <p style="font-size:13px;color:var(--text2);margin-top:2px;">Cycle Day ${currentDay} · ${dayData.label}</p>
     </div>
+    <div style="background:var(--bg2);border:1px solid var(--blue);border-left:3px solid var(--blue);border-radius:8px;padding:12px 14px;margin-bottom:16px;opacity:0.85;">
+      <div style="font-size:11px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">🎯 ${isOffDay ? 'Active Recovery Day' : 'Level 3 — Mansour Method'}</div>
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">${isOffDay ? 'Keep it light — recovery is where growth happens.' : 'Advanced periodization: alternating strength and hypertrophy blocks.'}</div>
+      <details style="margin:0;">
+        <summary style="font-size:12px;color:var(--text3);cursor:pointer;user-select:none;">More details</summary>
+        <div style="font-size:12px;color:var(--text2);line-height:1.55;margin-top:8px;">${isOffDay ? 'Light chest and forearm work. No heavy loading. The CNS needs this window to fully recover so you can go hard on the next training day.' : '2-on/1-off cycling structure. Odd days are full training sessions (strength or hypertrophy focus). Even days are active recovery. 15-day cycle total.'}</div>
+        <div style="font-size:11px;color:var(--text3);background:var(--bg3);border-radius:6px;padding:8px 10px;margin-top:8px;line-height:1.5;"><strong style="color:var(--text2);">Loads & Rest:</strong> ${isOffDay ? 'Light — keep RPE under 6. No max effort.' : 'Strength days: 3-5 reps, 85-90% 1RM, 3 min rest. Hypertrophy days: 8-12 reps, 70-75% 1RM, 90 sec rest.'}</div>
+      </details>
+    </div>
   `;
 
-  if (isOffDay) {
-    html += `<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:8px;padding:12px 14px;margin-bottom:16px;">
-      <div style="font-size:11px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Active Recovery Day</div>
-      <div style="font-size:13px;color:var(--text2);line-height:1.55;">Keep it light. The goal is to maintain chest activation and build forearm strength/endurance without taxing the CNS. Recovery is part of the program.</div>
-    </div>`;
-  }
-
   const mansourPrevDay = currentDay > 2 ? currentDay - 2 : null;
-  const sectionLabels = {cns:'Activation / Warmup', yellow:'Main Work', orange:'Accessory Work', red:'Finishers / Forearms'};
+  const sectionLabels = {cns:'CNS Activation', yellow:'Primary Cluster Sets', orange:'Accessory Work', red:'Pump / Finishers'};
   let lastSection = null;
   groups.forEach(group => {
     const firstType = group[0].type;
@@ -3286,8 +3299,7 @@ function groupExercisesNew(exercises) {
 }
 
 function renderExCardSimple(ex, prevWeekKey) {
-  const typeLabels = {cns:'Activation', yellow:'Main', orange:'Accessory', red:'Finisher'};
-  const colorMap = {cns:'var(--text3)', yellow:'var(--yellow)', orange:'var(--orange)', red:'var(--red)'};
+  const typeLabels = {cns:'CNS', yellow:'Main', orange:'Accessory', red:'Pump'};
 
   let setsHtml = '';
   for (let i = 0; i < ex.sets; i++) {
@@ -3302,11 +3314,18 @@ function renderExCardSimple(ex, prevWeekKey) {
     </div>
     <div class="ex-notes-body">${ex.notes}</div>` : '';
 
+  const loadStr = ex.load || '';
+  const tempoStr = ex.tempo || '';
+
   let prevHint = '';
   if (ex.type !== 'cns' && prevWeekKey != null) {
     const prevW = getWeight(ex.id, prevWeekKey);
     if (prevW) prevHint = `<div style="font-size:11px;color:var(--text3);margin-top:4px;">Last session: <strong style="color:var(--text2);">${prevW} lbs</strong></div>`;
   }
+
+  const poNudge = (ex.type === 'yellow' || ex.type === 'orange')
+    ? `<div class="po-nudge none" id="po-${ex.id}">First time — establish your baseline</div>`
+    : '';
 
   const weightSection = ex.type !== 'cns' ? `
     <div class="ex-weight">
@@ -3314,7 +3333,30 @@ function renderExCardSimple(ex, prevWeekKey) {
       <input type="number" id="weight-${ex.id}" placeholder="lbs" step="2.5" min="0">
       <span class="weight-unit">lbs</span>
     </div>
-    ${prevHint}` : '';
+    ${prevHint}
+    ${poNudge}` : '';
+
+  // YouTube demo lookup (shared map from renderExCard)
+  const YT_VIDEOS_REF = window._YT_VIDEOS || {};
+  const ytId = YT_VIDEOS_REF[ex.name];
+  const videoSection = ytId ? `
+    <div style="margin:8px 0;border-radius:8px;overflow:hidden;background:var(--bg3);" id="vid-wrap-${ex.id}">
+      <div onclick="expandVideo('${ex.id}','${ytId}')" style="display:flex;align-items:center;gap:10px;cursor:pointer;padding-right:10px;">
+        <div style="position:relative;flex-shrink:0;width:96px;height:54px;">
+          <img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg" style="width:96px;height:54px;object-fit:cover;display:block;" loading="lazy">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <div style="width:28px;height:28px;background:rgba(255,0,0,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="white"><polygon points="3,1 9,5 3,9"/></svg>
+            </div>
+          </div>
+        </div>
+        <span style="font-size:12px;font-weight:600;color:var(--text2);">▶ Play Demo</span>
+      </div>
+      <div id="vid-player-${ex.id}" style="display:none;position:relative;padding-bottom:56.25%;height:0;">
+        <iframe id="vid-iframe-${ex.id}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen allow="autoplay;encrypted-media"></iframe>
+        <button onclick="collapseVideo('${ex.id}')" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.7);border:none;color:#fff;border-radius:4px;padding:4px 8px;font-size:12px;font-weight:700;cursor:pointer;z-index:10;">✕</button>
+      </div>
+    </div>` : '';
 
   return `
     <div class="ex-card ${ex.type}" id="card-${ex.id}">
@@ -3324,7 +3366,10 @@ function renderExCardSimple(ex, prevWeekKey) {
       </div>
       <div class="ex-meta">
         <span><strong>${ex.sets}×${ex.reps}</strong></span>
+        ${tempoStr ? `<span>${tempoStr}</span>` : ''}
+        ${loadStr ? `<span style="color:${ex.type==='yellow'?'var(--yellow)':ex.type==='orange'?'var(--orange)':ex.type==='red'?'var(--red)':'var(--text2)'}">${loadStr}</span>` : ''}
       </div>
+      ${videoSection}
       ${notesSection}
       <div class="ex-sets">${setsHtml}</div>
       ${weightSection}
@@ -3370,6 +3415,14 @@ function bindExerciseCards(exercises, noteKey) {
     const weightInput = document.getElementById(`weight-${ex.id}`);
     if (weightInput) {
       weightInput.value = getWeight(ex.id, weekKey);
+      if (ex.type === 'yellow' || ex.type === 'orange') {
+        updatePONudgeKeyed(ex.id, weightInput.value, weekKey);
+        weightInput.addEventListener('input', () => {
+          setWeight(ex.id, weekKey, weightInput.value);
+          updatePONudgeKeyed(ex.id, weightInput.value, weekKey);
+          clearTimeout(window._syncTimer); window._syncTimer = setTimeout(syncToCloud, 2000);
+        });
+      }
       weightInput.addEventListener('change', () => {
         setWeight(ex.id, weekKey, weightInput.value);
         clearTimeout(window._syncTimer); window._syncTimer = setTimeout(syncToCloud, 2000);
@@ -3386,6 +3439,110 @@ function bindExerciseCards(exercises, noteKey) {
     });
   }
 }
+
+// Shared YouTube demo map — used by both renderExCard and renderExCardSimple
+const YT_VIDEOS = window._YT_VIDEOS = {
+  "Med Ball Rotation Pass": "o9BC7lgN1bo",
+  "Med Ball Slam": "cgKqNn90MEo",
+  "DB Bench Press": "SHsUIZiNdeY",
+  "TRX / Barbell Inverted Row": "v4zbFQr4LwA",
+  "DB Shoulder Press": "qEwKCR5JCog",
+  "Push Up": "Zi6c09DRGxk",
+  "DB Curl (Supinated)": "DgTlETfEuEU",
+  "Trap Bar Jump": "rZGkx5PaZSM",
+  "Front Squat": "ezRP5-ick9Q",
+  "DB Step Up": "aKj-6hgiViA",
+  "Barbell Glute Bridge": "ylpfCk3i-0Y",
+  "Back Extension": "gLT-WLH84B4",
+  "Med Ball Scoop Pass": "nudQAuCEpIc",
+  "Med Ball Overhead Throw": "h4SvwqKY-GM",
+  "DB Push-Press": "hYFI6_wDJ2c",
+  "Pull Up": "sIvJTfGxdFo",
+  "DB Alternating Curl (Seated)": "eZAvPxEB5Dw",
+  "DB French Press (Kneeling)": "jO2Jl9eZpXk",
+  "DB Alternating Hammer Curl (Seated)": "GYnj9smVzFE",
+  "Cable Pushdown": "94DXwlcX8Po",
+  "DB Side Delt Raise (Seated)": "3VcKaXpzqRo",
+  "DB Rear Delt Raise (Seated)": "GyhFsjrn7dw",
+  "Resisted Sprints": "1WMwpEFKKS8",
+  "Deadlift": "MBbyAqvTNkU",
+  "Slight Decline DB Bench Press": "KYJgQZPwGS8",
+  "1-Arm DB Row": "gfUg6qWohTk",
+  "DB Forward to Reverse Lunge": "1W0eILYvbM0",
+  "Med Ball Rotation Pass w/ Step": "DttZ5JU-b_U",
+  "Med Ball Rotation Slam": "k67D95cDohc",
+  "Bench Press": "vcBig73ojpE",
+  "Barbell Military Press": "eNFXEEdfQp4",
+  "Bodyweight Dips": "vi1-BOcj3cQ",
+  "DB Hammer Curl": "zC3nLlEvin4",
+  "Approach Box Jump": "if19-Pd_MUk",
+  "High Bar Back Squat": "bs_Ej32IYgo",
+  "DB Reverse Lunge": "MpfeGnBFEo8",
+  "Barbell Hip Thrust": "S_uZP4UH6J0",
+  "Glute Ham Raise": "6XB6f8yk9cU",
+  "Med Ball Overhead Throw off Box": "LVrhmzjnX_k",
+  "Barbell Push-Press": "4qTaJqfriNE",
+  "Chin Up": "p9AzXhVourc",
+  "DB JM Press": "FjkZpK8JhO8",
+  "Barbell Curl": "QZEqB6wUPxQ",
+  "Acceleration Sprints": "9uJaiOPpnWo",
+  "Sumo / Semi-Sumo Deadlift": "fKrujxCPRKI",
+  "DB Step Up to Reverse Lunge": "Q785cNkuHhU",
+  "Med Ball Rotation Pass (Running)": "dgEIggs-yUE",
+  "Landmine 1-Arm Row": "QTVMgZS7bHg",
+  "1-Arm Landmine Press": "Sjb5meztfSE",
+  "Weighted Dips": "JannOlicL4w",
+  "Band Assisted Jump": "48Hl7gsoBiw",
+  "Band Assisted Split Squat Jump": "hpJkPIHGBcM",
+  "Low Bar Back Squat": "BeM2oyJ0W0E",
+  "DB Bulgarian Split Squat": "hiLF_pF3EJM",
+  "Barbell Glute Bridge (Feet Up)": "SSAYjU3sr5k",
+  "Barbell Good Morning": "0Syp9iyINZ4",
+  "Neutral-grip Chin Up": "CcSKoDZU-TE",
+  "DB Skullcrusher": "tj81tVq3wLo",
+  "Cross-Body DB Hammer Curl": "7MrzVaPM0Uw",
+  "Barbell Floor Press": "gacJl2rHwtg",
+  "DB Side Delt Raise (Leaning)": "FGQ07Sb_D5Y",
+  "DB Rear Delt Raise (Incline Bench)": "V0FueWLtMTg",
+  "Flying Sprints": "qF88X_wLGlg",
+  "Trap Bar Deadlift": "5BpuTmfQjro",
+  "Slight Incline DB Bench Press": "KXCmAsx3hFo",
+  "Plate Bulgarian Split Squat": "A_p38ls2sb8",
+  "Med Ball Scoop Pass w/ Step": "nudQAuCEpIc",
+  "Med Ball Scoop Pass (Running)": "nudQAuCEpIc",
+  "Approach Med Ball Overhead Throw": "h4SvwqKY-GM",
+  "DB Hammer Curl (Standing)": "zC3nLlEvin4",
+  "DB Side Delt Raise (Standing)": "3VcKaXpzqRo",
+  "DB Rear Delt Raise (Standing)": "GyhFsjrn7dw",
+  // Growth Plan exercises
+  "Incline Bench Press": "8iPEnn-ltC8",
+  "Flat Bench Press": "vcBig73ojpE",
+  "Dumbbell Press": "SHsUIZiNdeY",
+  "Incline Dumbbell Press": "8iPEnn-ltC8",
+  "T-Bar Rows (Wide Grip)": "j3Igk5nyZE4",
+  "Seated Rows": "GZbfZ033f74",
+  "Hyperextension Lower Back": "gLT-WLH84B4",
+  "Hammer Strength ISO Lateral Rows": "GZbfZ033f74",
+  "Straight Arm Lat Pulldown": "DC0GQBjcFng",
+  "Bent Over Rear Delt Flys": "GyhFsjrn7dw",
+  "Lateral Raises": "3VcKaXpzqRo",
+  "Arnold Press": "6Z15_WdXmVw",
+  "Military Press": "eNFXEEdfQp4",
+  "Leg Press": "IZxyjW7MPJQ",
+  "Hack Squat": "0tn5K9NlCfo",
+  "Leg Extensions": "YyvSfVjQeL0",
+  "Romanian Deadlift": "2SHsk9374wo",
+  "Leg Curls": "ELOCsoDSmrg",
+  "Standing Calf Raises": "JbyjNymZOt0",
+  "Seated Calf Raises": "k554ztKFA_Y",
+  "Barbell Curl": "QZEqB6wUPxQ",
+  "Preacher Curl": "fIWP-FRFNU0",
+  "Tricep Pushdown": "94DXwlcX8Po",
+  "Overhead Tricep Extension": "jO2Jl9eZpXk",
+  "Dips": "vi1-BOcj3cQ",
+  "Shrugs": "NAqCFlxy0gg",
+  "Face Pulls": "rep-qVOkqgk",
+};
 
 function renderExCard(ex, weekIdx, currentWeekNum) {
   const weekLoad = ex.weekLoads ? (ex.weekLoads[weekIdx] || ex.weekLoads[ex.weekLoads.length-1]) : null;
@@ -3424,85 +3581,7 @@ function renderExCard(ex, weekIdx, currentWeekNum) {
     </div>
     <div class="ex-notes-body">${ex.notes}</div>` : '';
 
-  const YT_VIDEOS = {
-    "Med Ball Rotation Pass": "o9BC7lgN1bo",
-    "Med Ball Slam": "cgKqNn90MEo",
-    "DB Bench Press": "SHsUIZiNdeY",
-    "TRX / Barbell Inverted Row": "v4zbFQr4LwA",
-    "DB Shoulder Press": "qEwKCR5JCog",
-    "Push Up": "Zi6c09DRGxk",
-    "DB Curl (Supinated)": "DgTlETfEuEU",
-    "Trap Bar Jump": "rZGkx5PaZSM",
-    "Front Squat": "ezRP5-ick9Q",
-    "DB Step Up": "aKj-6hgiViA",
-    "Barbell Glute Bridge": "ylpfCk3i-0Y",
-    "Back Extension": "gLT-WLH84B4",
-    "Med Ball Scoop Pass": "nudQAuCEpIc",
-    "Med Ball Overhead Throw": "h4SvwqKY-GM",
-    "DB Push-Press": "hYFI6_wDJ2c",
-    "Pull Up": "sIvJTfGxdFo",
-    "DB Alternating Curl (Seated)": "eZAvPxEB5Dw",
-    "DB French Press (Kneeling)": "jO2Jl9eZpXk",
-    "DB Alternating Hammer Curl (Seated)": "GYnj9smVzFE",
-    "Cable Pushdown": "94DXwlcX8Po",
-    "DB Side Delt Raise (Seated)": "3VcKaXpzqRo",
-    "DB Rear Delt Raise (Seated)": "GyhFsjrn7dw",
-    "Resisted Sprints": "1WMwpEFKKS8",
-    "Deadlift": "MBbyAqvTNkU",
-    "Slight Decline DB Bench Press": "KYJgQZPwGS8",
-    "1-Arm DB Row": "gfUg6qWohTk",
-    "DB Forward to Reverse Lunge": "1W0eILYvbM0",
-    "Med Ball Rotation Pass w/ Step": "DttZ5JU-b_U",
-    "Med Ball Rotation Slam": "k67D95cDohc",
-    "Bench Press": "vcBig73ojpE",
-    "Barbell Military Press": "eNFXEEdfQp4",
-    "Bodyweight Dips": "vi1-BOcj3cQ",
-    "DB Hammer Curl": "zC3nLlEvin4",
-    "Approach Box Jump": "if19-Pd_MUk",
-    "High Bar Back Squat": "bs_Ej32IYgo",
-    "DB Reverse Lunge": "MpfeGnBFEo8",
-    "Barbell Hip Thrust": "S_uZP4UH6J0",
-    "Glute Ham Raise": "6XB6f8yk9cU",
-    "Med Ball Overhead Throw off Box": "LVrhmzjnX_k",
-    "Barbell Push-Press": "4qTaJqfriNE",
-    "Chin Up": "p9AzXhVourc",
-    "DB JM Press": "FjkZpK8JhO8",
-    "Barbell Curl": "QZEqB6wUPxQ",
-    "Acceleration Sprints": "9uJaiOPpnWo",
-    "Sumo / Semi-Sumo Deadlift": "fKrujxCPRKI",
-    "DB Step Up to Reverse Lunge": "Q785cNkuHhU",
-    "Med Ball Rotation Pass (Running)": "dgEIggs-yUE",
-    "Landmine 1-Arm Row": "QTVMgZS7bHg",
-    "1-Arm Landmine Press": "Sjb5meztfSE",
-    "Weighted Dips": "JannOlicL4w",
-    "Band Assisted Jump": "48Hl7gsoBiw",
-    "Band Assisted Split Squat Jump": "hpJkPIHGBcM",
-    "Low Bar Back Squat": "BeM2oyJ0W0E",
-    "DB Bulgarian Split Squat": "hiLF_pF3EJM",
-    "Barbell Glute Bridge (Feet Up)": "SSAYjU3sr5k",
-    "Barbell Good Morning": "0Syp9iyINZ4",
-    "Neutral-grip Chin Up": "CcSKoDZU-TE",
-    "DB Skullcrusher": "tj81tVq3wLo",
-    "Cross-Body DB Hammer Curl": "7MrzVaPM0Uw",
-    "Barbell Floor Press": "gacJl2rHwtg",
-    "DB Side Delt Raise (Leaning)": "FGQ07Sb_D5Y",
-    "DB Rear Delt Raise (Incline Bench)": "V0FueWLtMTg",
-    "Flying Sprints": "qF88X_wLGlg",
-    "Trap Bar Deadlift": "5BpuTmfQjro",
-    "Slight Incline DB Bench Press": "KXCmAsx3hFo",
-    "Plate Bulgarian Split Squat": "A_p38ls2sb8",
-    "Med Ball Scoop Pass w/ Step": "nudQAuCEpIc",
-    "Med Ball Scoop Pass (Running)": "nudQAuCEpIc",
-    "Approach Med Ball Overhead Throw": "h4SvwqKY-GM",
-    "DB Hammer Curl (Standing)": "zC3nLlEvin4",
-    "DB Side Delt Raise (Standing)": "3VcKaXpzqRo",
-    "DB Rear Delt Raise (Standing)": "GyhFsjrn7dw",
-    "DB Bench Press": "SHsUIZiNdeY",
-  };
   const ytId = YT_VIDEOS[ex.name];
-  const ytUrl = ytId
-    ? `https://www.youtube.com/watch?v=${ytId}`
-    : `https://www.youtube.com/results?search_query=${encodeURIComponent(ex.name + ' exercise form')}`;
 
   const videoSection = ytId ? `
     <div style="margin:8px 0;border-radius:8px;overflow:hidden;background:var(--bg3);" id="vid-wrap-${ex.id}">
@@ -4735,6 +4814,31 @@ function updatePONudge(exId, currentVal) {
     el.className = 'po-nudge none';
   } else {
     el.textContent = `↓ Down from ${lastWeekVal} lbs last week`;
+    el.className = 'po-nudge same';
+  }
+}
+
+// Generic version for Growth/Mansour — accepts current key, derives previous
+function updatePONudgeKeyed(exId, currentVal, currentKey) {
+  const el = document.getElementById(`po-${exId}`);
+  if (!el) return;
+  const prevKey = typeof currentKey === 'number' ? currentKey - 1 : null;
+  const lastVal = prevKey != null ? parseFloat(ls(`w_${exId}_${prevKey}`, '')) : NaN;
+  const thisVal = parseFloat(currentVal);
+  if (isNaN(lastVal) || prevKey == null || prevKey < 1) {
+    el.textContent = 'First time — establish your baseline';
+    el.className = 'po-nudge none';
+  } else if (!isNaN(thisVal) && thisVal > lastVal) {
+    el.textContent = `↑ Up from ${lastVal} lbs — great progress!`;
+    el.className = 'po-nudge up';
+  } else if (!isNaN(thisVal) && thisVal === lastVal) {
+    el.textContent = `→ Same as last session (${lastVal} lbs) — try adding 2.5-5 lbs`;
+    el.className = 'po-nudge same';
+  } else if (isNaN(thisVal)) {
+    el.textContent = `Last session: ${lastVal} lbs`;
+    el.className = 'po-nudge none';
+  } else {
+    el.textContent = `↓ Down from ${lastVal} lbs last session`;
     el.className = 'po-nudge same';
   }
 }
