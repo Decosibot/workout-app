@@ -566,21 +566,21 @@
     border-radius: var(--radius); padding: 14px; margin-bottom: 12px;
   }
   #goal-card.goal-active { border-color: var(--yellow-border); background: var(--yellow-bg); }
-  #goal-card.goal-on-track { border-color: #4caf50; background: rgba(76,175,80,0.07); }
+  #goal-card.goal-on-track { border-color: #4caf50; background: #0d1f0e; }
   #goal-card.goal-behind { border-color: var(--red); background: var(--red-bg); }
   .goal-status-pill {
     display: inline-block; padding: 3px 10px; border-radius: 20px;
     font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;
   }
-  .goal-status-pill.on-track { background: rgba(76,175,80,0.2); color: #4caf50; }
-  .goal-status-pill.behind { background: rgba(245,66,66,0.2); color: var(--red); }
-  .goal-status-pill.ahead { background: rgba(74,158,255,0.2); color: var(--blue); }
+  .goal-status-pill.on-track { background: #163320; color: #4caf50; }
+  .goal-status-pill.behind { background: #2a0a0a; color: var(--red); }
+  .goal-status-pill.ahead { background: #0d1f33; color: var(--blue); }
   .goal-status-pill.no-data { background: var(--bg3); color: var(--text3); }
   .goal-realism-box {
     font-size: 12px; line-height: 1.55; border-radius: 6px;
     padding: 10px 12px; margin-top: 10px;
   }
-  .goal-realism-box.ok { color: #4caf50; background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.25); }
+  .goal-realism-box.ok { color: #4caf50; background: #0d1f0e; border: 1px solid #1e4021; }
   .goal-realism-box.warn { color: var(--orange); background: var(--orange-bg); border: 1px solid var(--orange-border); }
   .goal-realism-box.bad { color: var(--red); background: var(--red-bg); border: 1px solid var(--red-border); }
   .goal-field-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
@@ -611,8 +611,8 @@
     transition: all 0.15s;
   }
   .goal-type-btn.active { background: var(--yellow-bg); border-color: var(--yellow); color: var(--yellow); }
-  .goal-type-btn.active.cut { background: var(--blue-bg, rgba(74,158,255,.1)); border-color: var(--blue); color: var(--blue); }
-  .goal-type-btn.active.recomp { background: rgba(76,175,80,.1); border-color: #4caf50; color: #4caf50; }
+  .goal-type-btn.active.cut { background: #0d1f33; border-color: var(--blue); color: var(--blue); }
+  .goal-type-btn.active.recomp { background: #0d1f0e; border-color: #4caf50; color: #4caf50; }
   .goal-banner-row {
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
   }
@@ -730,10 +730,10 @@
   .prog-sel-card{width:100%;max-width:400px;background:var(--bg2);border:2px solid var(--border);border-radius:16px;padding:20px;margin-bottom:14px;cursor:pointer;transition:all .2s}
   .prog-sel-card:active{transform:scale(.98)}
   .prog-sel-card.selected{border-color:var(--yellow)}
-  .prog-tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:rgba(255,255,255,.07);color:var(--text2)}
-  .prog-tag-y{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:rgba(245,200,66,.15);color:var(--yellow)}
-  .prog-tag-o{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:rgba(245,146,42,.15);color:var(--orange)}
-  .prog-tag-b{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:rgba(74,158,255,.15);color:var(--blue)}
+  .prog-tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:#222;color:var(--text2)}
+  .prog-tag-y{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:#2a2200;color:var(--yellow)}
+  .prog-tag-o{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:#2a1500;color:var(--orange)}
+  .prog-tag-b{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:#0d1f33;color:var(--blue)}
 
   /* ── SUPERSET BADGE ── */
   .superset-badge{font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:rgba(74,158,255,.15);color:var(--blue);margin-left:6px}
