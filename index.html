@@ -152,11 +152,17 @@
   .view.active { display: block; overflow-x: hidden; }
 
   /* ── TODAY VIEW ── */
+  #view-today {
+    min-height: calc(100vh - var(--header-h) - var(--nav-h));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
   .today-hero {
     background: linear-gradient(135deg, #1a1500 0%, #2a1a00 100%);
     border: 1px solid var(--yellow-border);
     border-radius: var(--radius);
-    padding: 20px;
+    padding: 24px;
     margin-bottom: 16px;
   }
   .today-hero .phase-badge {
@@ -589,7 +595,7 @@
     background: linear-gradient(135deg, #1a1a1a 0%, #242424 100%);
     border: 1px solid var(--border);
     border-radius: var(--radius); padding: 24px; margin-bottom: 16px;
-    text-align: center;
+    text-align: center; width: 100%;
   }
   #rest-day-card h2 { font-size: 28px; font-weight: 900; margin-bottom: 6px; }
   #rest-day-card .rest-day-name { font-size: 14px; color: var(--text2); margin-bottom: 16px; }
@@ -929,23 +935,26 @@
 
   <!-- TODAY VIEW -->
   <div id="view-today" class="view">
-    <!-- Hero card (workout day) -->
-    <div class="today-hero" id="today-hero-card">
-      <div class="phase-badge" id="hero-phase">Phase 1</div>
-      <h2 id="hero-day">Monday Upper</h2>
-      <div class="subtitle" id="hero-sub">Week 1 · 8×5 Cluster</div>
-      <button class="start-btn" onclick="startWorkout()">Start Today's Workout →</button>
+    <!-- Centered card area -->
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+      <!-- Hero card (workout day) -->
+      <div class="today-hero" id="today-hero-card">
+        <div class="phase-badge" id="hero-phase">Phase 1</div>
+        <h2 id="hero-day">Monday Upper</h2>
+        <div class="subtitle" id="hero-sub">Week 1 · 8×5 Cluster</div>
+        <button class="start-btn" onclick="startWorkout()">Start Today's Workout →</button>
+      </div>
+
+      <!-- Rest day card -->
+      <div id="rest-day-card" style="display:none;">
+        <h2 id="rest-day-heading">Rest Day 💪</h2>
+        <div class="rest-day-name" id="rest-day-name"></div>
+        <div class="rest-tip" id="rest-day-tip"></div>
+      </div>
     </div>
 
-    <!-- Rest day card -->
-    <div id="rest-day-card" style="display:none;">
-      <h2 id="rest-day-heading">Rest Day 💪</h2>
-      <div class="rest-day-name" id="rest-day-name"></div>
-      <div class="rest-tip" id="rest-day-tip"></div>
-    </div>
-
-    <!-- Level nav -->
-    <div id="level-nav-row" style="display:flex;gap:8px;margin-bottom:16px;"></div>
+    <!-- Level nav pinned to bottom of view -->
+    <div id="level-nav-row" style="display:flex;gap:8px;padding-bottom:8px;"></div>
   </div>
 
   <!-- WORKOUT VIEW -->
