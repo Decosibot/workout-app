@@ -829,7 +829,7 @@
       <button class="start-btn" onclick="startWorkout()">Start Today's Workout →</button>
     </div>
 
-    <!-- Rest day card (shown instead of hero on rest days) -->
+    <!-- Rest day card -->
     <div id="rest-day-card" style="display:none;">
       <h2 id="rest-day-heading">Rest Day 💪</h2>
       <div class="rest-day-name" id="rest-day-name"></div>
@@ -840,40 +840,8 @@
     <!-- Level nav -->
     <div id="level-nav-row" style="display:flex;gap:8px;margin-bottom:16px;"></div>
 
-    <!-- Day + Week selectors in one card -->
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 14px 10px;margin-bottom:12px;">
-      <div class="section-header" style="margin-top:0;margin-bottom:8px;">Select Day</div>
-      <div class="day-selector" id="day-selector"></div>
-      <div class="section-header" style="margin-bottom:8px;">Select Week</div>
-      <div class="week-selector" id="week-selector"></div>
-    </div>
-
-    <!-- Quick Stats -->
-    <div class="section-header">Quick Stats</div>
-    <div id="quick-stats" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;"></div>
-
-    <!-- Goal Card -->
-    <div id="goal-card"></div>
-
-    <!-- Nutrition Target Card -->
-    <div id="nutrition-card">
-      <div id="nutrition-setup">
-        <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text);">Nutrition Target</div>
-        <div class="nutrition-inputs">
-          <label>Bodyweight (lbs)</label>
-          <input type="number" id="nutr-bw" placeholder="185" min="50" max="500" step="1">
-          <div class="goal-toggle">
-            <button class="goal-btn active" id="goal-bulk" onclick="setGoalMode('bulk')">Bulk</button>
-            <button class="goal-btn" id="goal-maintain" onclick="setGoalMode('maintain')">Maintain</button>
-          </div>
-        </div>
-        <button class="nutrition-set-btn" onclick="saveNutrition()">Set Targets</button>
-      </div>
-      <div id="nutrition-banner" style="display:none;width:100%;display:none;align-items:center;justify-content:space-between;gap:8px;">
-        <span id="nutrition-banner-text"></span>
-        <button id="nutrition-edit-btn" onclick="editNutrition()">Edit</button>
-      </div>
-    </div>
+    <!-- Collapsed banners: nutrition + goal (read-only, tap goes to Program tab) -->
+    <div id="today-banners"></div>
   </div>
 
   <!-- WORKOUT VIEW -->
@@ -887,26 +855,48 @@
 
   <!-- PROGRAM VIEW -->
   <div id="view-program" class="view">
+    <!-- Sub-nav tabs for Program view -->
+    <div style="display:flex;gap:0;margin-bottom:16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+      <button class="prog-subnav active" data-sub="overview" onclick="switchProgSub('overview')" style="flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;color:var(--yellow);cursor:pointer;border-bottom:2px solid var(--yellow);">Overview</button>
+      <button class="prog-subnav" data-sub="schedule" onclick="switchProgSub('schedule')" style="flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;">Schedule</button>
+      <button class="prog-subnav" data-sub="goal" onclick="switchProgSub('goal')" style="flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;">Goal</button>
+      <button class="prog-subnav" data-sub="nutrition" onclick="switchProgSub('nutrition')" style="flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;">Nutrition</button>
+    </div>
     <div id="program-content"></div>
   </div>
 
-  <!-- HISTORY VIEW -->
-  <div id="view-history" class="view">
-    <div id="history-content"></div>
+  <!-- PROGRESS VIEW -->
+  <div id="view-progress" class="view">
+    <div id="progress-content"></div>
   </div>
 
-  <!-- 1RM VIEW -->
-  <div id="view-orm" class="view">
+  <!-- TOOLS VIEW -->
+  <div id="view-tools" class="view">
+    <!-- Body Weight Log -->
+    <div class="section-header" style="margin-top:0">Body Weight</div>
+    <div class="bw-log-row">
+      <input type="number" id="bw-input" placeholder="lbs" step="0.1" min="0">
+      <button class="bw-log-btn" onclick="logBodyWeight()">Log</button>
+    </div>
+    <div class="bw-chart-wrap" id="bw-chart-wrap">
+      <div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No data yet — log your first weigh-in above.</div>
+    </div>
+    <div class="bw-stat" id="bw-stat"></div>
+    <div class="section-header">Past Entries</div>
+    <div class="bw-list" id="bw-list"></div>
 
-    <!-- MASS GAIN CALCULATOR -->
-    <div class="section-header" style="margin-top:0">Mass Gain Calculator</div>
+    <!-- 1RM Calculator -->
+    <div class="section-header" style="margin-top:20px;">1RM Calculator</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.5;">Enter your 3-rep max weight to calculate estimated 1RM and training percentages.</p>
+    <div id="orm-cards"></div>
+
+    <!-- Mass Gain Calculator -->
+    <div class="section-header" style="margin-top:20px;">Mass Gain Calculator</div>
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:20px;">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
         <div>
           <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Current Weight</label>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <input id="mass-current" type="number" placeholder="lbs" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 10px;width:100%;outline:none;" oninput="calcMassGain()">
-          </div>
+          <input id="mass-current" type="number" placeholder="lbs" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 10px;width:100%;outline:none;" oninput="calcMassGain()">
         </div>
         <div>
           <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Goal Weight</label>
@@ -935,28 +925,6 @@
       </div>
       <div id="mass-result" style="display:none;margin-top:14px;border-top:1px solid var(--border);padding-top:14px;"></div>
     </div>
-
-    <!-- 1RM CALCULATOR -->
-    <div class="section-header">1RM Calculator</div>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.5;">
-      Enter your 3-rep max weight to calculate estimated 1RM and training percentages.
-    </p>
-    <div id="orm-cards"></div>
-  </div>
-
-  <!-- BODY WEIGHT VIEW -->
-  <div id="view-weight" class="view">
-    <div class="section-header" style="margin-top:0">Body Weight Tracker</div>
-    <div class="bw-log-row">
-      <input type="number" id="bw-input" placeholder="lbs" step="0.1" min="0">
-      <button class="bw-log-btn" onclick="logBodyWeight()">Log</button>
-    </div>
-    <div class="bw-chart-wrap" id="bw-chart-wrap">
-      <div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No data yet — log your first weigh-in above.</div>
-    </div>
-    <div class="bw-stat" id="bw-stat"></div>
-    <div class="section-header">Past Entries</div>
-    <div class="bw-list" id="bw-list"></div>
   </div>
 </main>
 
@@ -995,7 +963,7 @@
   </div>
   <div class="nav-tab" data-view="today" onclick="switchView('today')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
     </svg>
     Today
   </div>
@@ -1005,23 +973,17 @@
     </svg>
     Program
   </div>
-  <div class="nav-tab" data-view="history" onclick="switchView('history')">
+  <div class="nav-tab" data-view="progress" onclick="switchView('progress')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
     </svg>
-    History
+    Progress
   </div>
-  <div class="nav-tab" data-view="orm" onclick="switchView('orm')">
+  <div class="nav-tab" data-view="tools" onclick="switchView('tools')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
     </svg>
-    1RM Calc
-  </div>
-  <div class="nav-tab" data-view="weight" onclick="switchView('weight')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M6 9a6 6 0 1 0 12 0A6 6 0 0 0 6 9z"/><path d="M12 9v-1"/><path d="M4.22 14.22l1.06 1.06"/><path d="M1 17h2"/><path d="M21 17h2"/><path d="M18.72 15.28l1.06-1.06"/><path d="M12 21v-2"/><path d="M4.34 19.66l1.06-1.06"/><path d="M18.6 18.6l1.06 1.06"/>
-    </svg>
-    Weight
+    Tools
   </div>
 </nav>
 
@@ -2433,7 +2395,9 @@ function renderHome() {
 function switchView(viewName) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById(`view-${viewName}`).classList.add('active');
+  const viewEl = document.getElementById(`view-${viewName}`);
+  if (!viewEl) return;
+  viewEl.classList.add('active');
   const navTab = document.querySelector(`[data-view="${viewName}"]`);
   if (navTab) navTab.classList.add('active');
   state.activeView = viewName;
@@ -2441,9 +2405,8 @@ function switchView(viewName) {
   if (viewName === 'home') renderHome();
   if (viewName === 'today') renderToday();
   if (viewName === 'program') renderProgram();
-  if (viewName === 'history') renderHistory();
-  if (viewName === 'orm') renderORM();
-  if (viewName === 'weight') renderWeightView();
+  if (viewName === 'progress') renderProgress();
+  if (viewName === 'tools') { renderWeightView(); renderORM(); loadMassInputs(); }
   updateHeader();
   window.scrollTo(0, 0);
 }
@@ -2518,62 +2481,7 @@ function renderToday() {
     document.getElementById('streak-display').innerHTML = buildStreakHTML();
   }
 
-  // Day selector
-  const daySel = document.getElementById('day-selector');
-  daySel.innerHTML = '';
-  phase.days.forEach((d, i) => {
-    const completed = ls(`wk_done_${state.currentWeek}_${d.id}`, false);
-    const btn = document.createElement('div');
-    btn.className = `day-btn${i === state.currentDayIdx ? ' active' : ''}${completed ? ' completed' : ''}`;
-    btn.innerHTML = `<div class="day-label">${d.label.slice(0,3)}</div><div class="day-name">${d.name}</div>`;
-    btn.onclick = () => {
-      state.currentDayIdx = i;
-      saveState();
-      renderToday();
-      updateHeader();
-    };
-    daySel.appendChild(btn);
-  });
-
-  // Week selector
-  const weekSel = document.getElementById('week-selector');
-  weekSel.innerHTML = '';
-  [1,2,3,4,5,6,7,8].forEach(w => {
-    const ph = getPhaseForWeek(w);
-    const completed = ls(`week_done_${w}`, false);
-    const btn = document.createElement('div');
-    btn.className = `week-btn${w === state.currentWeek ? ' active' : ''}${completed ? ' completed' : ''}`;
-    btn.textContent = `W${w}`;
-    btn.title = ph.name;
-    btn.onclick = () => {
-      state.currentWeek = w;
-      state.currentDayIdx = 0;
-      saveState();
-      renderToday();
-      updateHeader();
-    };
-    weekSel.appendChild(btn);
-  });
-
-  // Quick stats
-  const qs = document.getElementById('quick-stats');
-  const bench = get1RM('Bench Press');
-  const squat = get1RM('Squat');
-  const stats = [
-    { label: 'Current Phase', value: phase.name },
-    { label: 'Cluster Scheme', value: phase.scheme },
-    { label: 'Bench 1RM', value: bench ? `${bench} lbs` : 'Not set' },
-    { label: 'Squat 1RM', value: squat ? `${squat} lbs` : 'Not set' },
-  ];
-  qs.innerHTML = stats.map(s => `
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
-      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${s.label}</div>
-      <div style="font-size:16px;font-weight:800;">${s.value}</div>
-    </div>
-  `).join('');
-
-  renderNutritionCard();
-  renderGoalCard();
+  renderTodayBanners();
   updateProgressBar();
   renderLevelNav();
 }
@@ -2590,37 +2498,6 @@ function renderTodayGrowth() {
 
   const gs = getGrowthState();
 
-  // Week selector
-  const weekSel = document.getElementById('week-selector');
-  weekSel.innerHTML = '';
-  [1,2,3,4].forEach(w => {
-    const btn = document.createElement('div');
-    btn.className = `week-btn${gs.week === w ? ' active' : ''}`;
-    btn.textContent = `W${w}`;
-    btn.onclick = () => {
-      const newState = { week: w, day: `w${w}_d1` };
-      saveGrowthState(newState);
-      renderTodayGrowth();
-    };
-    weekSel.appendChild(btn);
-  });
-
-  // Day selector — 6 days
-  const daySel = document.getElementById('day-selector');
-  daySel.innerHTML = '';
-  for (let d = 1; d <= 6; d++) {
-    const key = `w${gs.week}_d${d}`;
-    const dayInfo = GROWTH_PLAN.days[key];
-    if (!dayInfo) continue;
-    const btn = document.createElement('div');
-    btn.className = `day-btn${gs.day === key ? ' active' : ''}`;
-    btn.innerHTML = `<div class="day-label">D${d}</div><div class="day-name">${dayInfo.name}</div>`;
-    btn.onclick = () => {
-      saveGrowthState({ week: gs.week, day: key });
-      renderTodayGrowth();
-    };
-    daySel.appendChild(btn);
-  }
 
   // Update hero card
   const currentDay = GROWTH_PLAN.days[gs.day];
@@ -2629,29 +2506,7 @@ function renderTodayGrowth() {
   document.getElementById('hero-sub').textContent = currentDay ? `Week ${gs.week} · ${currentDay.label}` : '';
   document.getElementById('streak-display').innerHTML = '';
 
-  // Quick stats
-  const qs = document.getElementById('quick-stats');
-  qs.innerHTML = `
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
-      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Program</div>
-      <div style="font-size:16px;font-weight:800;">Workout Growth Plan</div>
-    </div>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
-      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Duration</div>
-      <div style="font-size:16px;font-weight:800;">4 Weeks</div>
-    </div>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
-      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Current Week</div>
-      <div style="font-size:16px;font-weight:800;">Week ${gs.week}</div>
-    </div>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
-      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Focus</div>
-      <div style="font-size:16px;font-weight:800;">High Volume</div>
-    </div>
-  `;
-
-  renderNutritionCard();
-  renderGoalCard();
+  renderTodayBanners();
   updateProgressBar();
   renderLevelNav();
 }
@@ -2683,56 +2538,7 @@ function renderTodayMansour() {
     document.getElementById('streak-display').innerHTML = '';
   }
 
-  // Day selector — prev/next for Mansour
-  const daySel = document.getElementById('day-selector');
-  daySel.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;grid-column:1/-1;">
-      <button onclick="mansourPrevDay()" style="background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;">← Prev</button>
-      <div style="text-align:center;">
-        <div style="font-size:18px;font-weight:800;color:var(--yellow);">Day ${currentMansourDay}</div>
-        <div style="font-size:11px;color:var(--text3);">of 15-day cycle</div>
-      </div>
-      <button onclick="mansourNextDay()" style="background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;">Next →</button>
-    </div>
-  `;
-
-  // Week selector — show cycle overview
-  const weekSel = document.getElementById('week-selector');
-  weekSel.innerHTML = '';
-  for (let d = 1; d <= 15; d++) {
-    const btn = document.createElement('div');
-    const isOff = d % 2 === 0;
-    btn.className = `week-btn${d === currentMansourDay ? ' active' : ''}`;
-    btn.textContent = isOff ? `D${d}🔵` : `D${d}`;
-    btn.title = isOff ? 'Off Day (Maintenance)' : (MANSOUR_METHOD.days[d] ? MANSOUR_METHOD.days[d].name : '');
-    btn.onclick = () => { saveMansourDay(d); renderTodayMansour(); updateHeader(); };
-    weekSel.appendChild(btn);
-  }
-
-  // Quick stats
-  const qs = document.getElementById('quick-stats');
-  const dayInfo = getMansourDayData(currentMansourDay);
-  qs.innerHTML = `
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
-      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Program</div>
-      <div style="font-size:16px;font-weight:800;">Mansour Method</div>
-    </div>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
-      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Cycle Day</div>
-      <div style="font-size:16px;font-weight:800;">${currentMansourDay} / 15</div>
-    </div>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
-      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Phase</div>
-      <div style="font-size:16px;font-weight:800;">${isOffDay ? 'Recovery' : (dayInfo.phase === 'strength' ? 'Strength' : 'Hypertrophy')}</div>
-    </div>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
-      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Structure</div>
-      <div style="font-size:16px;font-weight:800;">8-Day Split</div>
-    </div>
-  `;
-
-  renderNutritionCard();
-  renderGoalCard();
+  renderTodayBanners();
   updateProgressBar();
   renderLevelNav();
 }
@@ -3565,46 +3371,305 @@ function completeWorkout() {
 }
 
 // ════════════════════════════════════════════════════════════
+// PROGRESS VIEW
+// ════════════════════════════════════════════════════════════
+function renderProgress() {
+  const container = document.getElementById('progress-content');
+  if (!container) return;
+  const history = getHistory();
+  let html = '';
+
+  // ── PRs ──
+  const prLifts = ['Bench Press','DB Bench Press','Front Squat','High Bar Back Squat','Low Bar Back Squat','Deadlift','Sumo / Semi-Sumo Deadlift','Trap Bar Deadlift'];
+  const prs = prLifts.map(l => {
+    const val = get1RM(l);
+    return val ? { name: l, val } : null;
+  }).filter(Boolean);
+  // Also scan history for max weights logged
+  const historyMaxes = {};
+  history.forEach(s => {
+    Object.entries(s.weights || {}).forEach(([name, w]) => {
+      const val = parseFloat(w);
+      if (!historyMaxes[name] || val > historyMaxes[name]) historyMaxes[name] = val;
+    });
+  });
+  const allPRs = [...prs];
+  Object.entries(historyMaxes).forEach(([name, val]) => {
+    if (!allPRs.find(p => p.name === name)) allPRs.push({ name, val: val + ' (logged)' });
+  });
+
+  if (allPRs.length) {
+    html += `<div class="section-header" style="margin-top:0;">Personal Records</div>`;
+    html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;">`;
+    allPRs.forEach(p => {
+      html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="font-size:13px;color:var(--text2);">${p.name}</span>
+        <span style="font-size:15px;font-weight:800;">${p.val} lbs</span>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // ── Body Weight Chart ──
+  const bwLog = ls('bw_log', []);
+  html += `<div class="section-header">Body Weight</div>`;
+  html += `<div class="bw-log-row" style="margin-bottom:8px;">
+    <input type="number" id="bw-input-prog" placeholder="lbs" step="0.1" min="0" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:16px;font-weight:700;padding:10px;width:100%;outline:none;">
+    <button onclick="logBodyWeightProg()" style="background:var(--yellow);color:#000;border:none;border-radius:8px;font-size:13px;font-weight:800;padding:10px 16px;cursor:pointer;white-space:nowrap;">Log</button>
+  </div>`;
+  if (bwLog.length >= 2) {
+    html += `<div class="bw-chart-wrap" id="bw-chart-prog"></div>`;
+  }
+  if (bwLog.length) {
+    const latest = bwLog[bwLog.length - 1];
+    const first = bwLog[0];
+    const delta = (latest.weight - first.weight).toFixed(1);
+    const sign = delta > 0 ? '+' : '';
+    html += `<div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Latest: <strong style="color:var(--text);">${latest.weight} lbs</strong> · Change: <strong style="color:${delta > 0 ? 'var(--green)' : 'var(--red)'};">${sign}${delta} lbs</strong></div>`;
+  }
+
+  // ── Lift Charts ──
+  const mainLifts = ['Bench Press','DB Bench Press','Front Squat','High Bar Back Squat','Low Bar Back Squat','Deadlift','Sumo / Semi-Sumo Deadlift','Trap Bar Deadlift'];
+  const liftData = {};
+  history.forEach(session => {
+    Object.entries(session.weights || {}).forEach(([name, weight]) => {
+      const norm = mainLifts.find(l => name.toLowerCase().includes(l.toLowerCase().split(' ')[0]));
+      if (norm) {
+        if (!liftData[norm]) liftData[norm] = [];
+        liftData[norm].push({ date: session.date, weight: parseFloat(weight), dateRaw: session.dateRaw });
+      }
+    });
+  });
+  const chartLifts = Object.entries(liftData).filter(([,arr]) => arr.length >= 2).slice(0, 4);
+  if (chartLifts.length) {
+    html += `<div class="section-header">Lift Progression</div>`;
+    chartLifts.forEach(([name, data]) => {
+      const sorted = data.sort((a,b) => a.dateRaw - b.dateRaw);
+      html += `<div class="chart-section"><div class="chart-title">${name}</div><div class="chart-wrap">${renderChart(sorted)}</div></div>`;
+    });
+  }
+
+  // ── Workout History ──
+  html += `<div class="section-header">${history.length ? 'Workout Log' : ''}</div>`;
+  if (!history.length) {
+    html += `<div class="history-empty"><div style="font-size:48px;margin-bottom:12px;">🏋️</div><div style="font-size:16px;font-weight:700;color:var(--text2);">No workouts yet</div><div style="font-size:13px;margin-top:8px;">Complete your first session to see history here.</div></div>`;
+  } else {
+    history.forEach(session => {
+      const weights = Object.entries(session.weights || {});
+      html += `
+        <div class="history-item">
+          <div class="hi-header">
+            <div class="hi-date">${session.date}</div>
+            <div class="hi-badge">${session.day} · W${session.week}</div>
+          </div>
+          ${weights.length ? `<div class="hi-weights">${weights.map(([n,w]) => `<div class="hi-weight-row"><span>${n}</span><strong>${w} lbs</strong></div>`).join('')}</div>` : '<div style="font-size:12px;color:var(--text3);">No weights logged</div>'}
+        </div>`;
+    });
+  }
+
+  container.innerHTML = html;
+
+  // Render body weight chart inline if enough data
+  if (bwLog.length >= 2) {
+    const chartEl = document.getElementById('bw-chart-prog');
+    if (chartEl) {
+      const entries = bwLog.map(e => ({ weight: e.weight, dateRaw: new Date(e.date).getTime() || e.dateRaw || Date.now(), date: e.date }));
+      chartEl.innerHTML = renderChart(entries.sort((a,b) => a.dateRaw - b.dateRaw));
+    }
+  }
+}
+
+function logBodyWeightProg() {
+  const input = document.getElementById('bw-input-prog');
+  if (!input) return;
+  const val = parseFloat(input.value);
+  if (!val || val < 50 || val > 500) { showToast('Enter a valid weight'); return; }
+  const log = ls('bw_log', []);
+  log.push({ weight: val, date: new Date().toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}), dateRaw: Date.now() });
+  lsSet('bw_log', log);
+  input.value = '';
+  showToast('Weight logged!');
+  syncToCloud();
+  renderProgress();
+}
+
+// ════════════════════════════════════════════════════════════
 // PROGRAM VIEW
 // ════════════════════════════════════════════════════════════
 function renderProgram() {
-  let html = '';
-  PROGRAM.phases.forEach(phase => {
-    const weekRange = `Weeks ${phase.weeks[0]}–${phase.weeks[phase.weeks.length-1]}`;
-    html += `
-      <div class="phase-card">
-        <div class="phase-header">
-          <div>
-            <h3>${phase.name} — ${phase.title}</h3>
-            <div class="phase-scheme">${phase.scheme}</div>
+  switchProgSub('overview');
+}
+
+function switchProgSub(sub) {
+  // Update sub-nav button styles
+  document.querySelectorAll('.prog-subnav').forEach(b => {
+    const isActive = b.dataset.sub === sub;
+    b.style.color = isActive ? 'var(--yellow)' : 'var(--text3)';
+    b.style.borderBottom = isActive ? '2px solid var(--yellow)' : '2px solid transparent';
+    b.classList.toggle('active', isActive);
+  });
+
+  const container = document.getElementById('program-content');
+  if (!container) return;
+
+  if (sub === 'overview') {
+    renderProgramOverview(container);
+  } else if (sub === 'schedule') {
+    renderProgramSchedule(container);
+  } else if (sub === 'goal') {
+    container.innerHTML = '<div id="goal-card"></div>';
+    renderGoalCard();
+  } else if (sub === 'nutrition') {
+    container.innerHTML = `
+      <div id="nutrition-card">
+        <div id="nutrition-setup">
+          <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text);">Nutrition Target</div>
+          <div class="nutrition-inputs">
+            <label>Bodyweight (lbs)</label>
+            <input type="number" id="nutr-bw" placeholder="185" min="50" max="500" step="1">
+            <div class="goal-toggle">
+              <button class="goal-btn active" id="goal-bulk" onclick="setGoalMode('bulk')">Bulk</button>
+              <button class="goal-btn" id="goal-maintain" onclick="setGoalMode('maintain')">Maintain</button>
+            </div>
           </div>
+          <button class="nutrition-set-btn" onclick="saveNutrition()">Set Targets</button>
+        </div>
+        <div id="nutrition-banner" style="display:none;width:100%;align-items:center;justify-content:space-between;gap:8px;">
+          <span id="nutrition-banner-text"></span>
+          <button id="nutrition-edit-btn" onclick="editNutrition()">Edit</button>
+        </div>
+      </div>`;
+    renderNutritionCard();
+  }
+}
+
+function renderProgramOverview(container) {
+  let html = '';
+  // Level nav for quick switching
+  const levels = [
+    { id:'hc12', label:'Level 1 — Foundation', weeks:'Weeks 1–8', color:'var(--yellow)', desc:'8×5 cluster loading. 4 days/week. Build the base.' },
+    { id:'growth', label:'Level 2 — Volume Shock', weeks:'Weeks 9–12', color:'var(--orange)', desc:'High volume. 5–6 days/week. Break through plateaus.' },
+    { id:'mansour', label:'Level 3 — Peak Performance', weeks:'Weeks 13–16', color:'var(--blue)', desc:'Advanced periodization. Strength + hypertrophy days.' },
+  ];
+  levels.forEach(lv => {
+    const isActive = activeMensProgram === lv.id;
+    html += `<div style="background:var(--bg2);border:1px solid ${isActive ? lv.color : 'var(--border)'};border-radius:var(--radius);padding:14px;margin-bottom:10px;${isActive ? `border-left:4px solid ${lv.color};` : ''}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <span style="font-size:13px;font-weight:800;color:${isActive ? lv.color : 'var(--text)'};">${lv.label}</span>
+        ${isActive ? `<span style="font-size:10px;font-weight:800;background:${lv.color};color:#000;padding:2px 8px;border-radius:10px;">CURRENT</span>` : ''}
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">${lv.weeks}</div>
+      <div style="font-size:12px;color:var(--text2);">${lv.desc}</div>
+    </div>`;
+  });
+
+  // HC1.2 phase cards
+  if (activeMensProgram === 'hc12' || !activeMensProgram) {
+    PROGRAM.phases.forEach(phase => {
+      const weekRange = `Weeks ${phase.weeks[0]}–${phase.weeks[phase.weeks.length-1]}`;
+      html += `<div class="phase-card">
+        <div class="phase-header">
+          <div><h3>${phase.name} — ${phase.title}</h3><div class="phase-scheme">${phase.scheme}</div></div>
           <div class="phase-weeks">${weekRange}</div>
         </div>
         <div style="padding:12px 16px;border-bottom:1px solid var(--border);">
-          <div style="font-size:12px;font-weight:800;color:var(--yellow);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">🎯 Goal</div>
+          <div style="font-size:12px;font-weight:800;color:var(--yellow);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Goal</div>
           <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;">${phase.goal}</div>
           <div style="font-size:13px;color:var(--text2);line-height:1.55;margin-bottom:10px;">${phase.description}</div>
-          <div style="font-size:11px;color:var(--text3);background:var(--bg3);border-radius:6px;padding:8px 10px;line-height:1.5;">
-            <strong style="color:var(--text2);">Loads & Rest:</strong> ${phase.loads}
-          </div>
+          <div style="font-size:11px;color:var(--text3);background:var(--bg3);border-radius:6px;padding:8px 10px;line-height:1.5;"><strong style="color:var(--text2);">Loads & Rest:</strong> ${phase.loads}</div>
         </div>
         <div class="phase-days">
           ${phase.days.map(day => {
             const totalEx = day.exercises.length;
             const yellow = day.exercises.filter(e=>e.type==='yellow').length;
-            return `
-              <div class="phase-day-card" onclick="viewProgramDay(${phase.id}, '${day.id}')">
-                <div class="pdc-day">${day.label}</div>
-                <div class="pdc-name">${day.name}</div>
-                <div class="pdc-count">${totalEx} exercises · ${yellow} cluster lifts</div>
-              </div>
-            `;
+            return `<div class="phase-day-card" onclick="viewProgramDay(${phase.id}, '${day.id}')">
+              <div class="pdc-day">${day.label}</div>
+              <div class="pdc-name">${day.name}</div>
+              <div class="pdc-count">${totalEx} exercises · ${yellow} cluster lifts</div>
+            </div>`;
           }).join('')}
         </div>
-      </div>
-    `;
-  });
-  document.getElementById('program-content').innerHTML = html;
+      </div>`;
+    });
+  }
+  container.innerHTML = html;
+}
+
+function renderProgramSchedule(container) {
+  // Day + Week manual selectors (for override/review)
+  let html = `<div style="font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.5;">The program advances automatically as you complete workouts. Use these selectors to review or manually jump to a specific day.</div>`;
+
+  if (activeMensProgram === 'hc12' || !activeMensProgram) {
+    const phase = getPhaseForWeek(state.currentWeek);
+    html += `<div class="section-header" style="margin-top:0">Current Week</div>
+    <div class="week-selector" id="week-selector-prog" style="margin-bottom:16px;"></div>
+    <div class="section-header">Current Day</div>
+    <div class="day-selector" id="day-selector-prog"></div>`;
+    container.innerHTML = html;
+
+    // Week buttons
+    const weekSel = document.getElementById('week-selector-prog');
+    [1,2,3,4,5,6,7,8].forEach(w => {
+      const ph = getPhaseForWeek(w);
+      const completed = ls(`week_done_${w}`, false);
+      const btn = document.createElement('div');
+      btn.className = `week-btn${w === state.currentWeek ? ' active' : ''}${completed ? ' completed' : ''}`;
+      btn.textContent = `W${w}`;
+      btn.title = ph.name;
+      btn.onclick = () => { state.currentWeek = w; state.currentDayIdx = 0; saveState(); renderProgramSchedule(container); updateHeader(); showToast(`Jumped to Week ${w}`); };
+      weekSel.appendChild(btn);
+    });
+
+    // Day buttons
+    const daySel = document.getElementById('day-selector-prog');
+    phase.days.forEach((d, i) => {
+      const completed = ls(`wk_done_${state.currentWeek}_${d.id}`, false);
+      const btn = document.createElement('div');
+      btn.className = `day-btn${i === state.currentDayIdx ? ' active' : ''}${completed ? ' completed' : ''}`;
+      btn.innerHTML = `<div class="day-label">${d.label.slice(0,3)}</div><div class="day-name">${d.name}</div>`;
+      btn.onclick = () => { state.currentDayIdx = i; saveState(); renderProgramSchedule(container); updateHeader(); };
+      daySel.appendChild(btn);
+    });
+
+  } else if (activeMensProgram === 'growth') {
+    const gs = getGrowthState();
+    html += `<div class="section-header" style="margin-top:0">Week</div><div class="week-selector" id="week-selector-prog" style="margin-bottom:16px;"></div>`;
+    html += `<div class="section-header">Day</div><div class="day-selector" id="day-selector-prog"></div>`;
+    container.innerHTML = html;
+    const weekSel = document.getElementById('week-selector-prog');
+    [1,2,3,4].forEach(w => {
+      const btn = document.createElement('div');
+      btn.className = `week-btn${gs.week === w ? ' active' : ''}`;
+      btn.textContent = `W${w}`;
+      btn.onclick = () => { saveGrowthState({ week: w, day: `w${w}_d1` }); renderProgramSchedule(container); showToast(`Jumped to Week ${w}`); };
+      weekSel.appendChild(btn);
+    });
+    const daySel = document.getElementById('day-selector-prog');
+    for (let d = 1; d <= 6; d++) {
+      const key = `w${gs.week}_d${d}`;
+      const dayInfo = GROWTH_PLAN.days[key];
+      if (!dayInfo) continue;
+      const btn = document.createElement('div');
+      btn.className = `day-btn${gs.day === key ? ' active' : ''}`;
+      btn.innerHTML = `<div class="day-label">D${d}</div><div class="day-name">${dayInfo.name}</div>`;
+      btn.onclick = () => { saveGrowthState({ week: gs.week, day: key }); renderProgramSchedule(container); updateHeader(); };
+      daySel.appendChild(btn);
+    }
+
+  } else if (activeMensProgram === 'mansour') {
+    const cd = getMansourDay();
+    html += `<div class="section-header" style="margin-top:0">Cycle Day</div><div class="day-selector" id="day-selector-prog" style="grid-template-columns:repeat(5,1fr);"></div>`;
+    container.innerHTML = html;
+    const daySel = document.getElementById('day-selector-prog');
+    for (let d = 1; d <= 15; d += 2) {
+      const btn = document.createElement('div');
+      btn.className = `day-btn${cd === d ? ' active' : ''}`;
+      const dd = getMansourDayData(d);
+      btn.innerHTML = `<div class="day-label">D${d}</div><div class="day-name" style="font-size:9px;">${dd.name.split(' ')[0]}</div>`;
+      btn.onclick = () => { saveMansourDay(d); renderProgramSchedule(container); updateHeader(); showToast(`Jumped to Day ${d}`); };
+      daySel.appendChild(btn);
+    }
+  }
 }
 
 function viewProgramDay(phaseId, dayId) {
@@ -4257,6 +4322,54 @@ function editNutrition() {
   const goal = ls('nutr_goal', 'bulk');
   if (bw) document.getElementById('nutr-bw').value = bw;
   setGoalMode(goal);
+}
+
+function renderTodayBanners() {
+  const container = document.getElementById('today-banners');
+  if (!container) return;
+  let html = '';
+
+  // Nutrition banner
+  const bw = ls('nutr_bw', null);
+  const goal = ls('nutr_goal', 'bulk');
+  if (bw) {
+    const goalData = getGoalData();
+    const calories = goalData ? goalData.calTarget : (goal === 'bulk' ? Math.round(bw * 18) : Math.round(bw * 15));
+    const protein = goalData ? goalData.protein : (goal === 'bulk' ? Math.round(bw * 1.0) : Math.round(bw * 0.8));
+    html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;" onclick="switchView('program');switchProgSub('nutrition');">
+      <div>
+        <div style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Nutrition</div>
+        <div style="font-size:13px;font-weight:700;color:var(--text);">🔥 ${calories.toLocaleString()} kcal &nbsp;·&nbsp; 🥩 ${protein}g protein</div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);">Edit →</div>
+    </div>`;
+  } else {
+    html += `<div style="background:var(--bg2);border:1px dashed var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;text-align:center;cursor:pointer;" onclick="switchView('program');switchProgSub('nutrition');">
+      <div style="font-size:12px;color:var(--text3);">Set nutrition targets → Program tab</div>
+    </div>`;
+  }
+
+  // Goal banner
+  const goalData = getGoalData();
+  if (goalData) {
+    const prog = getGoalProgress();
+    const pillClass = { on_track:'on-track', ahead:'ahead', behind:'behind', no_data:'no-data' }[prog?.status || 'no_data'] || 'no-data';
+    const pillText  = { on_track:'On Track', ahead:'Ahead', behind:'Behind', no_data:'Active' }[prog?.status || 'no_data'];
+    const weeksLeft = Math.max(0, goalData.timeframeWeeks - Math.round((Date.now() - (goalData.startDate || Date.now())) / (7*86400000)));
+    html += `<div style="background:var(--yellow-bg);border:1px solid var(--yellow-border);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="switchView('program');switchProgSub('goal');">
+      <div>
+        <div style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Goal · ${weeksLeft} wks left</div>
+        <div style="font-size:13px;font-weight:700;color:var(--yellow);">${goalData.currentWeight} → ${goalData.targetWeight} lbs &nbsp;·&nbsp; ${goalData.calTarget.toLocaleString()} kcal</div>
+      </div>
+      <span class="goal-status-pill ${pillClass}">${pillText}</span>
+    </div>`;
+  } else {
+    html += `<div style="background:var(--bg2);border:1px dashed var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;text-align:center;cursor:pointer;" onclick="switchView('program');switchProgSub('goal');">
+      <div style="font-size:12px;color:var(--text3);">Set a goal → Program tab</div>
+    </div>`;
+  }
+
+  container.innerHTML = html;
 }
 
 function renderNutritionCard() {
