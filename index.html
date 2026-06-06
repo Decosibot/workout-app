@@ -535,6 +535,83 @@
   body.light #app-header { background: rgba(245,245,245,0.95); }
   body.light #app-nav { background: rgba(245,245,245,0.97); }
 
+  /* ── SIGMA THEME ── */
+  body.sigma {
+    --bg:     #000000;
+    --bg2:    #0a0a0a;
+    --bg3:    #111111;
+    --bg4:    #1a1a1a;
+    --border: #2a2a2a;
+    --text:   #ffffff;
+    --text2:  #aaaaaa;
+    --text3:  #555555;
+    /* Replace yellow accent with deep crimson */
+    --yellow:        #c0392b;
+    --yellow-bg:     #1a0000;
+    --yellow-border: #4a0808;
+    --radius:    4px;
+    --radius-sm: 2px;
+  }
+
+  /* Private gym background for sigma */
+  body.sigma::before {
+    background-image: url('https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800&q=60&auto=format&fit=crop');
+    background-position: center center;
+    filter: brightness(0.18) saturate(0.2);
+  }
+
+  /* Subtle red carbon weave overlay */
+  body.sigma::after {
+    background-image:
+      repeating-linear-gradient(45deg, rgba(192,57,43,0.04) 0px, rgba(192,57,43,0.04) 1px, transparent 1px, transparent 6px),
+      repeating-linear-gradient(-45deg, rgba(192,57,43,0.04) 0px, rgba(192,57,43,0.04) 1px, transparent 1px, transparent 6px);
+    background-size: 12px 12px;
+  }
+
+  body.sigma #app-header { background: rgba(0,0,0,0.97) !important; border-bottom: 1px solid #2a0000; }
+  body.sigma #app-nav    { background: rgba(0,0,0,0.99) !important; border-top: 1px solid #2a0000; }
+
+  /* Hero card: dark red gradient */
+  body.sigma .today-hero {
+    background: linear-gradient(135deg, #0d0000 0%, #1a0505 100%);
+    border-color: #4a0808;
+  }
+
+  /* Nav active pill: red instead of yellow */
+  body.sigma .nav-tab.active { color: #c0392b; }
+  body.sigma .nav-tab.active .nav-icon-wrap { background: rgba(192,57,43,0.15); }
+
+  /* Start button: crimson */
+  body.sigma .today-hero .start-btn { background: #c0392b; color: #fff; letter-spacing: 1px; }
+
+  /* Phase badge */
+  body.sigma .today-hero .phase-badge { background: #c0392b; color: #fff; }
+
+  /* Yellow pills / suggested tags become red */
+  body.sigma .po-nudge.up { color: #c0392b; background: rgba(192,57,43,0.1); }
+
+  /* Food picker active cat */
+  body.sigma .food-picker-cat.active { background: #1a0000; border-color: #c0392b; color: #c0392b; }
+
+  /* Section headers — uppercase tight tracking */
+  body.sigma .section-header {
+    letter-spacing: 3px;
+    font-size: 10px;
+    color: #c0392b;
+    border-bottom-color: #2a0000;
+  }
+
+  /* Cards sharper corners already handled by --radius:4px */
+
+  /* ORM calc button */
+  body.sigma .orm-calc-btn { background: #c0392b; }
+
+  /* Complete workout button */
+  body.sigma .complete-workout-btn { background: #c0392b; color: #fff; }
+
+  /* Header phase label */
+  body.sigma #header-phase { color: #c0392b; }
+
 
   /* ── NUTRITION SYSTEM ── */
   .nutr-macro-bar-wrap { margin-bottom:10px; }
@@ -4718,16 +4795,14 @@ function showToast(msg) {
 // DARK / LIGHT MODE TOGGLE
 // ════════════════════════════════════════════════════════════
 function applyTheme(theme) {
-  if (theme === 'light') {
-    document.body.classList.add('light');
-  } else {
-    document.body.classList.remove('light');
-  }
+  document.body.classList.remove('light', 'sigma');
+  if (theme === 'light') document.body.classList.add('light');
+  else if (theme === 'sigma') document.body.classList.add('sigma');
 }
 
 function toggleTheme() {
   const current = ls('theme', 'dark');
-  const next = current === 'dark' ? 'light' : 'dark';
+  const next = current === 'dark' ? 'sigma' : current === 'sigma' ? 'light' : 'dark';
   lsSet('theme', next);
   applyTheme(next);
 }
@@ -6312,7 +6387,8 @@ function showAccountMenu() {
 
   const user = auth.currentUser;
   const username = localStorage.getItem('wapp_username');
-  const themeLabel = ls('theme','dark') === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+  const _t = ls('theme','dark');
+  const themeLabel = _t === 'dark' ? 'Switch to Sigma Mode' : _t === 'sigma' ? 'Switch to Light Mode' : 'Switch to Dark Mode';
 
   const overlay = document.createElement('div');
   overlay.id = 'settings-sheet-overlay';
