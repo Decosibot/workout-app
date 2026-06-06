@@ -1029,6 +1029,7 @@
         <h2 id="rest-day-heading">Rest Day 💪</h2>
         <div class="rest-day-name" id="rest-day-name"></div>
         <div class="rest-tip" id="rest-day-tip"></div>
+        <button onclick="skipRestDay()" style="display:block;width:100%;margin-top:14px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:var(--radius-sm);font-size:13px;font-weight:700;padding:10px;cursor:pointer;">Train Anyway →</button>
       </div>
     </div>
 
@@ -1078,7 +1079,8 @@
 
     <!-- 1RM Calculator -->
     <div class="section-header" style="margin-top:20px;">1RM Calculator</div>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.5;">Enter your 3-rep max weight to calculate estimated 1RM and training percentages.</p>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:4px;line-height:1.5;">Enter your 3-rep max to get your estimated 1RM and every training percentage you need.</p>
+    <p style="font-size:12px;color:var(--yellow);margin-bottom:16px;line-height:1.5;">Dumbbells: enter the weight of ONE dumbbell — 2×25 lbs = 25 lbs.</p>
     <div id="orm-cards"></div>
 
     <!-- Mass Gain Calculator -->
@@ -2833,6 +2835,35 @@ function renderToday() {
   renderTodayNutritionBar();
 }
 
+// Skip rest day — show the next scheduled workout instead
+function skipRestDay() {
+  const heroCard = document.getElementById('today-hero-card');
+  const restCard = document.getElementById('rest-day-card');
+  restCard.style.display = 'none';
+  heroCard.style.display = '';
+  // Advance to the next workout day index
+  const days = ['mon','tue','wed','thu','fri','sat','sun'];
+  const dow = new Date().getDay(); // 0=Sun
+  // Find the next non-rest day going forward
+  const workoutDays = [1,2,4,5]; // Mon,Tue,Thu,Fri
+  let nextIdx = workoutDays.find(d => d > dow) || workoutDays[0];
+  const dayMap = {1:0, 2:1, 4:2, 5:3}; // Mon=0,Tue=1,Thu=2,Fri=3
+  const di = dayMap[nextIdx] ?? state.currentDayIdx;
+
+  if (activeMensProgram === 'hc12' || !activeMensProgram) {
+    const phase = getPhaseForWeek(state.currentWeek);
+    const dayData = phase.days[di];
+    document.getElementById('hero-phase').textContent = `PHASE 1 · WEEK ${state.currentWeek} OF 8`;
+    document.getElementById('hero-day').textContent = `${dayData.label} ${dayData.name}`;
+    document.getElementById('hero-sub').textContent = `Week ${state.currentWeek} · ${phase.scheme} Cluster`;
+    document.querySelector('.start-btn').onclick = () => { state.currentDayIdx = di; saveState(); startWorkout(); };
+  } else if (activeMensProgram === 'growth') {
+    renderTodayGrowth();
+  } else if (activeMensProgram === 'mansour') {
+    renderTodayMansour();
+  }
+}
+
 // ════════════════════════════════════════════════════════════
 // GROWTH PLAN TODAY VIEW
 // ════════════════════════════════════════════════════════════
@@ -3515,12 +3546,15 @@ function renderExCardSimple(ex, prevWeekKey) {
     ? `<div class="po-nudge none" id="po-${ex.id}">First time — establish your baseline</div>`
     : '';
 
+  const isDB = ex.name && ex.name.startsWith('DB');
+  const dbNote = isDB ? `<div style="font-size:10px;color:var(--yellow);margin-top:3px;">Per dumbbell — enter weight of one DB</div>` : '';
   const weightSection = ex.type !== 'cns' ? `
     <div class="ex-weight">
       <label>Weight used:</label>
       <input type="number" id="weight-${ex.id}" placeholder="lbs" step="2.5" min="0">
       <span class="weight-unit">lbs</span>
     </div>
+    ${dbNote}
     ${prevHint}
     ${poNudge}` : '';
 
@@ -3754,12 +3788,15 @@ function renderExCard(ex, weekIdx, currentWeekNum) {
     if (prevW) prevHint = `<div style="font-size:11px;color:var(--text3);margin-top:4px;">Last week: <strong style="color:var(--text2);">${prevW} lbs</strong></div>`;
   }
 
+  const isDB2 = ex.name && ex.name.startsWith('DB');
+  const dbNote2 = isDB2 ? `<div style="font-size:10px;color:var(--yellow);margin-top:3px;">Per dumbbell — enter weight of one DB</div>` : '';
   const weightSection = ex.type !== 'cns' ? `
     <div class="ex-weight">
       <label>Weight used:</label>
       <input type="number" id="weight-${ex.id}" placeholder="lbs" step="2.5" min="0">
       <span class="weight-unit">lbs</span>
     </div>
+    ${dbNote2}
     ${prevHint}
     ${poNudge}` : '';
 
@@ -4541,26 +4578,40 @@ function renderChart(data) {
 // 1RM VIEW
 // ════════════════════════════════════════════════════════════
 const ORM_EXERCISES = [
-  'Bench Press', 'Squat', 'Deadlift', 'Overhead Press', 'Front Squat', 'Trap Bar Deadlift'
+  { name:'Bench Press',       db:false },
+  { name:'Squat',             db:false },
+  { name:'Deadlift',          db:false },
+  { name:'Overhead Press',    db:false },
+  { name:'Front Squat',       db:false },
+  { name:'Trap Bar Deadlift', db:false },
+  { name:'DB Bench Press',    db:true  },
+  { name:'DB Push-Press',     db:true  },
+  { name:'DB Shoulder Press', db:true  },
+  { name:'1-Arm DB Row',      db:true  },
+  { name:'DB Reverse Lunge',  db:true  },
+  { name:'DB Step Up',        db:true  },
 ];
+
+const ORM_PCTS = [50,55,60,65,70,75,80,85,90,95];
 
 function renderORM() {
   let html = '';
-  ORM_EXERCISES.forEach(name => {
+  ORM_EXERCISES.forEach(({name, db}) => {
     const stored1RM = get1RM(name);
-    const pcts = stored1RM ? calcPcts(parseFloat(stored1RM)) : null;
+    const key = name.replace(/\s/g,'_');
     html += `
       <div class="orm-card">
-        <h3>${name}</h3>
+        <h3>${name}${db ? ' <span style="font-size:11px;color:var(--text3);font-weight:600;">per DB</span>' : ''}</h3>
+        ${db ? `<div style="font-size:11px;color:var(--yellow);margin-bottom:8px;">⚠ Enter weight of one dumbbell (e.g. 25 for 2×25)</div>` : ''}
         <div class="orm-input-row">
-          <label>3RM Weight (lbs)</label>
-          <input class="orm-input" type="number" id="orm-input-${name.replace(/\s/g,'_')}" placeholder="0" min="0" step="2.5" value="">
+          <label>${db ? 'Single DB 3RM (lbs)' : '3RM Weight (lbs)'}</label>
+          <input class="orm-input" type="number" id="orm-input-${key}" placeholder="0" min="0" step="2.5" value="">
           <button class="orm-calc-btn" onclick="calcORM('${name}')">Calc</button>
         </div>
-        <div class="orm-result ${stored1RM ? 'show' : ''}" id="orm-result-${name.replace(/\s/g,'_')}">
-          <div class="orm-1rm">${stored1RM || 0} <span>lbs estimated 1RM</span></div>
-          <div class="orm-pcts">
-            ${[65,70,75,80,85].map(pct => {
+        <div class="orm-result ${stored1RM ? 'show' : ''}" id="orm-result-${key}">
+          <div class="orm-1rm">${stored1RM || 0} <span>lbs estimated 1RM${db ? ' (per DB)' : ''}</span></div>
+          <div class="orm-pcts" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">
+            ${ORM_PCTS.map(pct => {
               const val = stored1RM ? Math.round(parseFloat(stored1RM) * pct / 100 / 2.5) * 2.5 : '—';
               return `<div class="orm-pct-item"><div class="pct-label">${pct}%</div><div class="pct-val">${val}</div></div>`;
             }).join('')}
@@ -4573,7 +4624,7 @@ function renderORM() {
 }
 
 function calcPcts(oneRM) {
-  return [65,70,75,80,85].map(pct => Math.round(oneRM * pct / 100 / 2.5) * 2.5);
+  return ORM_PCTS.map(pct => Math.round(oneRM * pct / 100 / 2.5) * 2.5);
 }
 
 function calcORM(name) {
@@ -4581,17 +4632,17 @@ function calcORM(name) {
   const input = document.getElementById(`orm-input-${key}`);
   const val = parseFloat(input.value);
   if (!val || val <= 0) { showToast('Enter a valid weight'); return; }
-  // Epley: 1RM = weight × (1 + 3/30)
+  // Epley: 1RM = weight × (1 + reps/30), using 3 reps
   const estimated = Math.round(val * (1 + 3/30) / 2.5) * 2.5;
   set1RM(name, estimated);
 
   const resultDiv = document.getElementById(`orm-result-${key}`);
+  const isDB = ORM_EXERCISES.find(e => e.name === name)?.db;
   resultDiv.classList.add('show');
-  resultDiv.querySelector('.orm-1rm').innerHTML = `${estimated} <span>lbs estimated 1RM</span>`;
+  resultDiv.querySelector('.orm-1rm').innerHTML = `${estimated} <span>lbs estimated 1RM${isDB ? ' (per DB)' : ''}</span>`;
   const pctDivs = resultDiv.querySelectorAll('.pct-val');
-  [65,70,75,80,85].forEach((pct, i) => {
-    const val = Math.round(estimated * pct / 100 / 2.5) * 2.5;
-    pctDivs[i].textContent = val;
+  ORM_PCTS.forEach((pct, i) => {
+    pctDivs[i].textContent = Math.round(estimated * pct / 100 / 2.5) * 2.5;
   });
 
   syncPRViews();
