@@ -529,6 +529,33 @@
   body.light #app-nav { background: rgba(245,245,245,0.97); }
 
 
+  /* ── NUTRITION SYSTEM ── */
+  .nutr-macro-bar-wrap { margin-bottom:10px; }
+  .nutr-macro-bar-label { display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:4px; }
+  .nutr-macro-bar-track { height:8px;background:var(--bg4);border-radius:4px;overflow:hidden; }
+  .nutr-macro-bar-fill { height:100%;border-radius:4px;transition:width 0.3s; }
+
+  .nutr-quick-scroll { display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;scrollbar-width:none; }
+  .nutr-quick-scroll::-webkit-scrollbar { display:none; }
+  .nutr-quick-btn { flex-shrink:0;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;text-align:center;white-space:nowrap; }
+  .nutr-quick-btn:active { opacity:0.7; }
+
+  .nutr-food-row { display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border); }
+  .nutr-food-name { font-size:13px;font-weight:700;color:var(--text);flex:1; }
+  .nutr-food-macros { font-size:11px;color:var(--text3);margin-top:2px; }
+  .nutr-food-remove { width:28px;height:28px;background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center; }
+
+  .food-picker-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:900;display:flex;flex-direction:column;justify-content:flex-end; }
+  .food-picker-sheet { background:var(--bg2);border-radius:20px 20px 0 0;padding:20px 16px;max-height:80vh;display:flex;flex-direction:column; }
+  .food-picker-search { width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;margin-bottom:12px;box-sizing:border-box;outline:none; }
+  .food-picker-cats { display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px;scrollbar-width:none; }
+  .food-picker-cats::-webkit-scrollbar { display:none; }
+  .food-picker-cat { flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer; }
+  .food-picker-cat.active { background:var(--yellow-bg);border-color:var(--yellow);color:var(--yellow); }
+  .food-picker-list { overflow-y:auto;flex:1; }
+  .food-picker-item { display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer; }
+  .food-picker-item:active { opacity:0.7; }
+
   /* ── NUTRITION BANNER ── */
   #nutrition-card {
     background: var(--bg2); border: 1px solid var(--border);
@@ -4003,26 +4030,7 @@ function switchProgSub(sub) {
     container.innerHTML = '<div id="goal-card"></div>';
     renderGoalCard();
   } else if (sub === 'nutrition') {
-    container.innerHTML = `
-      <div id="nutrition-card">
-        <div id="nutrition-setup">
-          <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text);">Nutrition Target</div>
-          <div class="nutrition-inputs">
-            <label>Bodyweight (lbs)</label>
-            <input type="number" id="nutr-bw" placeholder="185" min="50" max="500" step="1">
-            <div class="goal-toggle">
-              <button class="goal-btn active" id="goal-bulk" onclick="setGoalMode('bulk')">Bulk</button>
-              <button class="goal-btn" id="goal-maintain" onclick="setGoalMode('maintain')">Maintain</button>
-            </div>
-          </div>
-          <button class="nutrition-set-btn" onclick="saveNutrition()">Set Targets</button>
-        </div>
-        <div id="nutrition-banner" style="display:none;width:100%;align-items:center;justify-content:space-between;gap:8px;">
-          <span id="nutrition-banner-text"></span>
-          <button id="nutrition-edit-btn" onclick="editNutrition()">Edit</button>
-        </div>
-      </div>`;
-    renderNutritionCard();
+    renderNutritionMain();
   }
 }
 
@@ -4614,8 +4622,10 @@ let nutritionGoalMode = 'bulk';
 
 function setGoalMode(mode) {
   nutritionGoalMode = mode;
-  document.getElementById('goal-bulk').classList.toggle('active', mode === 'bulk');
-  document.getElementById('goal-maintain').classList.toggle('active', mode === 'maintain');
+  const b = document.getElementById('goal-bulk');
+  const m = document.getElementById('goal-maintain');
+  if (b) b.classList.toggle('active', mode === 'bulk');
+  if (m) m.classList.toggle('active', mode === 'maintain');
 }
 
 // ════════════════════════════════════════════════════════════
@@ -5036,7 +5046,12 @@ function renderGoalCard(forceSetup) {
 }
 
 function saveNutrition() {
+  // If the new nutrition setup form is present, delegate to it
+  const newBwEl = document.getElementById('nutr-setup-bw');
+  if (newBwEl) { saveNutritionProfile(); return; }
+  // Legacy path
   const bwInput = document.getElementById('nutr-bw');
+  if (!bwInput) return;
   const bw = parseFloat(bwInput.value);
   if (!bw || bw <= 0) { showToast('Enter a valid bodyweight'); return; }
   lsSet('nutr_bw', bw);
@@ -5047,15 +5062,500 @@ function saveNutrition() {
 }
 
 function editNutrition() {
+  // New system: re-render main with setup open
+  const newContainer = document.getElementById('nutr-setup-bw');
+  if (newContainer) { renderNutritionMain(true); return; }
+  // Legacy
   const setup = document.getElementById('nutrition-setup');
   const banner = document.getElementById('nutrition-banner');
-  setup.style.display = '';
-  banner.style.display = 'none';
-  document.getElementById('nutrition-card').classList.remove('banner-mode');
+  if (setup) setup.style.display = '';
+  if (banner) banner.style.display = 'none';
+  const card = document.getElementById('nutrition-card');
+  if (card) card.classList.remove('banner-mode');
   const bw = ls('nutr_bw', '');
   const goal = ls('nutr_goal', 'bulk');
-  if (bw) document.getElementById('nutr-bw').value = bw;
+  if (bw && document.getElementById('nutr-bw')) document.getElementById('nutr-bw').value = bw;
   setGoalMode(goal);
+}
+
+// ════════════════════════════════════════════════════════════
+// FULL NUTRITION SYSTEM
+// ════════════════════════════════════════════════════════════
+
+const FOOD_DB = [
+  // Protein
+  { name:'Chicken Breast (cooked)', category:'Protein', unit:85, unitLabel:'3oz serving', cal:140, protein:26, fat:3, carbs:0 },
+  { name:'Ground Beef 90/10', category:'Protein', unit:85, unitLabel:'3oz serving', cal:155, protein:22, fat:7, carbs:0 },
+  { name:'Salmon', category:'Protein', unit:85, unitLabel:'3oz serving', cal:177, protein:17, fat:11, carbs:0 },
+  { name:'Tuna (canned)', category:'Protein', unit:85, unitLabel:'3oz serving', cal:100, protein:22, fat:1, carbs:0 },
+  { name:'Eggs (whole)', category:'Protein', unit:50, unitLabel:'1 egg', cal:70, protein:6, fat:5, carbs:0 },
+  { name:'Egg Whites', category:'Protein', unit:99, unitLabel:'3 whites', cal:51, protein:11, fat:0, carbs:0 },
+  { name:'Turkey Breast', category:'Protein', unit:85, unitLabel:'3oz serving', cal:135, protein:26, fat:3, carbs:0 },
+  { name:'Shrimp', category:'Protein', unit:85, unitLabel:'3oz serving', cal:84, protein:18, fat:1, carbs:0 },
+  { name:'Steak (sirloin)', category:'Protein', unit:85, unitLabel:'3oz serving', cal:165, protein:26, fat:6, carbs:0 },
+  { name:'Tilapia', category:'Protein', unit:85, unitLabel:'3oz serving', cal:110, protein:23, fat:2, carbs:0 },
+  { name:'Pork Tenderloin', category:'Protein', unit:85, unitLabel:'3oz serving', cal:120, protein:22, fat:3, carbs:0 },
+  { name:'Bison', category:'Protein', unit:85, unitLabel:'3oz serving', cal:152, protein:22, fat:7, carbs:0 },
+  // Carbs
+  { name:'White Rice (cooked)', category:'Carbs', unit:186, unitLabel:'1 cup', cal:242, protein:4, fat:0, carbs:53 },
+  { name:'Brown Rice (cooked)', category:'Carbs', unit:195, unitLabel:'1 cup', cal:216, protein:5, fat:2, carbs:45 },
+  { name:'Oats (dry)', category:'Carbs', unit:40, unitLabel:'1/2 cup', cal:150, protein:5, fat:3, carbs:27 },
+  { name:'Sweet Potato', category:'Carbs', unit:130, unitLabel:'1 medium', cal:112, protein:2, fat:0, carbs:26 },
+  { name:'White Potato', category:'Carbs', unit:150, unitLabel:'1 medium', cal:130, protein:3, fat:0, carbs:30 },
+  { name:'Pasta (cooked)', category:'Carbs', unit:140, unitLabel:'1 cup', cal:220, protein:8, fat:1, carbs:43 },
+  { name:'Bread (white)', category:'Carbs', unit:25, unitLabel:'1 slice', cal:67, protein:2, fat:1, carbs:13 },
+  { name:'Banana', category:'Carbs', unit:118, unitLabel:'1 medium', cal:105, protein:1, fat:0, carbs:27 },
+  { name:'Apple', category:'Carbs', unit:182, unitLabel:'1 medium', cal:95, protein:0, fat:0, carbs:25 },
+  { name:'Blueberries', category:'Carbs', unit:148, unitLabel:'1 cup', cal:84, protein:1, fat:0, carbs:21 },
+  { name:'Bagel', category:'Carbs', unit:105, unitLabel:'1 bagel', cal:270, protein:11, fat:1, carbs:53 },
+  { name:'Tortilla (flour)', category:'Carbs', unit:45, unitLabel:'1 tortilla', cal:140, protein:4, fat:3, carbs:24 },
+  // Fats
+  { name:'Avocado', category:'Fats', unit:68, unitLabel:'1/2 avocado', cal:114, protein:1, fat:10, carbs:6 },
+  { name:'Olive Oil', category:'Fats', unit:14, unitLabel:'1 tbsp', cal:119, protein:0, fat:14, carbs:0 },
+  { name:'Peanut Butter', category:'Fats', unit:32, unitLabel:'2 tbsp', cal:190, protein:8, fat:16, carbs:7 },
+  { name:'Almond Butter', category:'Fats', unit:32, unitLabel:'2 tbsp', cal:196, protein:7, fat:18, carbs:6 },
+  { name:'Almonds', category:'Fats', unit:28, unitLabel:'1oz', cal:164, protein:6, fat:14, carbs:6 },
+  { name:'Walnuts', category:'Fats', unit:28, unitLabel:'1oz', cal:185, protein:4, fat:18, carbs:4 },
+  { name:'Mixed Nuts', category:'Fats', unit:28, unitLabel:'1oz', cal:173, protein:5, fat:16, carbs:6 },
+  { name:'Coconut Oil', category:'Fats', unit:14, unitLabel:'1 tbsp', cal:121, protein:0, fat:14, carbs:0 },
+  // Dairy
+  { name:'Greek Yogurt (nonfat)', category:'Dairy', unit:227, unitLabel:'1 cup', cal:130, protein:23, fat:0, carbs:9 },
+  { name:'Cottage Cheese', category:'Dairy', unit:113, unitLabel:'1/2 cup', cal:90, protein:13, fat:1, carbs:5 },
+  { name:'Whole Milk', category:'Dairy', unit:244, unitLabel:'1 cup', cal:149, protein:8, fat:8, carbs:12 },
+  { name:'Skim Milk', category:'Dairy', unit:244, unitLabel:'1 cup', cal:83, protein:8, fat:0, carbs:12 },
+  { name:'Cheddar Cheese', category:'Dairy', unit:28, unitLabel:'1oz', cal:114, protein:7, fat:9, carbs:0 },
+  { name:'Mozzarella', category:'Dairy', unit:28, unitLabel:'1oz', cal:85, protein:6, fat:6, carbs:1 },
+  { name:'Whipped Cream Cheese', category:'Dairy', unit:29, unitLabel:'2 tbsp', cal:70, protein:1, fat:6, carbs:2 },
+  // Supplements
+  { name:'Whey Protein', category:'Supplements', unit:30, unitLabel:'1 scoop', cal:120, protein:25, fat:2, carbs:3 },
+  { name:'Casein Protein', category:'Supplements', unit:33, unitLabel:'1 scoop', cal:120, protein:24, fat:1, carbs:4 },
+  { name:'Mass Gainer', category:'Supplements', unit:165, unitLabel:'2 scoops', cal:650, protein:50, fat:5, carbs:95 },
+  { name:'Creatine', category:'Supplements', unit:5, unitLabel:'1 tsp', cal:0, protein:0, fat:0, carbs:0 },
+  { name:'BCAA Powder', category:'Supplements', unit:7, unitLabel:'1 scoop', cal:20, protein:5, fat:0, carbs:0 },
+  { name:'Pre-Workout', category:'Supplements', unit:10, unitLabel:'1 scoop', cal:10, protein:0, fat:0, carbs:2 },
+];
+
+const MEAL_TEMPLATES = [
+  { name:'Bulking Breakfast', icon:'🍳', foods:[
+    { name:'Oats (dry)', qty:2 }, { name:'Eggs (whole)', qty:3 }, { name:'Whey Protein', qty:1 }, { name:'Banana', qty:1 }
+  ]},
+  { name:'Post-Workout', icon:'💪', foods:[
+    { name:'Whey Protein', qty:1 }, { name:'White Rice (cooked)', qty:1 }, { name:'Chicken Breast (cooked)', qty:1 }
+  ]},
+  { name:'High Protein Lunch', icon:'🥗', foods:[
+    { name:'Chicken Breast (cooked)', qty:2 }, { name:'Brown Rice (cooked)', qty:1 }, { name:'Avocado', qty:1 }
+  ]},
+  { name:'Lean Dinner', icon:'🍽️', foods:[
+    { name:'Salmon', qty:1 }, { name:'Sweet Potato', qty:1 }, { name:'Greek Yogurt (nonfat)', qty:0.5 }
+  ]},
+  { name:'Night Snack', icon:'🌙', foods:[
+    { name:'Cottage Cheese', qty:1 }, { name:'Casein Protein', qty:1 }, { name:'Almonds', qty:1 }
+  ]},
+];
+
+function getTodayLogKey() { return 'food_log_' + new Date().toISOString().slice(0,10); }
+function getTodayLog() { return ls(getTodayLogKey(), []); }
+function saveTodayLog(arr) { lsSet(getTodayLogKey(), arr); }
+
+function getWeekKey() {
+  const d = new Date();
+  const jan1 = new Date(d.getFullYear(), 0, 1);
+  const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+  return d.getFullYear() + '-' + String(week).padStart(2,'0');
+}
+
+function computeNutrProfile(bw, heightFt, heightIn, age, actMult, goal) {
+  const tdee = calcTDEE(bw, heightFt, heightIn, age, actMult);
+  let calTarget, protein, fat;
+  if (goal === 'bulk') {
+    calTarget = tdee + 300;
+    protein = Math.round(bw * 1.0);
+    fat = Math.round(bw * 0.4);
+  } else if (goal === 'cut') {
+    calTarget = tdee - 500;
+    protein = Math.round(bw * 1.2);
+    fat = Math.round(bw * 0.35);
+  } else {
+    calTarget = tdee;
+    protein = Math.round(bw * 0.9);
+    fat = Math.round(bw * 0.38);
+  }
+  const carbs = Math.max(0, Math.floor((calTarget - protein * 4 - fat * 9) / 4));
+  return { bw, heightFt, heightIn, age, actMult, goal, tdee, calTarget, protein, fat, carbs };
+}
+
+function saveNutritionProfile() {
+  const bw = parseFloat(document.getElementById('nutr-setup-bw')?.value);
+  const ft = parseInt(document.getElementById('nutr-setup-ft')?.value) || 0;
+  const inch = parseInt(document.getElementById('nutr-setup-in')?.value) || 0;
+  const age = parseInt(document.getElementById('nutr-setup-age')?.value) || 0;
+  const goalEl = document.querySelector('.nutr-goal-btn.active');
+  const actEl = document.querySelector('.nutr-act-btn.active');
+  if (!bw || bw <= 0) { showToast('Enter bodyweight'); return; }
+  if (!ft || ft < 3) { showToast('Enter height'); return; }
+  if (!age || age < 10) { showToast('Enter age'); return; }
+  if (!goalEl) { showToast('Select a goal'); return; }
+  if (!actEl) { showToast('Select activity level'); return; }
+  const goal = goalEl.dataset.goal;
+  const actMult = parseFloat(actEl.dataset.act);
+  const profile = computeNutrProfile(bw, ft, inch, age, actMult, goal);
+  lsSet('nutr_profile', profile);
+  // Keep legacy keys in sync
+  lsSet('nutr_bw', bw);
+  lsSet('nutr_goal', goal === 'cut' ? 'maintain' : goal);
+  syncToCloud();
+  renderNutritionMain();
+}
+
+function renderMacroBar(label, eaten, target, color) {
+  const pct = target > 0 ? Math.min(100, Math.round((eaten / target) * 100)) : 0;
+  let fillColor = color || 'var(--yellow)';
+  if (target > 0) {
+    if (eaten > target * 1.05) fillColor = 'var(--red)';
+    else if (eaten >= target * 0.9) fillColor = 'var(--green)';
+  }
+  const isCalories = label === 'Calories';
+  const suffix = isCalories ? ' kcal' : 'g';
+  return `<div class="nutr-macro-bar-wrap">
+    <div class="nutr-macro-bar-label">
+      <span>${label}</span>
+      <span>${eaten}${suffix} / ${target}${suffix}</span>
+    </div>
+    <div class="nutr-macro-bar-track">
+      <div class="nutr-macro-bar-fill" style="width:${pct}%;background:${fillColor};"></div>
+    </div>
+  </div>`;
+}
+
+function addFoodToLog(foodName, qty) {
+  const food = FOOD_DB.find(f => f.name === foodName);
+  if (!food) return;
+  const log = getTodayLog();
+  log.push({
+    name: food.name,
+    qty,
+    cal: Math.round(food.cal * qty),
+    protein: Math.round(food.protein * qty * 10) / 10,
+    fat: Math.round(food.fat * qty * 10) / 10,
+    carbs: Math.round(food.carbs * qty * 10) / 10,
+    addedAt: Date.now()
+  });
+  saveTodayLog(log);
+  renderDailyLog();
+}
+
+function addMealTemplate(templateName) {
+  const tmpl = MEAL_TEMPLATES.find(t => t.name === templateName);
+  if (!tmpl) return;
+  tmpl.foods.forEach(f => addFoodToLog(f.name, f.qty));
+  showToast(templateName + ' added');
+}
+
+function removeLogEntry(idx) {
+  const log = getTodayLog();
+  log.splice(idx, 1);
+  saveTodayLog(log);
+  renderDailyLog();
+}
+
+function renderDailyLog() {
+  const container = document.getElementById('nutr-daily-log');
+  if (!container) return;
+  const profile = ls('nutr_profile', null);
+  const log = getTodayLog();
+
+  const totals = log.reduce((a, e) => ({ cal: a.cal + e.cal, protein: a.protein + e.protein, fat: a.fat + e.fat, carbs: a.carbs + e.carbs }), { cal:0, protein:0, fat:0, carbs:0 });
+  const targets = profile ? { cal: profile.calTarget, protein: profile.protein, fat: profile.fat, carbs: profile.carbs } : { cal:2000, protein:150, fat:65, carbs:250 };
+
+  let html = '';
+
+  // Macro progress bars
+  html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:16px;">`;
+  html += renderMacroBar('Calories', Math.round(totals.cal), targets.cal, 'var(--yellow)');
+  html += renderMacroBar('Protein', Math.round(totals.protein), targets.protein, 'var(--blue)');
+  html += renderMacroBar('Fat', Math.round(totals.fat), targets.fat, 'var(--orange)');
+  html += renderMacroBar('Carbs', Math.round(totals.carbs), targets.carbs, 'var(--green)');
+  html += `</div>`;
+
+  // Quick-add meal templates
+  html += `<div class="nutr-quick-scroll">`;
+  MEAL_TEMPLATES.forEach(t => {
+    html += `<button class="nutr-quick-btn" onclick="addMealTemplate('${t.name.replace(/'/g,"\\'")}')"><div style="font-size:18px;">${t.icon}</div>${t.name}</button>`;
+  });
+  html += `</div>`;
+
+  // Add food button
+  html += `<button onclick="openFoodPicker()" style="width:100%;background:var(--yellow);color:#000;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:800;padding:12px;cursor:pointer;margin-bottom:16px;">+ Add Food</button>`;
+
+  // Today's log list
+  if (log.length === 0) {
+    html += `<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">No foods logged yet today</div>`;
+  } else {
+    html += `<div style="margin-bottom:8px;">`;
+    log.forEach((entry, idx) => {
+      html += `<div class="nutr-food-row">
+        <div style="flex:1;">
+          <div class="nutr-food-name">${entry.name}</div>
+          <div class="nutr-food-macros">${entry.qty}× &nbsp;·&nbsp; ${entry.cal} kcal &nbsp;·&nbsp; P:${entry.protein}g F:${entry.fat}g C:${entry.carbs}g</div>
+        </div>
+        <button class="nutr-food-remove" onclick="removeLogEntry(${idx})">✕</button>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Remaining row
+  const remCal = targets.cal - Math.round(totals.cal);
+  const remP = targets.protein - Math.round(totals.protein);
+  const remF = targets.fat - Math.round(totals.fat);
+  const remC = targets.carbs - Math.round(totals.carbs);
+  html += `<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:10px 12px;margin-top:8px;">
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Remaining</div>
+    <div style="font-size:12px;color:var(--text2);">${remCal > 0 ? remCal : 0} kcal &nbsp;·&nbsp; P:${remP > 0 ? remP : 0}g &nbsp;·&nbsp; F:${remF > 0 ? remF : 0}g &nbsp;·&nbsp; C:${remC > 0 ? remC : 0}g</div>
+  </div>`;
+
+  container.innerHTML = html;
+}
+
+function openFoodPicker() {
+  // Remove existing
+  document.getElementById('food-picker-overlay')?.remove();
+
+  let activeCat = 'All';
+  const overlay = document.createElement('div');
+  overlay.className = 'food-picker-overlay';
+  overlay.id = 'food-picker-overlay';
+
+  function renderSheet() {
+    const search = overlay.querySelector('#fp-search')?.value || '';
+    const filtered = FOOD_DB.filter(f => {
+      const catMatch = activeCat === 'All' || f.category === activeCat;
+      const searchMatch = !search || f.name.toLowerCase().includes(search.toLowerCase());
+      return catMatch && searchMatch;
+    });
+
+    overlay.innerHTML = `<div class="food-picker-sheet" onclick="event.stopPropagation()">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-size:16px;font-weight:800;">Add Food</div>
+        <button onclick="document.getElementById('food-picker-overlay').remove()" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;">✕</button>
+      </div>
+      <input class="food-picker-search" id="fp-search" type="text" placeholder="Search foods..." value="${search}" oninput="window._fpRerender()">
+      <div class="food-picker-cats">
+        ${['All','Protein','Carbs','Fats','Dairy','Supplements'].map(c =>
+          `<button class="food-picker-cat ${c === activeCat ? 'active' : ''}" onclick="window._fpSetCat('${c}')">${c}</button>`
+        ).join('')}
+      </div>
+      <div class="food-picker-list" id="fp-list">
+        ${filtered.map(f => `<div class="food-picker-item" onclick="window._fpSelect('${f.name.replace(/'/g,"\\'")}')">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);">${f.name}</div>
+            <div style="font-size:11px;color:var(--text3);">${f.unitLabel} &nbsp;·&nbsp; ${f.cal} kcal P:${f.protein}g F:${f.fat}g C:${f.carbs}g</div>
+          </div>
+          <div style="font-size:18px;color:var(--text3);">›</div>
+        </div>`).join('')}
+        ${filtered.length === 0 ? '<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">No foods found</div>' : ''}
+      </div>
+    </div>`;
+
+    // Re-attach focus to search
+    const si = overlay.querySelector('#fp-search');
+    if (si && search) { const len = si.value.length; si.focus(); si.setSelectionRange(len,len); }
+  }
+
+  window._fpRerender = () => { renderSheet(); };
+  window._fpSetCat = (cat) => { activeCat = cat; renderSheet(); };
+  window._fpSelect = (name) => {
+    const food = FOOD_DB.find(f => f.name === name);
+    if (!food) return;
+    overlay.innerHTML = `<div class="food-picker-sheet" onclick="event.stopPropagation()">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <button onclick="window._fpBack()" style="background:none;border:none;color:var(--text2);font-size:14px;cursor:pointer;">← Back</button>
+        <button onclick="document.getElementById('food-picker-overlay').remove()" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;">✕</button>
+      </div>
+      <div style="font-size:17px;font-weight:800;margin-bottom:4px;">${food.name}</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">${food.unitLabel} &nbsp;·&nbsp; ${food.cal} kcal P:${food.protein}g F:${food.fat}g C:${food.carbs}g</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+        <label style="font-size:13px;color:var(--text2);white-space:nowrap;">Quantity (servings)</label>
+        <input id="fp-qty" type="number" value="1" min="0.25" step="0.25" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 12px;width:80px;text-align:center;outline:none;">
+        <span style="font-size:12px;color:var(--text3);">${food.unitLabel}</span>
+      </div>
+      <button onclick="
+        const q=parseFloat(document.getElementById('fp-qty').value)||1;
+        addFoodToLog('${food.name.replace(/'/g,"\\'")}',q);
+        document.getElementById('food-picker-overlay').remove();
+      " style="width:100%;background:var(--yellow);color:#000;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:800;padding:14px;cursor:pointer;">Add to Log</button>
+    </div>`;
+    window._fpBack = () => renderSheet();
+  };
+
+  overlay.addEventListener('click', () => overlay.remove());
+  document.body.appendChild(overlay);
+  renderSheet();
+}
+
+function renderWeeklyCheckin() {
+  const profile = ls('nutr_profile', null);
+  if (!profile) return '';
+  const weekKey = getWeekKey();
+  const checkinKey = 'nutr_checkin_' + weekKey;
+  const done = ls(checkinKey, null);
+  if (done) return '';
+
+  // Show check-in if it's Monday OR if no checkin done this week
+  const bwLog = getBWLog();
+  const lastBW = bwLog.length > 0 ? bwLog[bwLog.length - 1].weight : profile.bw;
+
+  return `<div style="background:var(--yellow-bg);border:1px solid var(--yellow-border);border-radius:var(--radius);padding:16px;margin-bottom:16px;">
+    <div style="font-size:11px;font-weight:700;color:var(--yellow);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Weekly Check-in · Week ${weekKey.split('-')[1]}</div>
+    <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:12px;">How's the scale looking?</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <label style="font-size:13px;color:var(--text2);">Weight (lbs)</label>
+      <input type="number" id="checkin-weight" value="${lastBW}" step="0.1" min="50" max="500"
+        style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 12px;width:100px;text-align:center;outline:none;">
+    </div>
+    <button onclick="saveWeeklyCheckin()" style="background:var(--yellow);color:#000;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:800;padding:12px;width:100%;cursor:pointer;">Save Check-in</button>
+  </div>`;
+}
+
+function saveWeeklyCheckin() {
+  const weightEl = document.getElementById('checkin-weight');
+  const weight = parseFloat(weightEl?.value);
+  if (!weight || weight <= 0) { showToast('Enter a valid weight'); return; }
+
+  const profile = ls('nutr_profile', null);
+  const weekKey = getWeekKey();
+  const bwLog = getBWLog();
+
+  // Log the body weight
+  logBW(weight);
+
+  // Determine adjustment
+  let adjustment = 0;
+  let feedbackMsg = 'Check-in saved!';
+
+  if (profile && bwLog.length >= 2) {
+    const lastWeight = bwLog[bwLog.length - 1].weight;
+    const change = weight - lastWeight;
+
+    if (profile.goal === 'bulk' && change < 0.1) {
+      adjustment = 100;
+      feedbackMsg = `Up ${change.toFixed(1)} lbs — adjusting +100 kcal`;
+    } else if (profile.goal === 'cut' && change > -0.1) {
+      adjustment = -100;
+      feedbackMsg = `Down ${Math.abs(change).toFixed(1)} lbs — adjusting -100 kcal`;
+    } else if (profile.goal === 'bulk' && change >= 0.1) {
+      feedbackMsg = `Up ${change.toFixed(1)} lbs — on track!`;
+    } else if (profile.goal === 'cut' && change <= -0.1) {
+      feedbackMsg = `Down ${Math.abs(change).toFixed(1)} lbs — on track!`;
+    } else {
+      feedbackMsg = 'Weight holding steady';
+    }
+
+    if (adjustment !== 0) {
+      const updated = { ...profile, calTarget: profile.calTarget + adjustment };
+      lsSet('nutr_profile', updated);
+    }
+  }
+
+  lsSet('nutr_checkin_' + weekKey, { weight, date: new Date().toISOString(), adjustment });
+  showToast(feedbackMsg);
+  renderNutritionMain();
+}
+
+function renderNutritionMain(forceSetup) {
+  const container = document.getElementById('program-content');
+  if (!container) return;
+
+  const profile = ls('nutr_profile', null);
+  const showSetup = forceSetup || !profile;
+
+  let setupSection = '';
+  if (showSetup) {
+    const p = profile || {};
+    const goalBtns = ['bulk','maintain','cut'].map(g =>
+      `<button class="nutr-goal-btn${p.goal === g ? ' active' : ''}" data-goal="${g}"
+        onclick="document.querySelectorAll('.nutr-goal-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');"
+        style="flex:1;padding:9px 4px;font-size:12px;font-weight:700;border-radius:8px;border:1px solid var(--border);background:${p.goal===g?'var(--yellow-bg)':'var(--bg3)'};color:${p.goal===g?'var(--yellow)':'var(--text2)'};cursor:pointer;">
+        ${g.charAt(0).toUpperCase()+g.slice(1)}</button>`
+    ).join('');
+    const actBtns = [
+      { label:'Sedentary', sub:'Desk job', val:'1.2' },
+      { label:'Light', sub:'1-3 days/wk', val:'1.375' },
+      { label:'Moderate', sub:'3-5 days/wk', val:'1.55' },
+      { label:'Active', sub:'6-7 days/wk', val:'1.725' },
+    ].map(a =>
+      `<button class="nutr-act-btn${String(p.actMult)===a.val?' active':''}" data-act="${a.val}"
+        onclick="document.querySelectorAll('.nutr-act-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');"
+        style="flex:1;padding:9px 4px;font-size:11px;font-weight:700;border-radius:8px;border:1px solid var(--border);background:${String(p.actMult)===a.val?'var(--yellow-bg)':'var(--bg3)'};color:${String(p.actMult)===a.val?'var(--yellow)':'var(--text2)'};cursor:pointer;text-align:center;line-height:1.3;">
+        ${a.label}<br><span style="font-size:9px;font-weight:400;">${a.sub}</span></button>`
+    ).join('');
+
+    setupSection = `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;">
+      <div style="font-size:15px;font-weight:800;margin-bottom:14px;">TDEE Setup</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px;">Bodyweight (lbs)</label>
+          <input id="nutr-setup-bw" type="number" placeholder="185" value="${p.bw||''}" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px;outline:none;box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px;">Age</label>
+          <input id="nutr-setup-age" type="number" placeholder="25" value="${p.age||''}" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px;outline:none;box-sizing:border-box;">
+        </div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px;">Height</label>
+        <div style="display:flex;gap:8px;">
+          <input id="nutr-setup-ft" type="number" placeholder="ft" min="4" max="7" value="${p.heightFt||''}" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px;outline:none;text-align:center;">
+          <input id="nutr-setup-in" type="number" placeholder="in" min="0" max="11" value="${p.heightIn||''}" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px;outline:none;text-align:center;">
+        </div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px;">Goal</label>
+        <div style="display:flex;gap:6px;">${goalBtns}</div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px;">Activity Level</label>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">${actBtns}</div>
+      </div>
+      <button onclick="saveNutritionProfile()" style="width:100%;background:var(--yellow);color:#000;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:800;padding:14px;cursor:pointer;">Calculate & Save</button>
+    </div>`;
+  } else {
+    // Summary card
+    const goalLabel = { bulk:'Bulk +300', maintain:'Maintain', cut:'Cut -500' }[profile.goal] || profile.goal;
+    setupSection = `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div>
+          <div style="font-size:28px;font-weight:900;color:var(--yellow);">${profile.calTarget.toLocaleString()} <span style="font-size:14px;color:var(--text2);font-weight:600;">kcal/day</span></div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px;">TDEE: ${profile.tdee.toLocaleString()} kcal &nbsp;·&nbsp; ${goalLabel}</div>
+        </div>
+        <button onclick="renderNutritionMain(true)" style="background:none;border:1px solid var(--border);color:var(--text2);border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Edit</button>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:var(--bg3);border-radius:8px;padding:10px;text-align:center;">
+          <div style="font-size:18px;font-weight:800;color:var(--blue);">${profile.protein}g</div>
+          <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.3px;">Protein</div>
+        </div>
+        <div style="flex:1;background:var(--bg3);border-radius:8px;padding:10px;text-align:center;">
+          <div style="font-size:18px;font-weight:800;color:var(--orange);">${profile.fat}g</div>
+          <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.3px;">Fat</div>
+        </div>
+        <div style="flex:1;background:var(--bg3);border-radius:8px;padding:10px;text-align:center;">
+          <div style="font-size:18px;font-weight:800;color:var(--green);">${profile.carbs}g</div>
+          <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.3px;">Carbs</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  const checkinHtml = profile ? renderWeeklyCheckin() : '';
+
+  const dailyLogHtml = profile ? `<div class="section-header" style="margin-top:0;">Daily Food Log</div><div id="nutr-daily-log"></div>` : '';
+
+  container.innerHTML = checkinHtml + setupSection + dailyLogHtml;
+
+  if (profile && !showSetup) {
+    renderDailyLog();
+  }
 }
 
 function renderTodayBanners() {
@@ -5063,14 +5563,15 @@ function renderTodayBanners() {
   if (!container) return;
   let html = '';
 
-  // Nutrition banner
-  const bw = ls('nutr_bw', null);
-  const goal = ls('nutr_goal', 'bulk');
+  // Nutrition banner — prefer new nutr_profile over legacy keys
+  const nutrProfile = ls('nutr_profile', null);
+  const bw = nutrProfile ? nutrProfile.bw : ls('nutr_bw', null);
+  const goal = nutrProfile ? nutrProfile.goal : ls('nutr_goal', 'bulk');
   if (bw) {
     const goalData = getGoalData();
-    const calories = goalData ? goalData.calTarget : (goal === 'bulk' ? Math.round(bw * 18) : Math.round(bw * 15));
-    const protein = goalData ? goalData.protein : (goal === 'bulk' ? Math.round(bw * 1.0) : Math.round(bw * 0.8));
-    html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;" onclick="switchView('program');switchProgSub('nutrition');">
+    const calories = nutrProfile ? nutrProfile.calTarget : (goalData ? goalData.calTarget : (goal === 'bulk' ? Math.round(bw * 18) : Math.round(bw * 15)));
+    const protein = nutrProfile ? nutrProfile.protein : (goalData ? goalData.protein : (goal === 'bulk' ? Math.round(bw * 1.0) : Math.round(bw * 0.8)));
+    html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="switchView('program');switchProgSub('nutrition');">
       <div>
         <div style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Nutrition</div>
         <div style="font-size:13px;font-weight:700;color:var(--text);">🔥 ${calories.toLocaleString()} kcal &nbsp;·&nbsp; 🥩 ${protein}g protein</div>
@@ -5107,28 +5608,36 @@ function renderTodayBanners() {
 }
 
 function renderNutritionCard() {
+  // Prefer new nutr_profile if available
+  const nutrProfile = ls('nutr_profile', null);
+  if (nutrProfile) {
+    // New system — banner text only (used by legacy callers from other tabs)
+    const bannerEl = document.getElementById('nutrition-banner-text');
+    if (bannerEl) bannerEl.textContent = `🥩 ${nutrProfile.protein}g protein · 🔥 ${nutrProfile.calTarget.toLocaleString()} kcal`;
+    return;
+  }
   const bw = ls('nutr_bw', null);
   const goal = ls('nutr_goal', 'bulk');
   if (!bw) {
-    // Show setup form
     const setup = document.getElementById('nutrition-setup');
     const banner = document.getElementById('nutrition-banner');
     if (setup) setup.style.display = '';
     if (banner) banner.style.display = 'none';
-    document.getElementById('nutrition-card').classList.remove('banner-mode');
+    const card = document.getElementById('nutrition-card');
+    if (card) card.classList.remove('banner-mode');
     return;
   }
-  // Show banner
   const protein = goal === 'bulk' ? Math.round(bw * 1.0) : Math.round(bw * 0.8);
   const calories = goal === 'bulk' ? Math.round(bw * 18) : Math.round(bw * 15);
   const bannerText = `🥩 Protein: ${protein}g · 🔥 Calories: ${calories} kcal`;
-  document.getElementById('nutrition-banner-text').textContent = bannerText;
+  const bannerEl = document.getElementById('nutrition-banner-text');
+  if (bannerEl) bannerEl.textContent = bannerText;
   const setup = document.getElementById('nutrition-setup');
   const banner = document.getElementById('nutrition-banner');
   if (setup) setup.style.display = 'none';
-  if (banner) { banner.style.display = 'flex'; }
-  document.getElementById('nutrition-card').classList.add('banner-mode');
-  // Sync goal mode buttons state
+  if (banner) banner.style.display = 'flex';
+  const card = document.getElementById('nutrition-card');
+  if (card) card.classList.add('banner-mode');
   nutritionGoalMode = goal;
   const bulkBtn = document.getElementById('goal-bulk');
   const maintBtn = document.getElementById('goal-maintain');
