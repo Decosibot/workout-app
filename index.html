@@ -4126,94 +4126,110 @@ function renderProgramSchedule(container) {
   html += `<div id="day-review-panel"></div>`;
   container.innerHTML = html;
 
+  // Determine which week is currently being browsed (independent of activeMensProgram)
+  // so W9-W16 work even when the user is on Phase 1
+  let browseWeek = 1;
+  if (activeMensProgram === 'hc12' || !activeMensProgram) browseWeek = state.currentWeek;
+  else if (activeMensProgram === 'growth') browseWeek = getGrowthState().week + 8;
+  else if (activeMensProgram === 'mansour') browseWeek = 13 + Math.floor((getMansourDay() - 1) / 2);
+
+  function renderDaySelector(selectedWeek) {
+    const pm = phaseMap.find(p => selectedWeek >= p.overallStart && selectedWeek <= p.overallEnd);
+    const daySel = document.getElementById('day-selector-prog');
+    daySel.style.gridTemplateColumns = '';
+    daySel.innerHTML = '';
+    document.getElementById('day-review-panel').innerHTML = '';
+
+    if (pm.id === 'hc12') {
+      const localWeek = selectedWeek;
+      const phase = getPhaseForWeek(localWeek);
+      phase.days.forEach((d, i) => {
+        const completed = ls(`wk_done_${localWeek}_${d.id}`, false);
+        const btn = document.createElement('div');
+        btn.className = `day-btn${completed ? ' completed' : ''}`;
+        btn.innerHTML = `<div class="day-label">${d.label.slice(0,3)}</div><div class="day-name">${d.name}</div>`;
+        btn.onclick = () => {
+          daySel.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          showDayReview('hc12', { week: localWeek, dayIdx: i });
+        };
+        daySel.appendChild(btn);
+      });
+      // Auto-select first day
+      if (phase.days.length) {
+        daySel.querySelector('.day-btn').classList.add('active');
+        showDayReview('hc12', { week: localWeek, dayIdx: 0 });
+      }
+    } else if (pm.id === 'growth') {
+      const localWeek = selectedWeek - 8;
+      for (let d = 1; d <= 6; d++) {
+        const key = `w${localWeek}_d${d}`;
+        const dayInfo = GROWTH_PLAN.days[key];
+        if (!dayInfo) continue;
+        const btn = document.createElement('div');
+        btn.className = 'day-btn';
+        btn.innerHTML = `<div class="day-label">D${d}</div><div class="day-name">${dayInfo.name}</div>`;
+        btn.onclick = () => {
+          daySel.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          showDayReview('growth', { week: localWeek, dayKey: key });
+        };
+        daySel.appendChild(btn);
+      }
+      const firstBtn = daySel.querySelector('.day-btn');
+      if (firstBtn) {
+        firstBtn.classList.add('active');
+        showDayReview('growth', { week: localWeek, dayKey: `w${localWeek}_d1` });
+      }
+    } else if (pm.id === 'mansour') {
+      daySel.style.gridTemplateColumns = 'repeat(5,1fr)';
+      const startDay = (selectedWeek - 13) * 2 + 1;
+      for (let d = startDay; d <= startDay + 1; d++) {
+        const dd = getMansourDayData(d);
+        if (!dd) continue;
+        const btn = document.createElement('div');
+        btn.className = 'day-btn';
+        btn.innerHTML = `<div class="day-label">D${d}</div><div class="day-name" style="font-size:9px;">${dd.name.split(' ')[0]}</div>`;
+        btn.onclick = () => {
+          daySel.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          showDayReview('mansour', { cycleDay: d });
+        };
+        daySel.appendChild(btn);
+      }
+      const firstBtn = daySel.querySelector('.day-btn');
+      if (firstBtn) {
+        firstBtn.classList.add('active');
+        showDayReview('mansour', { cycleDay: startDay });
+      }
+    }
+  }
+
   const weekSel = document.getElementById('week-selector-prog');
   for (let w = 1; w <= 16; w++) {
     const pm = phaseMap.find(p => w >= p.overallStart && w <= p.overallEnd);
-    // determine if this week is the "active" one in overall terms
-    let isActive = false;
-    if (activeMensProgram === 'hc12' && w === state.currentWeek) isActive = true;
-    if (activeMensProgram === 'growth' && w === getGrowthState().week + 8) isActive = true;
-    if (activeMensProgram === 'mansour' && w >= 13) {
-      const cd = getMansourDay();
-      const mansourWeek = 13 + Math.floor((cd - 1) / 2);
-      if (w === mansourWeek) isActive = true;
-    }
+    const isSelected = (w === browseWeek);
     const btn = document.createElement('div');
+    btn.id = `sched-week-${w}`;
     btn.style.cssText = `padding:6px 2px;border-radius:6px;text-align:center;cursor:pointer;font-size:11px;font-weight:700;
-      border:1px solid ${isActive ? pm.color : 'var(--border)'};
-      background:${isActive ? 'var(--yellow-bg)' : 'var(--bg2)'};
-      color:${isActive ? pm.color : 'var(--text3)'};`;
+      border:1px solid ${isSelected ? pm.color : 'var(--border)'};
+      background:${isSelected ? 'var(--yellow-bg)' : 'var(--bg2)'};
+      color:${isSelected ? pm.color : 'var(--text3)'};`;
     btn.textContent = `W${w}`;
     btn.title = `${pm.label} · Week ${w - pm.overallStart + 1}`;
     btn.onclick = () => {
-      // Update the selected week for browsing (does not change active workout week)
-      if (pm.id === 'hc12') {
-        state.currentWeek = w; state.currentDayIdx = 0; saveState();
-      } else if (pm.id === 'growth') {
-        saveGrowthState({ week: w - 8, day: `w${w - 8}_d1` });
-      } else {
-        saveMansourDay((w - 13) * 2 + 1);
-      }
-      renderProgramSchedule(container); updateHeader();
+      weekSel.querySelectorAll('div').forEach(b => {
+        const bpm = phaseMap.find(p => parseInt(b.textContent.slice(1)) >= p.overallStart && parseInt(b.textContent.slice(1)) <= p.overallEnd);
+        b.style.borderColor = 'var(--border)'; b.style.background = 'var(--bg2)'; b.style.color = 'var(--text3)';
+      });
+      btn.style.borderColor = pm.color; btn.style.background = 'var(--yellow-bg)'; btn.style.color = pm.color;
+      browseWeek = w;
+      renderDaySelector(w);
     };
     weekSel.appendChild(btn);
   }
 
-  // Day selector — phase-specific. Tapping a day shows a read-only review panel.
-  const daySel = document.getElementById('day-selector-prog');
-  if (activeMensProgram === 'hc12' || !activeMensProgram) {
-    const phase = getPhaseForWeek(state.currentWeek);
-    phase.days.forEach((d, i) => {
-      const completed = ls(`wk_done_${state.currentWeek}_${d.id}`, false);
-      const isToday = (i === state.currentDayIdx);
-      const btn = document.createElement('div');
-      btn.className = `day-btn${isToday ? ' active' : ''}${completed ? ' completed' : ''}`;
-      btn.id = `sched-day-${i}`;
-      btn.innerHTML = `<div class="day-label">${d.label.slice(0,3)}</div><div class="day-name">${d.name}</div>`;
-      btn.onclick = () => {
-        daySel.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        showDayReview('hc12', { week: state.currentWeek, dayIdx: i });
-      };
-      daySel.appendChild(btn);
-    });
-    // Auto-show today's day on load
-    showDayReview('hc12', { week: state.currentWeek, dayIdx: state.currentDayIdx });
-  } else if (activeMensProgram === 'growth') {
-    const gs = getGrowthState();
-    for (let d = 1; d <= 6; d++) {
-      const key = `w${gs.week}_d${d}`;
-      const dayInfo = GROWTH_PLAN.days[key];
-      if (!dayInfo) continue;
-      const btn = document.createElement('div');
-      const isToday = (gs.day === key);
-      btn.className = `day-btn${isToday ? ' active' : ''}`;
-      btn.innerHTML = `<div class="day-label">D${d}</div><div class="day-name">${dayInfo.name}</div>`;
-      btn.onclick = () => {
-        daySel.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        showDayReview('growth', { week: gs.week, dayKey: key });
-      };
-      daySel.appendChild(btn);
-    }
-    showDayReview('growth', { week: gs.week, dayKey: gs.day });
-  } else if (activeMensProgram === 'mansour') {
-    daySel.style.gridTemplateColumns = 'repeat(5,1fr)';
-    const cd = getMansourDay();
-    for (let d = 1; d <= 15; d += 2) {
-      const btn = document.createElement('div');
-      btn.className = `day-btn${cd === d ? ' active' : ''}`;
-      const dd = getMansourDayData(d);
-      btn.innerHTML = `<div class="day-label">D${d}</div><div class="day-name" style="font-size:9px;">${dd.name.split(' ')[0]}</div>`;
-      btn.onclick = () => {
-        daySel.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        showDayReview('mansour', { cycleDay: d });
-      };
-      daySel.appendChild(btn);
-    }
-    showDayReview('mansour', { cycleDay: cd });
-  }
+  renderDaySelector(browseWeek);
 }
 
 function showDayReview(prog, opts) {
