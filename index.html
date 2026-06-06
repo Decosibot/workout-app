@@ -3485,7 +3485,7 @@ function showRitualOverlay(exercises, onComplete) {
       <img class="ritual-video-thumb" src="${thumbUrl}" alt="Video thumbnail">
       <div class="ritual-play-btn" onclick="(function(){
         const w=document.getElementById('ritual-vid-${videoId}');
-        w.innerHTML='<iframe style=\\'width:100%;aspect-ratio:16/9;border:none;display:block;\\' src=\\'https://www.youtube.com/embed/${videoId}?autoplay=1\\' allow=\\'autoplay; encrypted-media\\' allowfullscreen></iframe>';
+        w.innerHTML='<iframe style=\\'width:100%;aspect-ratio:16/9;border:none;display:block;\\' src=\\'https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1\\' allow=\\'autoplay; encrypted-media\\' allowfullscreen></iframe>';
       })()">
         <svg viewBox="0 0 68 48" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="68" height="48" rx="10" fill="rgba(0,0,0,0.7)"/>
@@ -3543,7 +3543,10 @@ function showRitualOverlay(exercises, onComplete) {
     overlay.innerHTML = `
       <div class="ritual-header">
         <div class="ritual-step-dots">${dots}</div>
-        <button class="ritual-skip" onclick="ritualSkip()">Skip →</button>
+        <div style="display:flex;gap:14px;align-items:center;">
+          <button class="ritual-skip" onclick="ritualSkip()">Next →</button>
+          <button class="ritual-skip" style="color:#c0392b;" onclick="ritualFinish()">Skip All</button>
+        </div>
       </div>
       <div class="ritual-body">${bodyHtml}</div>
     `;
@@ -3578,12 +3581,15 @@ function showRitualOverlay(exercises, onComplete) {
     ritualFinish();
   };
 
+  window.ritualFinish = ritualFinish;
+
   function ritualFinish() {
     clearTimer();
     overlay.remove();
     delete window.ritualTimerAction;
     delete window.ritualSkip;
     delete window.ritualBegin;
+    delete window.ritualFinish;
     delete window._FSS_AFF;
     onComplete();
   }
