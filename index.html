@@ -5280,17 +5280,15 @@ function renderDailyLog() {
   const profile = ls('nutr_profile', null);
   const log = getTodayLog();
 
-  const totals = log.reduce((a, e) => ({ cal: a.cal + e.cal, protein: a.protein + e.protein, fat: a.fat + e.fat, carbs: a.carbs + e.carbs }), { cal:0, protein:0, fat:0, carbs:0 });
-  const targets = profile ? { cal: profile.calTarget, protein: profile.protein, fat: profile.fat, carbs: profile.carbs } : { cal:2000, protein:150, fat:65, carbs:250 };
+  const totals = log.reduce((a, e) => ({ cal: a.cal + e.cal, protein: a.protein + e.protein }), { cal:0, protein:0 });
+  const targets = profile ? { cal: profile.calTarget, protein: profile.protein } : { cal:2000, protein:150 };
 
   let html = '';
 
-  // Macro progress bars
+  // Macro progress bars — calories and protein only
   html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:16px;">`;
   html += renderMacroBar('Calories', Math.round(totals.cal), targets.cal, 'var(--yellow)');
   html += renderMacroBar('Protein', Math.round(totals.protein), targets.protein, 'var(--blue)');
-  html += renderMacroBar('Fat', Math.round(totals.fat), targets.fat, 'var(--orange)');
-  html += renderMacroBar('Carbs', Math.round(totals.carbs), targets.carbs, 'var(--green)');
   html += `</div>`;
 
   // Quick-add meal templates
@@ -5312,7 +5310,7 @@ function renderDailyLog() {
       html += `<div class="nutr-food-row">
         <div style="flex:1;">
           <div class="nutr-food-name">${entry.name}</div>
-          <div class="nutr-food-macros">${entry.qty}× &nbsp;·&nbsp; ${entry.cal} kcal &nbsp;·&nbsp; P:${entry.protein}g F:${entry.fat}g C:${entry.carbs}g</div>
+          <div class="nutr-food-macros">${entry.qty}× &nbsp;·&nbsp; ${entry.cal} kcal &nbsp;·&nbsp; ${entry.protein}g protein</div>
         </div>
         <button class="nutr-food-remove" onclick="removeLogEntry(${idx})">✕</button>
       </div>`;
@@ -5323,11 +5321,17 @@ function renderDailyLog() {
   // Remaining row
   const remCal = targets.cal - Math.round(totals.cal);
   const remP = targets.protein - Math.round(totals.protein);
-  const remF = targets.fat - Math.round(totals.fat);
-  const remC = targets.carbs - Math.round(totals.carbs);
-  html += `<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:10px 12px;margin-top:8px;">
-    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Remaining</div>
-    <div style="font-size:12px;color:var(--text2);">${remCal > 0 ? remCal : 0} kcal &nbsp;·&nbsp; P:${remP > 0 ? remP : 0}g &nbsp;·&nbsp; F:${remF > 0 ? remF : 0}g &nbsp;·&nbsp; C:${remC > 0 ? remC : 0}g</div>
+  const remCalColor = remCal < 0 ? 'var(--red)' : remCal === 0 ? 'var(--green)' : 'var(--text2)';
+  const remPColor = remP < 0 ? 'var(--green)' : remP === 0 ? 'var(--green)' : 'var(--text2)';
+  html += `<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:10px 12px;margin-top:8px;display:flex;gap:16px;">
+    <div>
+      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Calories Left</div>
+      <div style="font-size:16px;font-weight:800;color:${remCalColor};">${remCal > 0 ? remCal : remCal === 0 ? '✓' : 'Over by ' + Math.abs(remCal)}</div>
+    </div>
+    <div>
+      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Protein Left</div>
+      <div style="font-size:16px;font-weight:800;color:${remPColor};">${remP > 0 ? remP + 'g' : remP === 0 ? '✓' : 'Over by ' + Math.abs(remP) + 'g'}</div>
+    </div>
   </div>`;
 
   container.innerHTML = html;
@@ -5422,7 +5426,7 @@ function renderWeeklyCheckin() {
   const lastBW = bwLog.length > 0 ? bwLog[bwLog.length - 1].weight : profile.bw;
 
   return `<div style="background:var(--yellow-bg);border:1px solid var(--yellow-border);border-radius:var(--radius);padding:16px;margin-bottom:16px;">
-    <div style="font-size:11px;font-weight:700;color:var(--yellow);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Weekly Check-in · Week ${weekKey.split('-')[1]}</div>
+    <div style="font-size:11px;font-weight:700;color:var(--yellow);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Weekly Check-in · Program Week ${getOverallWeek()}</div>
     <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:12px;">How's the scale looking?</div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
       <label style="font-size:13px;color:var(--text2);">Weight (lbs)</label>
