@@ -628,39 +628,6 @@
   /* Header phase label */
   body.sigma #header-phase { color: #c0392b; }
 
-  /* ── NOW PLAYING BAR ── */
-  #now-playing-bar {
-    display: none;
-    align-items: center;
-    gap: 10px;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 8px 12px;
-    margin-bottom: 12px;
-  }
-  #now-playing-bar.visible { display: flex; }
-  .np-art {
-    width: 36px; height: 36px; border-radius: 4px;
-    background: var(--bg4); flex-shrink: 0;
-    object-fit: cover; overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .np-art svg { width: 18px; height: 18px; opacity: 0.4; }
-  .np-info { flex: 1; min-width: 0; }
-  .np-title { font-size: 12px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .np-artist { font-size: 11px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
-  .np-controls { display: flex; gap: 4px; flex-shrink: 0; }
-  .np-btn {
-    width: 32px; height: 32px; border-radius: 50%;
-    background: var(--bg4); border: none; color: var(--text2);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; -webkit-tap-highlight-color: transparent;
-  }
-  .np-btn:active { opacity: 0.6; }
-  .np-btn svg { width: 14px; height: 14px; }
-  .np-btn.play-pause svg { width: 16px; height: 16px; }
-
   /* ── PRE-WORKOUT RITUAL ── */
   #ritual-overlay {
     position: fixed; inset: 0; z-index: 950;
@@ -1267,32 +1234,10 @@
 
   <!-- WORKOUT VIEW -->
   <div id="view-workout" class="view">
-    <button onclick="backFromWorkout()" style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px 16px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px;width:100%;-webkit-tap-highlight-color:transparent;">
+    <button onclick="backFromWorkout()" style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px 16px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:16px;width:100%;-webkit-tap-highlight-color:transparent;">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       Back to Today
     </button>
-
-    <!-- Now Playing Bar -->
-    <div id="now-playing-bar">
-      <div class="np-art" id="np-art">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-      </div>
-      <div class="np-info">
-        <div class="np-title" id="np-title">Nothing playing</div>
-        <div class="np-artist" id="np-artist">Start music in Apple Music, Spotify, or YouTube Music</div>
-      </div>
-      <div class="np-controls">
-        <button class="np-btn" onclick="npAction('previoustrack')" title="Previous">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
-        </button>
-        <button class="np-btn play-pause" id="np-play-btn" onclick="npAction('play')" title="Play / Pause">
-          <svg id="np-play-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-        </button>
-        <button class="np-btn" onclick="npAction('nexttrack')" title="Next">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm2-8.14L11.03 12 8 14.14V9.86zM16 6h2v12h-2z"/></svg>
-        </button>
-      </div>
-    </div>
 
     <div id="workout-content"></div>
   </div>
@@ -3128,8 +3073,6 @@ function switchView(viewName) {
   if (viewName === 'today') renderToday();
   if (viewName === 'program') renderProgram();
   if (viewName === 'tools') { renderWeightView(); renderORM(); loadMassInputs(); }
-  if (viewName === 'workout') startNPPolling();
-  else stopNPPolling();
   updateHeader();
   window.scrollTo(0, 0);
 }
@@ -5207,137 +5150,6 @@ function calcORM(name) {
     else if (activeMensProgram === 'mansour') renderWorkoutMansour && renderWorkoutMansour();
   }
   showToast(`${name}: ~${estimated} lbs 1RM — weights updated`);
-}
-
-// ════════════════════════════════════════════════════════════
-// NOW PLAYING — Media Session controls
-// ════════════════════════════════════════════════════════════
-let _npPollInterval = null;
-let _npPlaying = false;
-
-function npAction(action) {
-  // Send media key command via MediaSession if supported
-  if ('mediaSession' in navigator) {
-    try {
-      // Dispatch the action — works if another app registered handlers
-      // For play/pause we toggle based on tracked state
-      if (action === 'play') {
-        // No direct JS API to play/pause another app's audio —
-        // we dispatch the system media key equivalent via Audio trick
-        npSendMediaKey(_npPlaying ? 'pause' : 'play');
-      } else {
-        npSendMediaKey(action);
-      }
-    } catch(e) {}
-  }
-}
-
-function npSendMediaKey(action) {
-  // Create a silent audio element to "own" MediaSession briefly,
-  // set the action handler, then trigger it — the OS routes it to
-  // the active audio session (Apple Music, Spotify, YouTube Music, etc.)
-  if (!('mediaSession' in navigator)) return;
-  const actionMap = {
-    play:          () => { try { navigator.mediaSession.playbackState = 'playing'; } catch(e){} },
-    pause:         () => { try { navigator.mediaSession.playbackState = 'paused';  } catch(e){} },
-    nexttrack:     () => {},
-    previoustrack: () => {},
-  };
-
-  // Use keyboard Media key simulation where available (works on some browsers)
-  // Primary mechanism: MediaSession API action trigger
-  navigator.mediaSession.setActionHandler(action, null); // clear first
-  try {
-    // Re-register a no-op so OS knows we handle it, then the metadata
-    // polling will pick up the new state
-    navigator.mediaSession.setActionHandler(action, () => {});
-  } catch(e) {}
-
-  // The most reliable cross-app approach: synthesize the key event
-  const keyMap = { play:'MediaPlayPause', pause:'MediaPlayPause', nexttrack:'MediaTrackNext', previoustrack:'MediaTrackPrevious' };
-  const key = keyMap[action];
-  if (key) {
-    try {
-      document.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
-      document.dispatchEvent(new KeyboardEvent('keyup',   { key, bubbles: true }));
-    } catch(e) {}
-  }
-
-  // Update local play state and icon optimistically
-  if (action === 'play')  { _npPlaying = true;  npUpdateIcon(); }
-  if (action === 'pause') { _npPlaying = false; npUpdateIcon(); }
-  if (action === 'nexttrack' || action === 'previoustrack') {
-    setTimeout(npPoll, 800);
-  }
-}
-
-function npUpdateIcon() {
-  const icon = document.getElementById('np-play-icon');
-  const btn  = document.getElementById('np-play-btn');
-  if (!icon || !btn) return;
-  if (_npPlaying) {
-    // Pause icon
-    icon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
-    btn.onclick = () => npAction('pause');
-    btn.title = 'Pause';
-  } else {
-    // Play icon
-    icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
-    btn.onclick = () => npAction('play');
-    btn.title = 'Play';
-  }
-}
-
-function npPoll() {
-  const bar    = document.getElementById('now-playing-bar');
-  const title  = document.getElementById('np-title');
-  const artist = document.getElementById('np-artist');
-  const art    = document.getElementById('np-art');
-  if (!bar || !title || !artist) return;
-
-  if (!('mediaSession' in navigator)) {
-    bar.classList.remove('visible');
-    return;
-  }
-
-  const meta = navigator.mediaSession.metadata;
-  const state = navigator.mediaSession.playbackState; // 'playing'|'paused'|'none'
-
-  if (meta && meta.title) {
-    bar.classList.add('visible');
-    title.textContent  = meta.title  || 'Unknown Track';
-    artist.textContent = meta.artist || meta.album || '';
-
-    // Artwork
-    if (meta.artwork && meta.artwork.length > 0) {
-      const src = meta.artwork[meta.artwork.length - 1].src;
-      if (art.querySelector('img')) {
-        art.querySelector('img').src = src;
-      } else {
-        art.innerHTML = `<img src="${src}" style="width:36px;height:36px;object-fit:cover;border-radius:4px;" onerror="this.style.display='none'">`;
-      }
-    }
-
-    _npPlaying = (state === 'playing');
-    npUpdateIcon();
-  } else {
-    // No metadata — show bar in idle state so user knows controls are there
-    bar.classList.add('visible');
-    title.textContent  = 'No track info';
-    artist.textContent = 'Play music in Apple Music, Spotify, or YouTube Music';
-    _npPlaying = (state === 'playing');
-    npUpdateIcon();
-  }
-}
-
-function startNPPolling() {
-  npPoll();
-  if (_npPollInterval) clearInterval(_npPollInterval);
-  _npPollInterval = setInterval(npPoll, 2000);
-}
-
-function stopNPPolling() {
-  if (_npPollInterval) { clearInterval(_npPollInterval); _npPollInterval = null; }
 }
 
 // ════════════════════════════════════════════════════════════
