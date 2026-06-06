@@ -201,11 +201,14 @@
 
   /* ── TODAY VIEW ── */
   #view-today {
-    height: calc(100vh - var(--header-h) - var(--nav-h));
+    position: fixed;
+    top: var(--header-h);
+    bottom: var(--nav-h);
+    left: 0; right: 0;
+    padding: 12px 16px 8px;
     flex-direction: column;
     justify-content: space-between;
-    padding-top: 12px;
-    padding-bottom: 8px;
+    overflow: hidden;
   }
   #view-today.active { display: flex !important; }
   .today-hero {
