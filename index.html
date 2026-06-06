@@ -523,17 +523,33 @@
 
   /* ── LIGHT MODE ── */
   body.light {
-    --bg: #f5f5f5;
-    --bg2: #ffffff;
-    --bg3: #ebebeb;
-    --bg4: #ddd;
-    --border: #ddd;
-    --text: #111;
-    --text2: #555;
-    --text3: #999;
+    --bg:     #f5f0e8;
+    --bg2:    #fdfaf4;
+    --bg3:    #ede8dc;
+    --bg4:    #e0d9cc;
+    --border: #d4ccbf;
+    --text:   #1a1814;
+    --text2:  #5a5248;
+    --text3:  #9a9088;
+    --yellow:        #b8860b;
+    --yellow-bg:     #fdf3d8;
+    --yellow-border: #d4aa50;
   }
-  body.light #app-header { background: rgba(245,245,245,0.95); }
-  body.light #app-nav { background: rgba(245,245,245,0.97); }
+  body.light::before {
+    filter: brightness(0.12) saturate(0.3);
+  }
+  body.light #app-header { background: rgba(253,250,244,0.96) !important; border-bottom-color: #d4ccbf; }
+  body.light #app-nav    { background: rgba(253,250,244,0.98) !important; border-top-color: #d4ccbf; }
+  body.light .today-hero {
+    background: linear-gradient(135deg, #fdf3d8 0%, #f5e8c0 100%);
+    border-color: #d4aa50;
+  }
+  body.light .today-hero .start-btn { background: #b8860b; color: #fff; }
+  body.light .today-hero .phase-badge { background: #b8860b; color: #fff; }
+  body.light .nav-tab.active { color: #b8860b; }
+  body.light .nav-tab.active .nav-icon-wrap { background: rgba(184,134,11,0.12); }
+  body.light #header-phase { color: #b8860b; }
+  body.light .section-header { color: #5a5248; border-bottom-color: #d4ccbf; }
 
   /* ── SIGMA THEME ── */
   body.sigma {
@@ -2740,6 +2756,84 @@ const FSS_AFFIRMATIONS = [
   "The finish line is not the goal — becoming is.",
   "I am more than a conqueror through Him who loves me.",
   "I am grateful for all that I am and all that I am still becoming.",
+
+  // ── I AM — Life ──
+  "I am fully alive, fully present, and fully on purpose.",
+  "I am living a life that is greater than anything I could have imagined.",
+  "I am the architect of my life — I build its foundation and choose its contents.",
+  "I am walking in the fullness of everything I was created to be.",
+  "I am a magnet for extraordinary experiences and divine appointments.",
+  "I am living with intention, and my life reflects that every day.",
+  "I am unstoppable — every chapter of my life is better than the last.",
+  "I am exactly who I need to be to live the life I was destined for.",
+  "I am the standard. I set the tone for everything around me.",
+  "I am building a legacy that will outlive me.",
+
+  // ── I AM — Money & Abundance ──
+  "I am a money magnet — wealth flows to me easily and consistently.",
+  "I am worthy of financial abundance beyond what I can currently imagine.",
+  "I am a generator of wealth — I create value and value returns to me multiplied.",
+  "I am financially free, and that freedom funds everything I love.",
+  "I am operating at a level where money is never the obstacle.",
+  "I am attracting opportunities that produce life-changing income.",
+  "I am the kind of person money follows — because I move with purpose.",
+  "I am building generational wealth, not just a paycheck.",
+  "I am open to receiving money from multiple streams at once.",
+  "I am rich in spirit, rich in relationships, and rich in resources.",
+  "I am in control of my finances and my finances are growing.",
+  "I am a steward of abundance — I earn it, grow it, and give it.",
+
+  // ── I AM — Family ──
+  "I am a provider — my family will never lack because of my effort.",
+  "I am the person my family is proud of and my children will aspire to be.",
+  "I am building a home filled with love, security, and laughter.",
+  "I am present for the people who matter most — nothing replaces that.",
+  "I am creating memories and a foundation my family will stand on for generations.",
+  "I am a protector, a leader, and a safe place for the ones I love.",
+  "I am showing my family what is possible through my example.",
+  "I am the blessing my family needed.",
+  "I am devoted — my family gets my best, not my leftovers.",
+  "I am breaking every cycle that was never meant to reach my children.",
+
+  // ── I AM — Love ──
+  "I am deeply loved and I love deeply in return.",
+  "I am worthy of a love that is real, loyal, and transforming.",
+  "I am open to giving and receiving love without fear or reservation.",
+  "I am a person who leads with love and it comes back to me tenfold.",
+  "I am someone who makes the people around me feel seen and valued.",
+  "I am love in action — not just in words but in how I live.",
+  "I am building relationships rooted in trust, respect, and genuine care.",
+  "I am grateful for every person in my life who has chosen to love me.",
+  "I am a source of peace and warmth for everyone I encounter.",
+  "I am in a relationship with my highest self — and everything flows from there.",
+
+  // ── I AM — Health ──
+  "I am strong, vital, and operating at my physical peak.",
+  "I am in the best shape of my life and improving every single day.",
+  "I am disciplined about my body because my body is the vehicle for my vision.",
+  "I am healthy in every system — heart, mind, hormones, and spirit.",
+  "I am energized, recovered, and ready to perform at the highest level.",
+  "I am making choices every day that compound into extraordinary health.",
+  "I am my own best doctor — I listen to my body and honor what it needs.",
+  "I am building a physique that reflects the power inside me.",
+  "I am free from sickness, disease, and every form of physical limitation.",
+  "I am grateful for a body that works, recovers, and grows stronger.",
+  "I am sleeping deeply, eating intentionally, and living powerfully.",
+  "I am the picture of health — and it shows.",
+
+  // ── I AM — Faith ──
+  "I am covered by a grace that is greater than any mistake I have made.",
+  "I am walking by faith — I do not need to see the whole staircase.",
+  "I am divinely guided, protected, and positioned for my next breakthrough.",
+  "I am never alone — the same power that created the universe lives in me.",
+  "I am held by hands that have never dropped anyone.",
+  "I am fearless because my faith is bigger than my fear.",
+  "I am standing on a foundation that cannot be shaken.",
+  "I am chosen, called, and equipped for everything ahead of me.",
+  "I am trusting the timing of my life — God's delays are not denials.",
+  "I am a vessel for something greater than myself.",
+  "I am anchored in faith when everything else is uncertain.",
+  "I am praying with expectation and living with gratitude.",
 ];
 
 function getDayOfYear() {
