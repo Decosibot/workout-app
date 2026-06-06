@@ -916,6 +916,106 @@
   .workout-notes-wrap textarea:focus { border-color: var(--yellow); }
   .workout-notes-wrap label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
 
+  /* ── WORKOUT TIMER BAR ── */
+  #workout-timer-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 10px 14px;
+    margin-bottom: 14px; font-size: 13px; flex-shrink: 0;
+  }
+  #workout-timer-bar .wtb-label { color: var(--text3); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; font-size: 10px; }
+  #workout-timer-bar .wtb-time  { font-size: 20px; font-weight: 900; color: var(--yellow); font-variant-numeric: tabular-nums; }
+
+  /* ── RPE SELECTOR ── */
+  .rpe-row { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+  .rpe-btn {
+    flex: 1; min-width: 28px; padding: 5px 2px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 5px; font-size: 11px; font-weight: 700;
+    color: var(--text3); cursor: pointer; text-align: center;
+    transition: all .12s; font-family: inherit;
+  }
+  .rpe-btn.selected { background: var(--yellow-bg); border-color: var(--yellow); color: var(--yellow); }
+  .rpe-btn[data-rpe="9"].selected, .rpe-btn[data-rpe="10"].selected { background: rgba(245,66,66,0.15); border-color: var(--red); color: var(--red); }
+  .rpe-btn[data-rpe="7"].selected, .rpe-btn[data-rpe="8"].selected { background: rgba(245,146,42,0.15); border-color: var(--orange); color: var(--orange); }
+  .rpe-label { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; margin-top: 6px; }
+
+  /* ── WARMUP SETS ── */
+  .warmup-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 0; border-bottom: 1px solid var(--border);
+    font-size: 12px; color: var(--text3);
+  }
+  .warmup-row:last-child { border-bottom: none; }
+  .warmup-row .wu-pct { font-weight: 700; color: var(--text2); min-width: 36px; }
+  .warmup-row .wu-weight { font-weight: 800; color: var(--text); }
+  .warmup-section { background: var(--bg3); border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 8px; }
+  .warmup-toggle { font-size: 11px; font-weight: 700; color: var(--text3); cursor: pointer; padding: 4px 0; user-select: none; }
+  .warmup-toggle.open { color: var(--yellow); }
+
+  /* ── WATER TRACKER ── */
+  .water-bar-wrap {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px;
+  }
+  .water-bar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .water-bar-title { font-size: 13px; font-weight: 800; }
+  .water-bar-count { font-size: 13px; font-weight: 800; color: var(--blue); }
+  .water-cups { display: flex; gap: 6px; flex-wrap: wrap; }
+  .water-cup {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--bg3); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; cursor: pointer; transition: all .12s;
+  }
+  .water-cup.filled { background: rgba(74,158,255,0.2); border-color: var(--blue); }
+  .water-target-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 12px; color: var(--text3); }
+  .water-target-row input { width: 50px; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 13px; font-weight: 700; padding: 4px 6px; text-align: center; outline: none; }
+
+  /* ── SHARE CARD ── */
+  #share-overlay {
+    position: fixed; inset: 0; z-index: 820;
+    background: rgba(0,0,0,0.92);
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    padding: 24px; padding-top: env(safe-area-inset-top,24px);
+  }
+  #share-overlay.show { display: flex; }
+  #share-card-canvas {
+    width: 100%; max-width: 360px; border-radius: 16px; overflow: hidden;
+    background: #0a0a0a; border: 1px solid #333; margin-bottom: 16px;
+  }
+  .share-close-btn {
+    background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+    border-radius: var(--radius-sm); padding: 12px 32px; font-size: 15px;
+    font-weight: 700; cursor: pointer; font-family: inherit; width: 100%; max-width: 360px;
+  }
+
+  /* ── ONBOARDING ── */
+  #onboard-overlay {
+    position: fixed; inset: 0; z-index: 950; background: var(--bg);
+    display: none; flex-direction: column;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  #onboard-overlay.show { display: flex; }
+  .onboard-slide {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 32px 28px; text-align: center;
+  }
+  .onboard-icon { font-size: 64px; margin-bottom: 24px; }
+  .onboard-title { font-size: 26px; font-weight: 900; color: var(--text); margin-bottom: 12px; line-height: 1.2; }
+  .onboard-sub { font-size: 15px; color: var(--text2); line-height: 1.65; margin-bottom: 32px; }
+  .onboard-dots { display: flex; gap: 8px; margin-bottom: 24px; }
+  .onboard-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: background .2s; }
+  .onboard-dot.active { background: var(--yellow); width: 20px; border-radius: 4px; }
+  .onboard-next-btn {
+    width: 100%; background: var(--yellow); color: #000; border: none;
+    border-radius: var(--radius); padding: 16px; font-size: 16px; font-weight: 900;
+    cursor: pointer; font-family: inherit; transition: opacity .15s;
+  }
+  .onboard-next-btn:active { opacity: 0.85; }
+  .onboard-skip { background: none; border: none; color: var(--text3); font-size: 13px; cursor: pointer; padding: 12px; font-family: inherit; }
+
   /* ── BODY WEIGHT VIEW ── */
   .bw-log-row {
     display: flex; gap: 8px; align-items: center; margin-bottom: 16px;
@@ -1519,11 +1619,14 @@
 
   <!-- WORKOUT VIEW -->
   <div id="view-workout" class="view">
-    <button onclick="backFromWorkout()" style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px 16px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:16px;width:100%;-webkit-tap-highlight-color:transparent;">
+    <button onclick="backFromWorkout()" style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px 16px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px;width:100%;-webkit-tap-highlight-color:transparent;">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       Back to Today
     </button>
-
+    <div id="workout-timer-bar">
+      <div><div class="wtb-label">Duration</div><div class="wtb-time" id="wtb-time">0:00</div></div>
+      <div style="font-size:11px;color:var(--text3);text-align:right;">Started<br><span id="wtb-start-label" style="color:var(--text2);font-weight:700;"></span></div>
+    </div>
     <div id="workout-content"></div>
   </div>
 
@@ -1679,6 +1782,18 @@
     </div>
   </div>
 </main>
+
+<!-- SHARE OVERLAY -->
+<div id="share-overlay">
+  <div id="share-card-canvas"></div>
+  <button onclick="doShareCard()" style="width:100%;max-width:360px;background:var(--yellow);color:#000;border:none;border-radius:var(--radius-sm);padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:10px;">Save / Share Image</button>
+  <button class="share-close-btn" onclick="document.getElementById('share-overlay').classList.remove('show')">Close</button>
+</div>
+
+<!-- ONBOARDING OVERLAY -->
+<div id="onboard-overlay">
+  <div class="onboard-slide" id="onboard-slide"></div>
+</div>
 
 <!-- LEVEL UP BANNER -->
 <div id="level-up-banner" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:600;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center">
@@ -8507,6 +8622,428 @@ Object.assign(YT_VIDEOS, {
   "Push Jerk": "4qTaJqfriNE",
   "Split Jerk": "4qTaJqfriNE",
 });
+
+// ════════════════════════════════════════════════════════════
+// WORKOUT DURATION TIMER
+// ════════════════════════════════════════════════════════════
+let _workoutStartTs = 0;
+let _workoutTimerInterval = null;
+
+function startWorkoutTimer() {
+  _workoutStartTs = Date.now();
+  lsSet('workout_start_ts', _workoutStartTs);
+  _tickWorkoutTimer();
+  _workoutTimerInterval = setInterval(_tickWorkoutTimer, 1000);
+}
+
+function stopWorkoutTimer() {
+  clearInterval(_workoutTimerInterval);
+  _workoutTimerInterval = null;
+  const elapsed = _workoutStartTs ? Math.floor((Date.now() - _workoutStartTs) / 1000) : 0;
+  lsSet('workout_start_ts', 0);
+  return elapsed;
+}
+
+function _tickWorkoutTimer() {
+  const el = document.getElementById('wtb-time');
+  if (!el || !_workoutStartTs) return;
+  const s = Math.floor((Date.now() - _workoutStartTs) / 1000);
+  const m = Math.floor(s / 60), sec = s % 60;
+  el.textContent = `${m}:${sec.toString().padStart(2,'0')}`;
+}
+
+function _formatDuration(seconds) {
+  if (!seconds) return '';
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+// Patch startWorkout to start timer
+const _origStartWorkout = startWorkout;
+window.startWorkout = function() {
+  startWorkoutTimer();
+  const startLabel = document.getElementById('wtb-start-label');
+  if (startLabel) startLabel.textContent = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  _origStartWorkout.apply(this, arguments);
+};
+
+// Patch all three complete functions to record duration
+['completeWorkout','completeWorkoutGrowth','completeWorkoutMansour'].forEach(fnName => {
+  const orig = window[fnName];
+  if (typeof orig !== 'function') return;
+  window[fnName] = function() {
+    const elapsed = stopWorkoutTimer();
+    lsSet('last_workout_duration', elapsed);
+    orig.apply(this, arguments);
+    // Patch history entry to include duration
+    const h = getHistory();
+    if (h.length && elapsed > 0) {
+      h[0].duration = elapsed;
+      lsSet('hc_history', h);
+    }
+  };
+});
+
+// ════════════════════════════════════════════════════════════
+// RPE LOGGING PER EXERCISE
+// ════════════════════════════════════════════════════════════
+function getRPE(exId, week) { return ls(`rpe_${exId}_${week}`, 0); }
+function saveRPE(exId, week, val) { lsSet(`rpe_${exId}_${week}`, val); }
+
+function renderRPERow(exId, week) {
+  const saved = getRPE(exId, week);
+  const btns = [6,7,8,9,10].map(n => {
+    const labels = {6:'Easy',7:'Hard',8:'Very Hard',9:'Near Max',10:'Max'};
+    return `<button class="rpe-btn${saved===n?' selected':''}" data-rpe="${n}" onclick="selectRPE('${exId}',${week},${n},this)" title="${labels[n]}">${n}</button>`;
+  }).join('');
+  return `
+    <div style="margin-top:8px;">
+      <div class="rpe-label">Effort (RPE)</div>
+      <div class="rpe-row" id="rpe-row-${exId}">${btns}</div>
+    </div>`;
+}
+
+function selectRPE(exId, week, val, btn) {
+  saveRPE(exId, week, val);
+  const row = document.getElementById(`rpe-row-${exId}`);
+  if (!row) return;
+  row.querySelectorAll('.rpe-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+// ════════════════════════════════════════════════════════════
+// WARM-UP SET GENERATOR
+// ════════════════════════════════════════════════════════════
+function getWarmupSets(workingWeight) {
+  if (!workingWeight || workingWeight < 45) return [];
+  // Bar → 40% → 60% → 80% → working
+  const pcts = [0, 0.4, 0.6, 0.8];
+  return pcts.map(p => {
+    const w = p === 0 ? 45 : Math.round(workingWeight * p / 5) * 5;
+    const reps = p === 0 ? 10 : p < 0.5 ? 8 : p < 0.7 ? 5 : 3;
+    const label = p === 0 ? 'Bar' : `${Math.round(p*100)}%`;
+    return { label, weight: w, reps };
+  });
+}
+
+function renderWarmupSection(ex, workingWeight) {
+  if (ex.type === 'cns' || ex.type === 'red') return '';
+  const sets = getWarmupSets(parseFloat(workingWeight) || 0);
+  if (!sets.length) return '';
+  const rows = sets.map(s =>
+    `<div class="warmup-row">
+      <span class="wu-pct">${s.label}</span>
+      <span class="wu-weight">${s.weight} lbs</span>
+      <span style="color:var(--text3);">× ${s.reps} reps</span>
+    </div>`
+  ).join('');
+  return `
+    <div style="margin-bottom:8px;">
+      <div class="warmup-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">▸ Warm-up Sets</div>
+      <div class="warmup-section" style="display:none;" id="wu-${ex.id}">
+        ${rows}
+        <div style="font-size:10px;color:var(--text3);margin-top:6px;">Bar=45 lbs shown. Adjust to your equipment.</div>
+      </div>
+    </div>`;
+}
+
+// Patch renderExCard to inject RPE row and warm-up section
+const _origRenderExCard = renderExCard;
+window.renderExCard = function(ex, weekIdx, currentWeekNum) {
+  let html = _origRenderExCard.apply(this, arguments);
+  if (ex.type === 'cns') return html;
+
+  const week = currentWeekNum || 1;
+  const rpeHtml = renderRPERow(ex.id, week);
+  const storedWeight = getWeight(ex.id, week);
+  const warmupHtml = renderWarmupSection(ex, storedWeight);
+
+  // Inject RPE row before the closing </div> of ex-card
+  // Inject warmup before ex-sets
+  html = html.replace(/(<div class="ex-sets")/, warmupHtml + '$1');
+  // Inject RPE after the weight section (before closing card tag)
+  html = html.replace(/(<\/div>\s*$)/, rpeHtml + '$1');
+  return html;
+};
+
+// Update warm-up sets when weight is entered
+document.addEventListener('change', function(e) {
+  if (!e.target.matches('input[id^="weight-"]')) return;
+  const exId = e.target.id.replace('weight-','');
+  const wuSection = document.getElementById(`wu-${exId}`);
+  if (!wuSection) return;
+  const sets = getWarmupSets(parseFloat(e.target.value) || 0);
+  if (!sets.length) return;
+  wuSection.innerHTML = sets.map(s =>
+    `<div class="warmup-row"><span class="wu-pct">${s.label}</span><span class="wu-weight">${s.weight} lbs</span><span style="color:var(--text3);">× ${s.reps} reps</span></div>`
+  ).join('') + `<div style="font-size:10px;color:var(--text3);margin-top:6px;">Bar=45 lbs shown. Adjust to your equipment.</div>`;
+});
+
+// ════════════════════════════════════════════════════════════
+// WORKOUT HISTORY — DURATION + NOTES IN LOG
+// ════════════════════════════════════════════════════════════
+// Patch renderHome history section to show duration and notes
+const _origRenderHome2 = renderHome;
+renderHome = function() {
+  _origRenderHome2.apply(this, arguments);
+  const container = document.getElementById('home-content');
+  if (!container) return;
+  // Enrich history items with duration and notes
+  const history = getHistory();
+  const items = container.querySelectorAll('.history-item');
+  items.forEach((item, idx) => {
+    const session = history[idx];
+    if (!session) return;
+    const extras = [];
+    if (session.duration) extras.push(`<span style="font-size:11px;color:var(--text3);">⏱ ${_formatDuration(session.duration)}</span>`);
+    if (session.note) extras.push(`<div style="font-size:12px;color:var(--text2);margin-top:4px;font-style:italic;">"${session.note}"</div>`);
+    if (extras.length) {
+      const header = item.querySelector('.hi-header');
+      if (header) header.insertAdjacentHTML('afterend', `<div style="margin-bottom:6px;">${extras.join(' &nbsp;·&nbsp; ')}</div>`);
+    }
+  });
+};
+
+// ════════════════════════════════════════════════════════════
+// WATER INTAKE TRACKER
+// ════════════════════════════════════════════════════════════
+function getWaterKey() { return 'water_' + new Date().toISOString().slice(0,10); }
+function getWaterCount() { return ls(getWaterKey(), 0); }
+function saveWaterCount(n) { lsSet(getWaterKey(), n); }
+function getWaterTarget() { return ls('water_target', 8); }
+
+function renderWaterTracker(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const count = getWaterCount();
+  const target = getWaterTarget();
+  const cups = Array.from({length: target}, (_, i) =>
+    `<div class="water-cup${i < count ? ' filled' : ''}" onclick="logWater(${i+1})" title="${i+1} cups">💧</div>`
+  ).join('');
+  container.innerHTML = `
+    <div class="water-bar-wrap">
+      <div class="water-bar-header">
+        <div class="water-bar-title">💧 Water Today</div>
+        <div class="water-bar-count">${count} / ${target} cups</div>
+      </div>
+      <div class="water-cups">${cups}</div>
+      <div class="water-target-row">
+        Daily target:
+        <input type="number" id="water-target-input" value="${target}" min="4" max="20" onchange="setWaterTarget(this.value)">
+        cups
+        <span style="margin-left:auto;font-size:11px;">${count >= target ? '✓ Goal hit!' : Math.round(count/target*100) + '%'}</span>
+      </div>
+    </div>`;
+}
+
+function logWater(cups) {
+  saveWaterCount(cups);
+  // Re-render whichever container is visible
+  renderWaterTracker('water-today-wrap');
+  renderWaterTracker('water-home-wrap');
+}
+
+function setWaterTarget(val) {
+  lsSet('water_target', parseInt(val) || 8);
+  renderWaterTracker('water-today-wrap');
+  renderWaterTracker('water-home-wrap');
+}
+
+// ════════════════════════════════════════════════════════════
+// BODY WEIGHT GOAL LINE ON CHART
+// ════════════════════════════════════════════════════════════
+const _origRenderBWChart = renderBWChart;
+window.renderBWChart = function(data) {
+  let svg = _origRenderBWChart.apply(this, arguments);
+  const goalData = getGoalData();
+  if (!goalData || !goalData.targetWeight) return svg;
+  const target = parseFloat(goalData.targetWeight);
+  const weights = data.map(d => d.weight);
+  const minW = Math.min(...weights), maxW = Math.max(...weights);
+  const range = maxW - minW || 1;
+  const W = 340, H = 130, PAD_L = 40, PAD_R = 12, PAD_T = 14, PAD_B = 20;
+  // Only draw if target is within visible range ±20%
+  if (target < minW * 0.8 || target > maxW * 1.2) return svg;
+  const y = Math.round(PAD_T + (1 - (target - minW) / range) * (H - PAD_T - PAD_B));
+  const goalLine = `<line x1="${PAD_L}" y1="${y}" x2="${W-PAD_R}" y2="${y}" stroke="var(--green)" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.7"/>
+    <text x="${W-PAD_R-2}" y="${y-3}" fill="var(--green)" font-size="9" text-anchor="end" opacity="0.85">Goal: ${target}</text>`;
+  return svg.replace('</svg>', goalLine + '</svg>');
+};
+
+// ════════════════════════════════════════════════════════════
+// SHARE / EXPORT WEEKLY SUMMARY CARD
+// ════════════════════════════════════════════════════════════
+function showShareCard() {
+  const overlay = document.getElementById('share-overlay');
+  overlay.classList.add('show');
+  buildShareCard();
+}
+
+function buildShareCard() {
+  const canvas = document.getElementById('share-card-canvas');
+  const history = getHistory();
+  const recentWeek = history.slice(0, 5);
+  const bwEntries = getBWLog();
+  const latestBW = bwEntries.length ? bwEntries[bwEntries.length-1].weight : null;
+  const prBoard = getPRBoard();
+  const topPRs = Object.entries(prBoard).sort((a,b)=>b[1].weight-a[1].weight).slice(0,3);
+
+  let overallWeek = 1;
+  if (activeMensProgram === 'growth') overallWeek = 8 + getGrowthState().week;
+  else if (activeMensProgram === 'mansour') overallWeek = 12 + Math.ceil(getMansourDay()/4);
+  else overallWeek = ls('hc_state',{}).week || 1;
+
+  const phaseNames = {hc12:'The Grind',growth:'The Surge',mansour:'The Takeover'};
+  const phase = phaseNames[activeMensProgram] || 'The Grind';
+
+  const prRows = topPRs.map(([n,d]) =>
+    `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #222;">
+      <span style="font-size:12px;color:#aaa;">${n}</span>
+      <span style="font-size:12px;font-weight:800;color:#f0f0f0;">${d.weight} lbs</span>
+    </div>`).join('');
+
+  const sessionRows = recentWeek.slice(0,3).map(s =>
+    `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #222;">
+      <span style="font-size:12px;color:#aaa;">${s.day}</span>
+      <span style="font-size:11px;color:#666;">${s.date}${s.duration ? ' · '+_formatDuration(s.duration) : ''}</span>
+    </div>`).join('');
+
+  canvas.innerHTML = `
+    <div style="background:linear-gradient(160deg,#0a0a0a,#1a1200);padding:24px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
+        <div>
+          <div style="font-size:11px;font-weight:800;color:#f5c842;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">TAKEOVER</div>
+          <div style="font-size:22px;font-weight:900;color:#f0f0f0;line-height:1.1;">${phase}</div>
+          <div style="font-size:13px;color:#aaa;margin-top:2px;">Week ${overallWeek} of 16</div>
+        </div>
+        <div style="text-align:right;">
+          ${latestBW ? `<div style="font-size:26px;font-weight:900;color:#f0f0f0;">${latestBW}</div><div style="font-size:11px;color:#666;">lbs</div>` : ''}
+        </div>
+      </div>
+      ${sessionRows ? `<div style="margin-bottom:16px;"><div style="font-size:10px;font-weight:800;color:#555;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Recent Sessions</div>${sessionRows}</div>` : ''}
+      ${prRows ? `<div><div style="font-size:10px;font-weight:800;color:#555;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Top PRs</div>${prRows}</div>` : ''}
+      <div style="margin-top:20px;padding-top:12px;border-top:1px solid #222;font-size:10px;color:#444;text-align:center;letter-spacing:1px;">decosibot.github.io/workout-app</div>
+    </div>`;
+}
+
+async function doShareCard() {
+  const canvas = document.getElementById('share-card-canvas');
+  // Try native share first, fall back to screenshot instructions
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: 'My Takeover Progress', text: 'Week ' + (ls('hc_state',{}).week||1) + ' of 16 — Takeover Program', url: 'https://decosibot.github.io/workout-app' });
+      return;
+    } catch(e) {}
+  }
+  // If html2canvas is available use it, else instruct screenshot
+  if (typeof html2canvas !== 'undefined') {
+    html2canvas(canvas).then(c => {
+      const link = document.createElement('a');
+      link.download = 'takeover-progress.png';
+      link.href = c.toDataURL();
+      link.click();
+    });
+  } else {
+    showToast('Take a screenshot to save your card!');
+  }
+}
+
+// Add share button to Home
+const _origRenderHome3 = renderHome;
+renderHome = function() {
+  _origRenderHome3.apply(this, arguments);
+  const container = document.getElementById('home-content');
+  if (!container) return;
+  const gotoBtn = container.querySelector('.home-goto-today');
+  if (gotoBtn) {
+    gotoBtn.insertAdjacentHTML('beforebegin', `<div id="water-home-wrap"></div>`);
+    renderWaterTracker('water-home-wrap');
+    gotoBtn.insertAdjacentHTML('afterend',
+      `<button onclick="showShareCard()" style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:12px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:16px;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Share Progress
+      </button>`);
+  }
+};
+
+// ════════════════════════════════════════════════════════════
+// ONBOARDING
+// ════════════════════════════════════════════════════════════
+const ONBOARD_SLIDES = [
+  {
+    icon: '⚡',
+    title: '16 Weeks.\nThree Phases.\nOne Takeover.',
+    sub: 'This app runs your full training system — Phase 1: The Grind, Phase 2: The Surge, Phase 3: The Takeover. Every workout, every weight, every PR tracked automatically.',
+  },
+  {
+    icon: '🏋️',
+    title: 'Your Program.\nYour Way.',
+    sub: 'Log your 1RM in Tools → the app auto-suggests your working weights every session. Hit your sets, tap the circles, and the app knows what to do next.',
+  },
+  {
+    icon: '📊',
+    title: 'Watch Yourself\nGrow.',
+    sub: 'Body weight, PRs, body fat %, lift charts — everything builds over 16 weeks. Take your weekly progress photo and watch the transformation happen.',
+  },
+  {
+    icon: '🔥',
+    title: 'The Ritual\nSets the Tone.',
+    sub: 'Every workout begins with a power pose, mental rehearsal, and affirmation. Science-backed priming. You show up different when you prepare like a champion.',
+  },
+  {
+    icon: '🚀',
+    title: "Let's Go.",
+    sub: 'Pick your phase and start today. The only bad workout is the one you didn\'t do.',
+    isLast: true,
+  },
+];
+
+let _onboardIdx = 0;
+
+function showOnboarding() {
+  _onboardIdx = 0;
+  document.getElementById('onboard-overlay').classList.add('show');
+  renderOnboardSlide();
+}
+
+function renderOnboardSlide() {
+  const slide = ONBOARD_SLIDES[_onboardIdx];
+  const dots = ONBOARD_SLIDES.map((_, i) =>
+    `<div class="onboard-dot${i === _onboardIdx ? ' active' : ''}"></div>`
+  ).join('');
+  const isLast = slide.isLast;
+  document.getElementById('onboard-slide').innerHTML = `
+    <div class="onboard-icon">${slide.icon}</div>
+    <div class="onboard-title">${slide.title.replace(/\n/g,'<br>')}</div>
+    <div class="onboard-sub">${slide.sub}</div>
+    <div class="onboard-dots">${dots}</div>
+    <button class="onboard-next-btn" onclick="advanceOnboard()">${isLast ? 'Start Training →' : 'Next →'}</button>
+    ${!isLast ? `<button class="onboard-skip" onclick="finishOnboard()">Skip intro</button>` : ''}`;
+}
+
+function advanceOnboard() {
+  _onboardIdx++;
+  if (_onboardIdx >= ONBOARD_SLIDES.length) { finishOnboard(); return; }
+  renderOnboardSlide();
+}
+
+function finishOnboard() {
+  lsSet('onboarded', true);
+  document.getElementById('onboard-overlay').classList.remove('show');
+}
+
+// ════════════════════════════════════════════════════════════
+// PATCH init TO SHOW ONBOARDING ON FIRST LAUNCH
+// ════════════════════════════════════════════════════════════
+const _origBootApp = bootApp;
+window.bootApp = function(fromCloud) {
+  _origBootApp.apply(this, arguments);
+  if (!ls('onboarded', false)) {
+    setTimeout(showOnboarding, 400);
+  }
+};
 
 // Start notifications on load if already granted
 (function() {
