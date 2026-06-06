@@ -1025,6 +1025,9 @@
       </div>
     </div>
 
+    <!-- Log Food shortcut -->
+    <div id="today-nutrition-bar" style="margin-top:12px;"></div>
+
     <!-- Level nav pinned to bottom of view -->
     <div id="level-nav-row" style="display:flex;gap:8px;padding-bottom:8px;"></div>
   </div>
@@ -2820,6 +2823,7 @@ function renderToday() {
   renderTodayBanners();
   updateProgressBar();
   renderLevelNav();
+  renderTodayNutritionBar();
 }
 
 // ════════════════════════════════════════════════════════════
@@ -2837,8 +2841,8 @@ function renderTodayGrowth() {
     document.getElementById('hero-phase').textContent = `STRENGTH TEST · WEEK ${ow}`;
     document.getElementById('hero-day').textContent = `Max Test Day ${testNum}`;
     document.getElementById('hero-sub').textContent = `Bench · Squat · Deadlift · OHP · Row`;
-    
-    renderTodayBanners(); updateProgressBar(); renderLevelNav();
+
+    renderTodayBanners(); updateProgressBar(); renderLevelNav(); renderTodayNutritionBar();
     return;
   }
 
@@ -2852,6 +2856,7 @@ function renderTodayGrowth() {
   renderTodayBanners();
   updateProgressBar();
   renderLevelNav();
+  renderTodayNutritionBar();
 }
 
 // ════════════════════════════════════════════════════════════
@@ -2897,6 +2902,7 @@ function renderTodayMansour() {
   renderTodayBanners();
   updateProgressBar();
   renderLevelNav();
+  renderTodayNutritionBar();
 }
 
 function mansourPrevDay() {
@@ -5242,13 +5248,22 @@ function addFoodToLog(foodName, qty) {
   });
   saveTodayLog(log);
   renderDailyLog();
+  renderTodayNutritionBar();
 }
 
 function addMealTemplate(templateName) {
   const tmpl = MEAL_TEMPLATES.find(t => t.name === templateName);
   if (!tmpl) return;
-  tmpl.foods.forEach(f => addFoodToLog(f.name, f.qty));
+  const log = getTodayLog();
+  tmpl.foods.forEach(f => {
+    const food = FOOD_DB.find(fd => fd.name === f.name);
+    if (!food) return;
+    log.push({ name:food.name, qty:f.qty, cal:Math.round(food.cal*f.qty), protein:Math.round(food.protein*f.qty*10)/10, fat:Math.round(food.fat*f.qty*10)/10, carbs:Math.round(food.carbs*f.qty*10)/10, addedAt:Date.now() });
+  });
+  saveTodayLog(log);
   showToast(templateName + ' added');
+  renderDailyLog();
+  renderTodayNutritionBar();
 }
 
 function removeLogEntry(idx) {
@@ -5256,6 +5271,7 @@ function removeLogEntry(idx) {
   log.splice(idx, 1);
   saveTodayLog(log);
   renderDailyLog();
+  renderTodayNutritionBar();
 }
 
 function renderDailyLog() {
@@ -5471,7 +5487,17 @@ function renderNutritionMain(forceSetup) {
 
   let setupSection = '';
   if (showSetup) {
-    const p = profile || {};
+    // Pre-fill from existing nutr_profile, then fall back to goal_data, then mass_inputs
+    const gd = getGoalData();
+    const mi = ls('mass_inputs', {});
+    const p = {
+      bw:        profile?.bw        || gd?.currentWeight || mi.current || '',
+      heightFt:  profile?.heightFt  || gd?.heightFt      || mi.ft      || '',
+      heightIn:  profile?.heightIn  ?? gd?.heightIn      ?? mi.inches  ?? '',
+      age:       profile?.age       || gd?.age            || mi.age     || '',
+      actMult:   profile?.actMult   || gd?.activityMult   || mi.activity|| 1.55,
+      goal:      profile?.goal      || (gd?.type === 'cut' ? 'cut' : gd?.type === 'bulk' ? 'bulk' : ''),
+    };
     const goalBtns = ['bulk','maintain','cut'].map(g =>
       `<button class="nutr-goal-btn${p.goal === g ? ' active' : ''}" data-goal="${g}"
         onclick="document.querySelectorAll('.nutr-goal-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');"
@@ -5556,6 +5582,60 @@ function renderNutritionMain(forceSetup) {
   if (profile && !showSetup) {
     renderDailyLog();
   }
+}
+
+function renderTodayNutritionBar() {
+  const el = document.getElementById('today-nutrition-bar');
+  if (!el) return;
+  const profile = ls('nutr_profile', null);
+  if (!profile) {
+    el.innerHTML = `<div onclick="switchView('program');switchProgSub('nutrition');"
+      style="background:var(--bg2);border:1px dashed var(--border);border-radius:var(--radius);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:4px;">
+      <span style="font-size:13px;color:var(--text3);">Set up nutrition targets →</span>
+      <span style="font-size:18px;">🍽️</span>
+    </div>`;
+    return;
+  }
+  const log = getTodayLog();
+  const eaten = log.reduce((a,f) => ({ cal:a.cal+f.cal, protein:a.protein+f.protein, fat:a.fat+f.fat, carbs:a.carbs+f.carbs }), {cal:0,protein:0,fat:0,carbs:0});
+  const calPct = Math.min(100, Math.round(eaten.cal / profile.calTarget * 100));
+  const protPct = Math.min(100, Math.round(eaten.protein / profile.protein * 100));
+  const calColor = eaten.cal > profile.calTarget * 1.05 ? 'var(--red)' : eaten.cal >= profile.calTarget * 0.9 ? 'var(--green)' : 'var(--yellow)';
+  const protColor = eaten.protein > profile.protein * 1.05 ? 'var(--green)' : eaten.protein >= profile.protein * 0.9 ? 'var(--green)' : 'var(--yellow)';
+
+  el.innerHTML = `
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:4px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;">Today's Nutrition</div>
+        <button onclick="openFoodPicker()" style="background:var(--yellow);color:#000;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:800;cursor:pointer;">+ Log Food</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:3px;">
+            <span>Calories</span><span style="color:${calColor};">${eaten.cal} / ${profile.calTarget}</span>
+          </div>
+          <div style="height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;">
+            <div style="width:${calPct}%;height:100%;background:${calColor};border-radius:3px;transition:width .3s;"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:3px;">
+            <span>Protein</span><span style="color:${protColor};">${eaten.protein}g / ${profile.protein}g</span>
+          </div>
+          <div style="height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;">
+            <div style="width:${protPct}%;height:100%;background:${protColor};border-radius:3px;transition:width .3s;"></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        ${['Bulking Breakfast','Post-Workout','High Protein Lunch','Lean Dinner','Night Snack'].map(t =>
+          `<button onclick="addMealTemplate('${t}');renderTodayNutritionBar();"
+            style="flex:1;padding:5px 2px;font-size:10px;font-weight:700;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            ${t.split(' ')[0]}
+          </button>`
+        ).join('')}
+      </div>
+    </div>`;
 }
 
 function renderTodayBanners() {
