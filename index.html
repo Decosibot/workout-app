@@ -3175,19 +3175,16 @@ function renderWorkout() {
     const weightInput = document.getElementById(`weight-${ex.id}`);
     if (weightInput) {
       weightInput.value = getWeight(ex.id, state.currentWeek);
-      weightInput.addEventListener('change', () => {
+      const saveW = () => {
         setWeight(ex.id, state.currentWeek, weightInput.value);
         clearTimeout(window._syncTimer); window._syncTimer = setTimeout(syncToCloud, 2000);
+      };
+      weightInput.addEventListener('input', () => {
+        saveW();
+        if (ex.type === 'yellow' || ex.type === 'orange') updatePONudge(ex.id, weightInput.value);
       });
-      // Progressive overload nudge (yellow/orange only)
-      if (ex.type === 'yellow' || ex.type === 'orange') {
-        updatePONudge(ex.id, weightInput.value);
-        weightInput.addEventListener('input', () => {
-          setWeight(ex.id, state.currentWeek, weightInput.value);
-          updatePONudge(ex.id, weightInput.value);
-          clearTimeout(window._syncTimer); window._syncTimer = setTimeout(syncToCloud, 2000);
-        });
-      }
+      weightInput.addEventListener('change', saveW);
+      if (ex.type === 'yellow' || ex.type === 'orange') updatePONudge(ex.id, weightInput.value);
     }
     // Restore skipped state
     if (ls(`skip_${ex.id}_${state.currentWeek}`, false)) {
@@ -4334,37 +4331,59 @@ function viewProgramDay(phaseId, dayId) {
 // ════════════════════════════════════════════════════════════
 function renderHistory() {
   const history = getHistory();
-  let html = '';
+  const el = document.getElementById('history-content');
+  if (!el) return;
 
-  // Charts for main lifts
-  const mainLifts = ['Bench Press','DB Bench Press','Front Squat','High Bar Back Squat','Low Bar Back Squat','Deadlift','Sumo / Semi-Sumo Deadlift','Trap Bar Deadlift'];
-
-  // Build data sets
+  // Build lift → [{date, weight, dateRaw, week, day}] from all history
   const liftData = {};
   history.forEach(session => {
     Object.entries(session.weights || {}).forEach(([name, weight]) => {
-      const norm = mainLifts.find(l => name.toLowerCase().includes(l.toLowerCase().split(' ')[0]));
-      if (norm) {
-        if (!liftData[norm]) liftData[norm] = [];
-        liftData[norm].push({ date: session.date, weight: parseFloat(weight), dateRaw: session.dateRaw });
-      }
+      const w = parseFloat(weight);
+      if (!name || isNaN(w) || w <= 0) return;
+      if (!liftData[name]) liftData[name] = [];
+      liftData[name].push({ date: session.date, weight: w, dateRaw: session.dateRaw || 0, week: session.week, day: session.day });
     });
   });
 
-  // Compact chart data by top lifts
-  const chartLifts = Object.entries(liftData).filter(([,arr]) => arr.length >= 2).slice(0,3);
-  if (chartLifts.length > 0) {
-    html += `<div class="section-header" style="margin-top:0">Progress Charts</div>`;
-    chartLifts.forEach(([name, data]) => {
-      const sorted = data.sort((a,b) => a.dateRaw - b.dateRaw);
-      html += `<div class="chart-section"><div class="chart-title">${name}</div><div class="chart-wrap">${renderChart(sorted)}</div></div>`;
+  // Sort each lift's entries chronologically
+  Object.values(liftData).forEach(arr => arr.sort((a,b) => a.dateRaw - b.dateRaw));
+
+  const liftNames = Object.keys(liftData).sort();
+  const defaultLift = liftNames[0] || null;
+
+  let html = '';
+
+  if (liftNames.length === 0) {
+    html += `<div class="history-empty">
+      <div style="font-size:48px;margin-bottom:12px;">📈</div>
+      <div style="font-size:16px;font-weight:700;color:var(--text2);">No weight data yet</div>
+      <div style="font-size:13px;margin-top:8px;color:var(--text3);">Log the weight used during workouts — it'll chart here automatically.</div>
+    </div>`;
+  } else {
+    // Lift picker
+    html += `<div class="section-header" style="margin-top:0">Weight Progression</div>`;
+    html += `<div id="lift-picker" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">`;
+    liftNames.forEach((name, idx) => {
+      const pts = liftData[name];
+      const latest = pts[pts.length - 1].weight;
+      const first = pts[0].weight;
+      const delta = latest - first;
+      const deltaStr = delta > 0 ? `+${delta}` : `${delta}`;
+      const isDefault = idx === 0;
+      html += `<button onclick="selectLiftChart('${name.replace(/'/g,"\\'")}',this)"
+        style="padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid ${isDefault ? 'var(--yellow)' : 'var(--border)'};background:${isDefault ? 'var(--yellow-bg)' : 'var(--bg2)'};color:${isDefault ? 'var(--yellow)' : 'var(--text2)'};"
+        data-lift="${name}">${name}</button>`;
     });
+    html += `</div>`;
+
+    // Chart area
+    html += `<div id="lift-chart-area" style="margin-bottom:20px;"></div>`;
   }
 
+  // Past workouts log
   html += `<div class="section-header">${history.length > 0 ? 'Past Workouts' : ''}</div>`;
-
   if (history.length === 0) {
-    html += `<div class="history-empty"><div style="font-size:48px;margin-bottom:12px;">🏋️</div><div style="font-size:16px;font-weight:700;color:var(--text2);">No workouts yet</div><div style="font-size:13px;margin-top:8px;">Complete your first session to see history here.</div></div>`;
+    html += `<div style="font-size:13px;color:var(--text3);padding:12px 0;">Complete your first session to see history here.</div>`;
   } else {
     history.forEach(session => {
       const weights = Object.entries(session.weights || {});
@@ -4373,16 +4392,90 @@ function renderHistory() {
         <div class="history-item">
           <div class="hi-header">
             <div class="hi-date">${session.date}</div>
-            <div class="hi-badge">${session.day} · W${session.week}</div>
+            <div class="hi-badge">${session.day || ''} · W${session.week || ''}</div>
           </div>
-          ${weights.length > 0 ? `<div class="hi-weights">${weights.map(([name,w]) => `<div class="hi-weight-row"><span>${name}</span><strong>${w} lbs</strong></div>`).join('')}</div>` : '<div style="font-size:12px;color:var(--text3);">No weights logged</div>'}
+          ${weights.length > 0
+            ? `<div class="hi-weights">${weights.map(([n,w]) => `<div class="hi-weight-row"><span>${n}</span><strong>${w} lbs</strong></div>`).join('')}</div>`
+            : '<div style="font-size:12px;color:var(--text3);">No weights logged</div>'}
           ${sessionNote ? `<div class="hi-note">"${sessionNote}"</div>` : ''}
-        </div>
-      `;
+        </div>`;
     });
   }
 
-  document.getElementById('history-content').innerHTML = html;
+  el.innerHTML = html;
+
+  // Auto-render first lift chart
+  if (defaultLift) {
+    window._liftData = liftData;
+    renderLiftChart(defaultLift);
+  }
+}
+
+function selectLiftChart(liftName, btn) {
+  document.querySelectorAll('#lift-picker button').forEach(b => {
+    b.style.borderColor = 'var(--border)';
+    b.style.background = 'var(--bg2)';
+    b.style.color = 'var(--text2)';
+  });
+  btn.style.borderColor = 'var(--yellow)';
+  btn.style.background = 'var(--yellow-bg)';
+  btn.style.color = 'var(--yellow)';
+  renderLiftChart(liftName);
+}
+
+function renderLiftChart(liftName) {
+  const area = document.getElementById('lift-chart-area');
+  if (!area || !window._liftData) return;
+  const data = window._liftData[liftName];
+  if (!data || data.length === 0) { area.innerHTML = ''; return; }
+
+  const latest = data[data.length - 1].weight;
+  const first = data[0].weight;
+  const best = Math.max(...data.map(d => d.weight));
+  const delta = latest - first;
+  const deltaColor = delta > 0 ? 'var(--green)' : delta < 0 ? 'var(--red)' : 'var(--text3)';
+  const deltaStr = delta > 0 ? `+${delta} lbs` : delta < 0 ? `${delta} lbs` : 'No change';
+
+  let statsHtml = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Current</div>
+        <div style="font-size:18px;font-weight:800;color:var(--text);">${latest}</div>
+        <div style="font-size:10px;color:var(--text3);">lbs</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Best</div>
+        <div style="font-size:18px;font-weight:800;color:var(--yellow);">${best}</div>
+        <div style="font-size:10px;color:var(--text3);">lbs</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Progress</div>
+        <div style="font-size:18px;font-weight:800;color:${deltaColor};">${deltaStr}</div>
+        <div style="font-size:10px;color:var(--text3);">${data.length} sessions</div>
+      </div>
+    </div>`;
+
+  const chartHtml = data.length >= 2 ? renderChart(data) : `<div style="text-align:center;color:var(--text3);font-size:12px;padding:12px 0;">Log this exercise again to see your progression chart.</div>`;
+
+  // Session log for this lift
+  const rows = [...data].reverse().map(d =>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--text);">${d.weight} lbs</div>
+        <div style="font-size:11px;color:var(--text3);">W${d.week} · ${d.day || ''}</div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);">${d.date}</div>
+    </div>`
+  ).join('');
+
+  area.innerHTML = `
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;">
+      <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:12px;">${liftName}</div>
+      ${statsHtml}
+      <div class="chart-wrap" style="margin-bottom:12px;">${chartHtml}</div>
+      <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Session Log</div>
+      ${rows}
+    </div>`;
 }
 
 function renderChart(data) {
