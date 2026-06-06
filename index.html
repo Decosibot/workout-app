@@ -4054,12 +4054,12 @@ function showRitualOverlay(exercises, onComplete) {
     overlay.innerHTML = `
       <div class="ritual-header">
         <div class="ritual-step-dots">${dots}</div>
-        <div style="display:flex;gap:14px;align-items:center;">
-          <button class="ritual-skip" onclick="ritualSkip()">Next →</button>
-          <button class="ritual-skip" style="color:#c0392b;" onclick="ritualFinish()">Skip All</button>
-        </div>
+        <button class="ritual-skip" onclick="ritualSkip()">Next →</button>
       </div>
       <div class="ritual-body">${bodyHtml}</div>
+      <div style="padding:0 24px 24px;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));">
+        <button onclick="ritualFinish()" style="width:100%;background:none;border:1px solid #444;color:#888;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Skip All — Go Straight to Workout</button>
+      </div>
     `;
   }
 
