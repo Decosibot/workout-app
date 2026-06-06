@@ -612,6 +612,105 @@
   /* Header phase label */
   body.sigma #header-phase { color: #c0392b; }
 
+  /* ── PRE-WORKOUT RITUAL ── */
+  #ritual-overlay {
+    position: fixed; inset: 0; z-index: 950;
+    background: #000;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding: 0;
+    overflow-y: auto;
+  }
+  .ritual-header {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #1a0000;
+  }
+  .ritual-step-dots {
+    display: flex; gap: 8px;
+  }
+  .ritual-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #2a2a2a; transition: background 0.3s;
+  }
+  .ritual-dot.active { background: #c0392b; }
+  .ritual-dot.done { background: #555; }
+  .ritual-skip {
+    background: none; border: none; color: #555; font-size: 13px;
+    font-weight: 700; cursor: pointer; font-family: inherit; letter-spacing: 0.5px;
+  }
+  .ritual-body {
+    width: 100%; max-width: 480px; padding: 24px 20px 32px;
+    display: flex; flex-direction: column; gap: 20px;
+  }
+  .ritual-title {
+    font-size: 11px; font-weight: 900; letter-spacing: 4px;
+    text-transform: uppercase; color: #c0392b;
+  }
+  .ritual-heading {
+    font-size: 28px; font-weight: 900; color: #fff; line-height: 1.1;
+    letter-spacing: -0.5px;
+  }
+  .ritual-sub {
+    font-size: 13px; color: #666; margin-top: -12px;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .ritual-video-wrap {
+    border-radius: 6px; overflow: hidden; background: #111;
+    position: relative; cursor: pointer;
+  }
+  .ritual-video-thumb {
+    width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block;
+  }
+  .ritual-play-btn {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.4);
+  }
+  .ritual-play-btn svg { width: 52px; height: 52px; }
+  .ritual-instructions {
+    font-size: 15px; color: #aaa; line-height: 1.7;
+    font-style: italic; border-left: 2px solid #c0392b; padding-left: 14px;
+  }
+  .ritual-timer-display {
+    font-size: 64px; font-weight: 900; color: #c0392b; text-align: center;
+    letter-spacing: 2px; font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .ritual-timer-display.done-flash { color: #fff; }
+  .ritual-timer-btn {
+    width: 100%; padding: 16px; background: #c0392b; color: #fff;
+    border: none; border-radius: 4px; font-size: 15px; font-weight: 900;
+    letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+    font-family: inherit;
+  }
+  .ritual-timer-btn:active { opacity: 0.85; }
+  .ritual-timer-btn.running { background: #1a0000; color: #c0392b; border: 1px solid #c0392b; }
+  .ritual-ex-list {
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .ritual-ex-item {
+    font-size: 13px; font-weight: 700; color: #888;
+    padding: 8px 12px; border-left: 2px solid #2a2a2a;
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .ritual-affirmation {
+    font-size: 18px; font-weight: 700; color: #fff; line-height: 1.6;
+    text-align: center; padding: 20px; border: 1px solid #2a0000;
+    border-radius: 4px; background: #0a0000; min-height: 120px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ritual-new-btn {
+    background: none; border: 1px solid #2a2a2a; color: #555;
+    border-radius: 4px; padding: 8px 16px; font-size: 12px; font-weight: 700;
+    cursor: pointer; font-family: inherit; align-self: center;
+  }
+  .ritual-begin-btn {
+    width: 100%; padding: 18px; background: #c0392b; color: #fff;
+    border: none; border-radius: 4px; font-size: 16px; font-weight: 900;
+    letter-spacing: 3px; text-transform: uppercase; cursor: pointer;
+    font-family: inherit; margin-top: 8px;
+  }
+  .ritual-begin-btn:active { opacity: 0.85; }
 
   /* ── NUTRITION SYSTEM ── */
   .nutr-macro-bar-wrap { margin-bottom:10px; }
@@ -3241,6 +3340,141 @@ function completeMaxTest() {
 // ════════════════════════════════════════════════════════════
 let _workoutReturnState = null;
 
+function showRitualOverlay(exercises, onComplete) {
+  if (!ls('ritual_enabled', true)) { onComplete(); return; }
+
+  let step = 1;
+  let timerInterval = null;
+  let timerSeconds = 0;
+  let timerRunning = false;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'ritual-overlay';
+  document.body.appendChild(overlay);
+
+  function clearTimer() {
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    timerRunning = false;
+  }
+
+  function formatTime(s) {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${m}:${sec.toString().padStart(2, '0')}`;
+  }
+
+  function makeVideoEmbed(videoId) {
+    const thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+    return `<div class="ritual-video-wrap" id="ritual-vid-${videoId}">
+      <img class="ritual-video-thumb" src="${thumbUrl}" alt="Video thumbnail">
+      <div class="ritual-play-btn" onclick="(function(){
+        const w=document.getElementById('ritual-vid-${videoId}');
+        w.innerHTML='<iframe style=\\'width:100%;aspect-ratio:16/9;border:none;display:block;\\' src=\\'https://www.youtube.com/embed/${videoId}?autoplay=1\\' allow=\\'autoplay; encrypted-media\\' allowfullscreen></iframe>';
+      })()">
+        <svg viewBox="0 0 68 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="68" height="48" rx="10" fill="rgba(0,0,0,0.7)"/>
+          <polygon points="26,14 26,34 48,24" fill="#fff"/>
+        </svg>
+      </div>
+    </div>`;
+  }
+
+  function renderStep() {
+    clearTimer();
+    const dots = [1,2,3].map(i => `<div class="ritual-dot${i < step ? ' done' : i === step ? ' active' : ''}"></div>`).join('');
+    let bodyHtml = '';
+
+    if (step === 1) {
+      timerSeconds = 120;
+      bodyHtml = `
+        <div class="ritual-title">Step 1 of 3</div>
+        <div class="ritual-heading">POWER POSE</div>
+        <div class="ritual-sub">Amy Cuddy · 2 Minutes</div>
+        ${makeVideoEmbed('Ks-_Mh1QhMc')}
+        <div class="ritual-instructions">Stand tall. Feet wide. Hands on hips or arms raised. Hold for 2 minutes.</div>
+        <div class="ritual-timer-display" id="ritual-timer-display">${formatTime(timerSeconds)}</div>
+        <button class="ritual-timer-btn" id="ritual-timer-btn" onclick="ritualTimerAction()">START TIMER</button>
+      `;
+    } else if (step === 2) {
+      timerSeconds = 90;
+      const exListHtml = exercises.length
+        ? `<div class="ritual-ex-list">${exercises.map(e => `<div class="ritual-ex-item">${e}</div>`).join('')}</div>`
+        : '';
+      bodyHtml = `
+        <div class="ritual-title">Step 2 of 3</div>
+        <div class="ritual-heading">MENTAL REHEARSAL</div>
+        <div class="ritual-sub">Dr. Joe Dispenza · Visualize</div>
+        ${makeVideoEmbed('lFcSrYw2lts')}
+        <div class="ritual-instructions">Close your eyes. See yourself completing every rep. Feel the weight. Own the outcome.</div>
+        ${exListHtml}
+        <div class="ritual-timer-display" id="ritual-timer-display">${formatTime(timerSeconds)}</div>
+        <button class="ritual-timer-btn" id="ritual-timer-btn" onclick="ritualTimerAction()">START TIMER</button>
+      `;
+    } else if (step === 3) {
+      const aff = FSS_AFFIRMATIONS[Math.floor(Math.random() * FSS_AFFIRMATIONS.length)];
+      bodyHtml = `
+        <div class="ritual-title">Step 3 of 3</div>
+        <div class="ritual-heading">DECLARE IT</div>
+        <div class="ritual-affirmation" id="ritual-aff-text">${aff}</div>
+        <button class="ritual-new-btn" onclick="
+          const pool = window._FSS_AFF || FSS_AFFIRMATIONS;
+          document.getElementById('ritual-aff-text').textContent = pool[Math.floor(Math.random()*pool.length)];
+        ">🔄 New</button>
+        <button class="ritual-begin-btn" onclick="ritualBegin()">BEGIN WORKOUT →</button>
+      `;
+    }
+
+    overlay.innerHTML = `
+      <div class="ritual-header">
+        <div class="ritual-step-dots">${dots}</div>
+        <button class="ritual-skip" onclick="ritualSkip()">Skip →</button>
+      </div>
+      <div class="ritual-body">${bodyHtml}</div>
+    `;
+  }
+
+  window._FSS_AFF = FSS_AFFIRMATIONS;
+
+  window.ritualTimerAction = function() {
+    if (timerRunning) return;
+    timerRunning = true;
+    const btn = document.getElementById('ritual-timer-btn');
+    const display = document.getElementById('ritual-timer-display');
+    if (btn) { btn.textContent = 'RUNNING…'; btn.classList.add('running'); }
+    timerInterval = setInterval(function() {
+      timerSeconds--;
+      if (display) display.textContent = formatTime(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearTimer();
+        if (display) { display.textContent = '0:00'; display.classList.add('done-flash'); }
+        setTimeout(function() { step++; if (step > 3) { ritualFinish(); } else { renderStep(); } }, 600);
+      }
+    }, 1000);
+  };
+
+  window.ritualSkip = function() {
+    clearTimer();
+    step++;
+    if (step > 3) { ritualFinish(); } else { renderStep(); }
+  };
+
+  window.ritualBegin = function() {
+    ritualFinish();
+  };
+
+  function ritualFinish() {
+    clearTimer();
+    overlay.remove();
+    delete window.ritualTimerAction;
+    delete window.ritualSkip;
+    delete window.ritualBegin;
+    delete window._FSS_AFF;
+    onComplete();
+  }
+
+  renderStep();
+}
+
 function startWorkout() {
   // Save position before entering workout so Back can return to same day
   if (activeMensProgram === 'hc12' || !activeMensProgram) {
@@ -3251,11 +3485,27 @@ function startWorkout() {
   } else if (activeMensProgram === 'mansour') {
     _workoutReturnState = { prog: 'mansour', cycleDay: getMansourDay() };
   }
-  switchView('workout');
-  if (isMaxTestDay()) { renderMaxTestDay(); return; }
-  if (activeMensProgram === 'growth') { renderWorkoutGrowth(); return; }
-  if (activeMensProgram === 'mansour') { renderWorkoutMansour(); return; }
-  renderWorkout();
+
+  let ritualExercises = [];
+  if (activeMensProgram === 'growth') {
+    const gs = getGrowthState();
+    const d = GROWTH_PLAN.days[gs.day];
+    ritualExercises = d ? d.exercises.map(e => e.name) : [];
+  } else if (activeMensProgram === 'mansour') {
+    const md = getMansourDayData(getMansourDay());
+    ritualExercises = md ? md.exercises.map(e => e.name) : [];
+  } else {
+    const dd = getCurrentDayData();
+    ritualExercises = dd ? dd.exercises.map(e => e.name) : [];
+  }
+
+  showRitualOverlay(ritualExercises, function() {
+    switchView('workout');
+    if (isMaxTestDay()) { renderMaxTestDay(); return; }
+    if (activeMensProgram === 'growth') { renderWorkoutGrowth(); return; }
+    if (activeMensProgram === 'mansour') { renderWorkoutMansour(); return; }
+    renderWorkout();
+  });
 }
 
 function backFromWorkout() {
@@ -6427,6 +6677,7 @@ function showAccountMenu() {
 
       ${sectionLabel('Appearance')}
       ${sheetBtn(themeLabel, "document.getElementById('settings-sheet-overlay')?.remove();toggleTheme();")}
+      ${sheetBtn(ls('ritual_enabled', true) ? 'Disable Pre-Workout Ritual' : 'Enable Pre-Workout Ritual', "lsSet('ritual_enabled', !ls('ritual_enabled',true)); document.getElementById('settings-sheet-overlay')?.remove(); showToast('Ritual ' + (ls('ritual_enabled',true)?'enabled':'disabled'));")}
 
       ${sectionLabel('Program')}
       ${sheetBtn('Switch Phase', "document.getElementById('settings-sheet-overlay')?.remove();showProgSelect();")}
