@@ -4121,8 +4121,9 @@ function renderProgramSchedule(container) {
 
   html += `<div class="section-header" style="margin-top:0">16-Week Timeline</div>`;
   html += `<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-bottom:16px;" id="week-selector-prog"></div>`;
-  html += `<div class="section-header">Current Day</div>`;
+  html += `<div class="section-header">Select a Day to Review</div>`;
   html += `<div class="day-selector" id="day-selector-prog"></div>`;
+  html += `<div id="day-review-panel"></div>`;
   container.innerHTML = html;
 
   const weekSel = document.getElementById('week-selector-prog');
@@ -4145,7 +4146,7 @@ function renderProgramSchedule(container) {
     btn.textContent = `W${w}`;
     btn.title = `${pm.label} · Week ${w - pm.overallStart + 1}`;
     btn.onclick = () => {
-      const localW = w - pm.id === 'hc12' ? 0 : pm.id === 'growth' ? 8 : 12;
+      // Update the selected week for browsing (does not change active workout week)
       if (pm.id === 'hc12') {
         state.currentWeek = w; state.currentDayIdx = 0; saveState();
       } else if (pm.id === 'growth') {
@@ -4153,23 +4154,31 @@ function renderProgramSchedule(container) {
       } else {
         saveMansourDay((w - 13) * 2 + 1);
       }
-      renderProgramSchedule(container); updateHeader(); showToast(`Jumped to Week ${w}`);
+      renderProgramSchedule(container); updateHeader();
     };
     weekSel.appendChild(btn);
   }
 
-  // Day selector — phase-specific
+  // Day selector — phase-specific. Tapping a day shows a read-only review panel.
   const daySel = document.getElementById('day-selector-prog');
   if (activeMensProgram === 'hc12' || !activeMensProgram) {
     const phase = getPhaseForWeek(state.currentWeek);
     phase.days.forEach((d, i) => {
       const completed = ls(`wk_done_${state.currentWeek}_${d.id}`, false);
+      const isToday = (i === state.currentDayIdx);
       const btn = document.createElement('div');
-      btn.className = `day-btn${i === state.currentDayIdx ? ' active' : ''}${completed ? ' completed' : ''}`;
+      btn.className = `day-btn${isToday ? ' active' : ''}${completed ? ' completed' : ''}`;
+      btn.id = `sched-day-${i}`;
       btn.innerHTML = `<div class="day-label">${d.label.slice(0,3)}</div><div class="day-name">${d.name}</div>`;
-      btn.onclick = () => { state.currentDayIdx = i; saveState(); renderProgramSchedule(container); updateHeader(); };
+      btn.onclick = () => {
+        daySel.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        showDayReview('hc12', { week: state.currentWeek, dayIdx: i });
+      };
       daySel.appendChild(btn);
     });
+    // Auto-show today's day on load
+    showDayReview('hc12', { week: state.currentWeek, dayIdx: state.currentDayIdx });
   } else if (activeMensProgram === 'growth') {
     const gs = getGrowthState();
     for (let d = 1; d <= 6; d++) {
@@ -4177,11 +4186,17 @@ function renderProgramSchedule(container) {
       const dayInfo = GROWTH_PLAN.days[key];
       if (!dayInfo) continue;
       const btn = document.createElement('div');
-      btn.className = `day-btn${gs.day === key ? ' active' : ''}`;
+      const isToday = (gs.day === key);
+      btn.className = `day-btn${isToday ? ' active' : ''}`;
       btn.innerHTML = `<div class="day-label">D${d}</div><div class="day-name">${dayInfo.name}</div>`;
-      btn.onclick = () => { saveGrowthState({ week: gs.week, day: key }); renderProgramSchedule(container); updateHeader(); };
+      btn.onclick = () => {
+        daySel.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        showDayReview('growth', { week: gs.week, dayKey: key });
+      };
       daySel.appendChild(btn);
     }
+    showDayReview('growth', { week: gs.week, dayKey: gs.day });
   } else if (activeMensProgram === 'mansour') {
     daySel.style.gridTemplateColumns = 'repeat(5,1fr)';
     const cd = getMansourDay();
@@ -4190,10 +4205,95 @@ function renderProgramSchedule(container) {
       btn.className = `day-btn${cd === d ? ' active' : ''}`;
       const dd = getMansourDayData(d);
       btn.innerHTML = `<div class="day-label">D${d}</div><div class="day-name" style="font-size:9px;">${dd.name.split(' ')[0]}</div>`;
-      btn.onclick = () => { saveMansourDay(d); renderProgramSchedule(container); updateHeader(); showToast(`Jumped to Day ${d}`); };
+      btn.onclick = () => {
+        daySel.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        showDayReview('mansour', { cycleDay: d });
+      };
       daySel.appendChild(btn);
     }
+    showDayReview('mansour', { cycleDay: cd });
   }
+}
+
+function showDayReview(prog, opts) {
+  const panel = document.getElementById('day-review-panel');
+  if (!panel) return;
+
+  let exercises = [], dayLabel = '', dayName = '', weekKey = '';
+
+  if (prog === 'hc12') {
+    const phase = getPhaseForWeek(opts.week);
+    const day = phase.days[opts.dayIdx];
+    if (!day) { panel.innerHTML = ''; return; }
+    exercises = day.exercises;
+    dayLabel = day.label;
+    dayName = day.name;
+    weekKey = opts.week;
+  } else if (prog === 'growth') {
+    const dayInfo = GROWTH_PLAN.days[opts.dayKey];
+    if (!dayInfo) { panel.innerHTML = ''; return; }
+    exercises = dayInfo.exercises || [];
+    dayLabel = `Week ${opts.week}`;
+    dayName = dayInfo.name;
+    weekKey = opts.dayKey; // growth sets stored by dayKey
+  } else if (prog === 'mansour') {
+    const dd = getMansourDayData(opts.cycleDay);
+    if (!dd) { panel.innerHTML = ''; return; }
+    exercises = dd.exercises || [];
+    dayLabel = `Day ${opts.cycleDay}`;
+    dayName = dd.name;
+    weekKey = opts.cycleDay;
+  }
+
+  const sectionLabels = { cns:'CNS Activation', yellow:'Primary Cluster Sets', orange:'Accessory Work', red:'Pump / Finishers' };
+  const typeColors = { yellow: 'var(--yellow)', orange: 'var(--orange)', red: 'var(--red)', cns: 'var(--text3)' };
+  const typeBg = { yellow: 'var(--yellow-bg)', orange: 'var(--orange-bg)', red: 'var(--red-bg)', cns: 'var(--gray-bg)' };
+  const typeBorder = { yellow: 'var(--yellow-border)', orange: 'var(--orange-border)', red: 'var(--red-border)', cns: 'var(--gray-border)' };
+
+  let lastSection = null;
+  let html = `<div style="margin-top:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div>
+        <div style="font-size:18px;font-weight:800;color:var(--text);">${dayLabel} — ${dayName}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">${exercises.length} exercises · tap a set circle to mark done</div>
+      </div>
+    </div>`;
+
+  exercises.forEach(ex => {
+    const type = ex.type || 'orange';
+    if (type !== lastSection) {
+      lastSection = type;
+      html += `<div class="section-header">${sectionLabels[type] || ''}</div>`;
+    }
+
+    // Completed sets — stored by ex.id + weekKey
+    const completedSets = getSets(ex.id, weekKey);
+    const totalSets = ex.sets || 3;
+    const allDone = completedSets.length >= totalSets;
+
+    let setsHtml = '';
+    for (let i = 0; i < totalSets; i++) {
+      const done = completedSets.includes(i);
+      setsHtml += `<div style="width:28px;height:28px;border-radius:50%;border:2px solid ${done ? 'var(--green)' : typeColors[type]};background:${done ? 'var(--green)' : 'transparent'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:${done ? '#fff' : typeColors[type]};">${done ? '✓' : i+1}</div>`;
+    }
+
+    html += `<div style="border-radius:var(--radius);border:1px solid ${typeBorder[type]};background:${typeBg[type]};padding:14px;margin-bottom:8px;position:relative;overflow:hidden;${allDone ? '' : ''}">
+      <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:${typeColors[type]};border-radius:var(--radius) 0 0 var(--radius);"></div>
+      <div style="padding-left:8px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;">
+          <div style="font-size:14px;font-weight:800;color:var(--text);flex:1;">${ex.name}</div>
+          ${allDone ? `<div style="font-size:10px;font-weight:800;background:var(--green);color:#fff;padding:2px 8px;border-radius:10px;flex-shrink:0;">DONE</div>` : ''}
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:10px;">${ex.sets} sets × ${ex.reps} reps${ex.tempo ? ' · ' + ex.tempo : ''}${ex.load ? ' · ' + ex.load : ''}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">${setsHtml}</div>
+        ${ex.notes ? `<div style="font-size:12px;color:var(--text2);background:var(--bg3);border-radius:6px;padding:8px 10px;margin-top:10px;line-height:1.5;">${ex.notes}</div>` : ''}
+      </div>
+    </div>`;
+  });
+
+  html += `</div>`;
+  panel.innerHTML = html;
 }
 
 function viewProgramDay(phaseId, dayId) {
