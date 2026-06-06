@@ -8391,7 +8391,6 @@ renderHome = function() {
 
   // Build new sections HTML
   const calHtml = renderCalendar(_calDisplayYear, _calDisplayMonth);
-  const prHtml = renderPRBoard();
   const deloadHtml = renderDeloadBanner();
   const notifHtml = renderNotifCard();
 
@@ -8411,13 +8410,6 @@ renderHome = function() {
   const progressCard = container.querySelector('.home-progress-card');
   if (progressCard) {
     progressCard.insertAdjacentHTML('afterend', calHtml);
-  }
-
-  // Inject PR board after calendar (or after progress card)
-  const calCard = container.querySelector('.home-calendar-card');
-  const insertAfter = calCard || progressCard;
-  if (insertAfter && prHtml) {
-    insertAfter.insertAdjacentHTML('afterend', prHtml);
   }
 
   clearNewPRFlags();
