@@ -2085,6 +2085,37 @@ function addHistory(entry) {
 function get1RM(name) { return ls(`orm_${name}`, ''); }
 function set1RM(name, val) { lsSet(`orm_${name}`, val); }
 
+// Map exercise names to the canonical 1RM key
+const ORM_ALIAS = {
+  'High Bar Back Squat':       'Squat',
+  'Low Bar Back Squat':        'Squat',
+  'Sumo / Semi-Sumo Deadlift': 'Deadlift',
+  'Barbell Push-Press':        'Overhead Press',
+  'DB Push-Press':             'DB Push-Press',
+};
+function get1RMForExercise(exName) {
+  const key = ORM_ALIAS[exName] || exName;
+  const val = get1RM(key);
+  return val ? parseFloat(val) : null;
+}
+
+// Parse "70-75% 1RM" → midpoint 72.5; "65% 1RM" → 65
+function parse1RMPct(loadStr) {
+  if (!loadStr || !loadStr.includes('1RM')) return null;
+  const m = loadStr.match(/(\d+)[-–](\d+)%/) || loadStr.match(/(\d+)%/);
+  if (!m) return null;
+  return m[2] ? (parseFloat(m[1]) + parseFloat(m[2])) / 2 : parseFloat(m[1]);
+}
+
+// Return suggested weight (rounded to nearest 2.5) or null
+function getSuggestedWeight(ex) {
+  const pct = parse1RMPct(ex.load);
+  if (!pct) return null;
+  const orm = get1RMForExercise(ex.name);
+  if (!orm) return null;
+  return Math.round(orm * pct / 100 / 2.5) * 2.5;
+}
+
 // ════════════════════════════════════════════════════════════
 // UNIFIED BODY WEIGHT LOG  (single source: 'bw_log' array)
 // ════════════════════════════════════════════════════════════
@@ -3245,17 +3276,23 @@ function renderWorkout() {
     // Weight input
     const weightInput = document.getElementById(`weight-${ex.id}`);
     if (weightInput) {
-      weightInput.value = getWeight(ex.id, state.currentWeek);
+      const savedW = getWeight(ex.id, state.currentWeek);
+      if (savedW) {
+        weightInput.value = savedW;
+      } else {
+        const suggested = getSuggestedWeight(ex);
+        if (suggested) weightInput.value = suggested;
+      }
       const saveW = () => {
         setWeight(ex.id, state.currentWeek, weightInput.value);
         clearTimeout(window._syncTimer); window._syncTimer = setTimeout(syncToCloud, 2000);
       };
       weightInput.addEventListener('input', () => {
         saveW();
-        if (ex.type === 'yellow' || ex.type === 'orange') updatePONudge(ex.id, weightInput.value);
+        if (ex.type === 'yellow' || ex.type === 'orange') updatePONudge(ex.id, weightInput.value, ex);
       });
       weightInput.addEventListener('change', saveW);
-      if (ex.type === 'yellow' || ex.type === 'orange') updatePONudge(ex.id, weightInput.value);
+      if (ex.type === 'yellow' || ex.type === 'orange') updatePONudge(ex.id, weightInput.value, ex);
     }
     // Restore skipped state
     if (ls(`skip_${ex.id}_${state.currentWeek}`, false)) {
@@ -3636,12 +3673,18 @@ function bindExerciseCards(exercises, noteKey) {
     }
     const weightInput = document.getElementById(`weight-${ex.id}`);
     if (weightInput) {
-      weightInput.value = getWeight(ex.id, weekKey);
+      const savedW2 = getWeight(ex.id, weekKey);
+      if (savedW2) {
+        weightInput.value = savedW2;
+      } else {
+        const suggested2 = getSuggestedWeight(ex);
+        if (suggested2) weightInput.value = suggested2;
+      }
       if (ex.type === 'yellow' || ex.type === 'orange') {
-        updatePONudgeKeyed(ex.id, weightInput.value, weekKey);
+        updatePONudgeKeyed(ex.id, weightInput.value, weekKey, ex);
         weightInput.addEventListener('input', () => {
           setWeight(ex.id, weekKey, weightInput.value);
-          updatePONudgeKeyed(ex.id, weightInput.value, weekKey);
+          updatePONudgeKeyed(ex.id, weightInput.value, weekKey, ex);
           clearTimeout(window._syncTimer); window._syncTimer = setTimeout(syncToCloud, 2000);
         });
       }
@@ -4646,7 +4689,13 @@ function calcORM(name) {
   });
 
   syncPRViews();
-  showToast(`${name}: ~${estimated} lbs 1RM`);
+  // Refresh workout view live if open so suggested weights appear immediately
+  if (state.activeView === 'workout') {
+    if (activeMensProgram === 'hc12' || !activeMensProgram) renderWorkout();
+    else if (activeMensProgram === 'growth') renderWorkoutGrowth && renderWorkoutGrowth();
+    else if (activeMensProgram === 'mansour') renderWorkoutMansour && renderWorkoutMansour();
+  }
+  showToast(`${name}: ~${estimated} lbs 1RM — weights updated`);
 }
 
 // ════════════════════════════════════════════════════════════
@@ -5810,14 +5859,21 @@ function buildStreakHTML() {
 // ════════════════════════════════════════════════════════════
 // PROGRESSIVE OVERLOAD NUDGE
 // ════════════════════════════════════════════════════════════
-function updatePONudge(exId, currentVal) {
+function updatePONudge(exId, currentVal, ex) {
   const el = document.getElementById(`po-${exId}`);
   if (!el) return;
   const lastWeekVal = parseFloat(ls(`w_${exId}_${state.currentWeek - 1}`, ''));
   const thisVal = parseFloat(currentVal);
+  const suggested = ex ? getSuggestedWeight(ex) : null;
+
   if (isNaN(lastWeekVal) || state.currentWeek <= 1) {
-    el.textContent = 'First time — establish your baseline';
-    el.className = 'po-nudge none';
+    if (suggested) {
+      el.textContent = `Suggested: ${suggested} lbs (${ex.load})`;
+      el.className = 'po-nudge up';
+    } else {
+      el.textContent = 'First time — establish your baseline';
+      el.className = 'po-nudge none';
+    }
   } else if (!isNaN(thisVal) && thisVal > lastWeekVal) {
     el.textContent = `↑ Up from ${lastWeekVal} lbs — great progress!`;
     el.className = 'po-nudge up';
@@ -5825,8 +5881,13 @@ function updatePONudge(exId, currentVal) {
     el.textContent = `→ Same as last week (${lastWeekVal} lbs) — try adding 2.5-5 lbs`;
     el.className = 'po-nudge same';
   } else if (isNaN(thisVal)) {
-    el.textContent = `Last week: ${lastWeekVal} lbs`;
-    el.className = 'po-nudge none';
+    if (suggested) {
+      el.textContent = `Suggested: ${suggested} lbs based on your 1RM (${ex.load})`;
+      el.className = 'po-nudge up';
+    } else {
+      el.textContent = `Last week: ${lastWeekVal} lbs`;
+      el.className = 'po-nudge none';
+    }
   } else {
     el.textContent = `↓ Down from ${lastWeekVal} lbs last week`;
     el.className = 'po-nudge same';
@@ -5834,15 +5895,22 @@ function updatePONudge(exId, currentVal) {
 }
 
 // Generic version for Growth/Mansour — accepts current key, derives previous
-function updatePONudgeKeyed(exId, currentVal, currentKey) {
+function updatePONudgeKeyed(exId, currentVal, currentKey, ex) {
   const el = document.getElementById(`po-${exId}`);
   if (!el) return;
   const prevKey = typeof currentKey === 'number' ? currentKey - 1 : null;
   const lastVal = prevKey != null ? parseFloat(ls(`w_${exId}_${prevKey}`, '')) : NaN;
   const thisVal = parseFloat(currentVal);
+  const suggested = ex ? getSuggestedWeight(ex) : null;
+
   if (isNaN(lastVal) || prevKey == null || prevKey < 1) {
-    el.textContent = 'First time — establish your baseline';
-    el.className = 'po-nudge none';
+    if (suggested) {
+      el.textContent = `Suggested: ${suggested} lbs (${ex.load})`;
+      el.className = 'po-nudge up';
+    } else {
+      el.textContent = 'First time — establish your baseline';
+      el.className = 'po-nudge none';
+    }
   } else if (!isNaN(thisVal) && thisVal > lastVal) {
     el.textContent = `↑ Up from ${lastVal} lbs — great progress!`;
     el.className = 'po-nudge up';
@@ -5850,8 +5918,13 @@ function updatePONudgeKeyed(exId, currentVal, currentKey) {
     el.textContent = `→ Same as last session (${lastVal} lbs) — try adding 2.5-5 lbs`;
     el.className = 'po-nudge same';
   } else if (isNaN(thisVal)) {
-    el.textContent = `Last session: ${lastVal} lbs`;
-    el.className = 'po-nudge none';
+    if (suggested) {
+      el.textContent = `Suggested: ${suggested} lbs based on your 1RM (${ex.load})`;
+      el.className = 'po-nudge up';
+    } else {
+      el.textContent = `Last session: ${lastVal} lbs`;
+      el.className = 'po-nudge none';
+    }
   } else {
     el.textContent = `↓ Down from ${lastVal} lbs last session`;
     el.className = 'po-nudge same';
