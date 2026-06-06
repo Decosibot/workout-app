@@ -648,7 +648,7 @@
     overflow-y: auto;
   }
   .ritual-header {
-    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    width: 100%; display: flex; align-items: center; justify-content: center;
     padding: 16px 20px;
     border-bottom: 1px solid #1a0000;
   }
@@ -4044,11 +4044,11 @@ function showRitualOverlay(exercises, onComplete) {
     overlay.innerHTML = `
       <div class="ritual-header">
         <div class="ritual-step-dots">${dots}</div>
-        <button class="ritual-skip" onclick="ritualSkip()">Next →</button>
       </div>
       <div class="ritual-body">${bodyHtml}</div>
-      <div style="padding:0 24px 24px;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));">
-        <button onclick="ritualFinish()" style="width:100%;background:none;border:1px solid #444;color:#888;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Skip All — Go Straight to Workout</button>
+      <div style="padding:0 16px 24px;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));display:flex;gap:10px;">
+        <button onclick="ritualSkip()" style="flex:2;background:#c0392b;border:none;color:#fff;border-radius:10px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:0.3px;">Next →</button>
+        <button onclick="ritualFinish()" style="flex:1;background:none;border:1px solid #444;color:#666;border-radius:10px;padding:14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Skip All</button>
       </div>
     `;
   }
