@@ -1053,6 +1053,269 @@
     transition: opacity .15s, transform .15s;
   }
   .home-goto-today:active { opacity: 0.85; transform: scale(0.98); }
+
+  /* ── WORKOUT HISTORY CALENDAR ── */
+  .home-calendar-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; margin-bottom: 16px;
+  }
+  .home-calendar-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+  }
+  .home-calendar-title { font-size: 13px; font-weight: 800; }
+  .home-calendar-nav { display: flex; align-items: center; gap: 8px; }
+  .cal-nav-btn {
+    background: var(--bg3); border: 1px solid var(--border); color: var(--text2);
+    border-radius: 6px; width: 28px; height: 28px; font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cal-month-label { font-size: 12px; font-weight: 700; color: var(--text2); min-width: 90px; text-align: center; }
+  .cal-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+  }
+  .cal-dow {
+    text-align: center; font-size: 9px; font-weight: 700; color: var(--text3);
+    text-transform: uppercase; padding-bottom: 4px;
+  }
+  .cal-day {
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    border-radius: 6px; font-size: 12px; font-weight: 600; color: var(--text3);
+    position: relative;
+  }
+  .cal-day.today { border: 1px solid var(--yellow); color: var(--yellow); font-weight: 800; }
+  .cal-day.trained { background: var(--green); color: #fff; font-weight: 800; }
+  .cal-day.trained.today { background: var(--yellow); border: none; color: #000; }
+  .cal-day.other-month { opacity: 0.3; }
+  .cal-streak-row { display: flex; gap: 8px; margin-top: 10px; }
+  .cal-streak-chip {
+    flex: 1; background: var(--bg3); border-radius: 8px; padding: 8px;
+    text-align: center;
+  }
+  .cal-streak-chip .csc-val { font-size: 20px; font-weight: 900; color: var(--yellow); }
+  .cal-streak-chip .csc-label { font-size: 10px; color: var(--text3); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+
+  /* ── PERSONAL RECORDS BOARD ── */
+  .pr-board-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; margin-bottom: 16px;
+  }
+  .pr-board-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+  }
+  .pr-board-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 9px 0; border-bottom: 1px solid var(--border);
+  }
+  .pr-board-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .pr-board-name { font-size: 13px; color: var(--text2); }
+  .pr-board-right { display: flex; align-items: center; gap: 8px; }
+  .pr-board-val { font-size: 15px; font-weight: 800; color: var(--text); }
+  .pr-board-badge {
+    font-size: 9px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase;
+    padding: 2px 5px; border-radius: 4px; background: rgba(245,200,66,0.15); color: var(--yellow);
+  }
+  .pr-board-badge.new-pr { background: rgba(76,175,80,0.2); color: var(--green); }
+  .pr-board-date { font-size: 10px; color: var(--text3); }
+
+  /* ── DELOAD BANNER ── */
+  .deload-banner {
+    background: linear-gradient(135deg, #1a0d00, #2a1500);
+    border: 1px solid var(--orange-border); border-radius: var(--radius);
+    padding: 14px 16px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .deload-banner-icon { font-size: 24px; flex-shrink: 0; }
+  .deload-banner-text { flex: 1; }
+  .deload-banner-title { font-size: 13px; font-weight: 800; color: var(--orange); margin-bottom: 2px; }
+  .deload-banner-sub { font-size: 12px; color: var(--text2); line-height: 1.4; }
+
+  /* ── PROGRESS PHOTOS ── */
+  #photo-overlay {
+    position: fixed; inset: 0; z-index: 800;
+    background: rgba(0,0,0,0.96);
+    display: none; flex-direction: column;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  #photo-overlay.show { display: flex; }
+  .photo-overlay-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+  }
+  .photo-overlay-title { font-size: 17px; font-weight: 800; }
+  .photo-overlay-close {
+    background: var(--bg3); border: none; color: var(--text2); border-radius: 50%;
+    width: 32px; height: 32px; font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; font-family: inherit;
+  }
+  .photo-overlay-body { flex: 1; overflow-y: auto; padding: 16px; }
+  .photo-week-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;
+  }
+  .photo-week-slot {
+    background: var(--bg2); border: 1px dashed var(--border); border-radius: var(--radius);
+    aspect-ratio: 3/4; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 6px; cursor: pointer; position: relative; overflow: hidden;
+  }
+  .photo-week-slot img {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  }
+  .photo-week-slot .photo-label {
+    font-size: 11px; font-weight: 700; color: var(--text3); text-align: center;
+    position: relative; z-index: 1;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  }
+  .photo-week-slot .photo-add-icon {
+    font-size: 28px; color: var(--text3); position: relative; z-index: 1;
+  }
+  .photo-compare-btn {
+    width: 100%; background: var(--bg2); border: 1px solid var(--border);
+    color: var(--text); border-radius: var(--radius-sm); padding: 12px;
+    font-size: 14px; font-weight: 700; cursor: pointer; margin-bottom: 8px; font-family: inherit;
+  }
+  .photo-compare-wrap {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;
+  }
+  .photo-compare-img {
+    border-radius: var(--radius-sm); overflow: hidden; background: var(--bg2);
+    border: 1px solid var(--border);
+  }
+  .photo-compare-img img { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; }
+  .photo-compare-img .pcl { font-size: 11px; font-weight: 700; color: var(--text3); padding: 6px; text-align: center; }
+
+  /* ── BARCODE SCANNER ── */
+  #barcode-overlay {
+    position: fixed; inset: 0; z-index: 810;
+    background: #000;
+    display: none; flex-direction: column;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  #barcode-overlay.show { display: flex; }
+  #barcode-video {
+    width: 100%; flex: 1; object-fit: cover;
+  }
+  .barcode-scan-line {
+    position: absolute; left: 10%; right: 10%; height: 2px;
+    background: var(--yellow); box-shadow: 0 0 8px var(--yellow);
+    animation: scanline 2s ease-in-out infinite;
+  }
+  @keyframes scanline {
+    0%,100% { top: 30%; } 50% { top: 70%; }
+  }
+  .barcode-ui {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-end; padding: 24px 16px;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    background: linear-gradient(transparent 40%, rgba(0,0,0,0.85));
+  }
+  .barcode-instruction {
+    font-size: 14px; color: #fff; font-weight: 600; margin-bottom: 12px; text-align: center;
+  }
+  .barcode-result-box {
+    width: 100%; background: rgba(0,0,0,0.8); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px; margin-bottom: 12px; display: none;
+  }
+  .barcode-result-box.show { display: block; }
+  .barcode-result-name { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  .barcode-result-macros { font-size: 12px; color: var(--text2); margin-bottom: 10px; }
+  .barcode-add-btn {
+    width: 100%; background: var(--yellow); color: #000; border: none;
+    border-radius: var(--radius-sm); padding: 11px; font-size: 14px; font-weight: 800;
+    cursor: pointer; font-family: inherit;
+  }
+  .barcode-close-btn {
+    background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+    border-radius: var(--radius-sm); padding: 12px 32px; font-size: 15px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+  }
+  /* Manual barcode entry fallback */
+  .barcode-manual-row {
+    display: flex; gap: 8px; width: 100%; margin-bottom: 10px;
+  }
+  .barcode-manual-input {
+    flex: 1; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); font-size: 14px; padding: 10px 12px; outline: none; font-family: inherit;
+  }
+  .barcode-manual-input:focus { border-color: var(--yellow); }
+  .barcode-lookup-btn {
+    background: var(--bg3); border: 1px solid var(--border); color: var(--yellow);
+    border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 800;
+    cursor: pointer; font-family: inherit; white-space: nowrap;
+  }
+
+  /* ── PUSH NOTIFICATION BANNER ── */
+  .notif-permission-card {
+    background: var(--bg2); border: 1px solid var(--yellow-border);
+    border-radius: var(--radius); padding: 14px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .notif-permission-icon { font-size: 24px; flex-shrink: 0; }
+  .notif-permission-text { flex: 1; }
+  .notif-permission-title { font-size: 13px; font-weight: 800; margin-bottom: 2px; }
+  .notif-permission-sub { font-size: 11px; color: var(--text2); }
+  .notif-enable-btn {
+    background: var(--yellow); color: #000; border: none; border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 800; cursor: pointer;
+    font-family: inherit; white-space: nowrap; flex-shrink: 0;
+  }
+
+  /* ── BODY COMPOSITION ── */
+  .bc-label {
+    font-size: 11px; color: var(--text3); font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    display: block; margin-bottom: 4px;
+  }
+  .bc-sex-btn {
+    flex: 1; padding: 8px 4px; font-size: 13px; font-weight: 700;
+    border-radius: 6px; border: 1px solid var(--border);
+    background: var(--bg3); color: var(--text2); cursor: pointer; font-family: inherit;
+    transition: all .15s;
+  }
+  .bc-sex-btn.active {
+    background: var(--yellow-bg); border-color: var(--yellow); color: var(--yellow);
+  }
+  .bc-result-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px;
+  }
+  .bc-card {
+    background: var(--bg3); border-radius: var(--radius-sm);
+    padding: 12px; border: 1px solid var(--border);
+  }
+  .bc-card.full { grid-column: 1 / -1; }
+  .bc-card .bc-card-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+    color: var(--text3); margin-bottom: 4px;
+  }
+  .bc-card .bc-card-val {
+    font-size: 22px; font-weight: 900; color: var(--text); line-height: 1;
+  }
+  .bc-card .bc-card-sub {
+    font-size: 11px; color: var(--text2); margin-top: 3px;
+  }
+  .bc-card.good .bc-card-val  { color: var(--green); }
+  .bc-card.warn .bc-card-val  { color: var(--orange); }
+  .bc-card.bad  .bc-card-val  { color: var(--red); }
+  .bc-card.great .bc-card-val { color: var(--yellow); }
+  .bc-range-bar {
+    height: 8px; border-radius: 4px; margin-top: 8px;
+    background: linear-gradient(90deg, var(--blue) 0%, var(--green) 25%, var(--yellow) 55%, var(--orange) 75%, var(--red) 100%);
+    position: relative; overflow: visible;
+  }
+  .bc-range-marker {
+    position: absolute; top: -4px; width: 2px; height: 16px;
+    background: #fff; border-radius: 1px; transform: translateX(-50%);
+    box-shadow: 0 0 4px rgba(0,0,0,0.6);
+  }
+  .bc-range-labels {
+    display: flex; justify-content: space-between;
+    font-size: 9px; color: var(--text3); margin-top: 3px;
+  }
+  .bc-ffmi-gauge {
+    height: 10px; border-radius: 5px; margin-top: 8px;
+    background: linear-gradient(90deg, var(--text3) 0%, var(--green) 40%, var(--yellow) 70%, var(--orange) 85%, var(--red) 100%);
+    position: relative;
+  }
 </style>
 </head>
 <body>
@@ -1139,15 +1402,27 @@
       <div style="font-size:13px;color:var(--text2);margin-top:8px;line-height:1.5;">Pick a username and 4-digit PIN.<br>Use the same ones on any device to restore your progress.</div>
     </div>
 
-    <input id="auth-username" type="text" placeholder="Username (e.g. jeff_lifts)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-      style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:16px;padding:14px;outline:none;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">
-    <input id="auth-pin" type="number" placeholder="4-digit PIN" inputmode="numeric" maxlength="4"
-      style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:22px;padding:14px;outline:none;box-sizing:border-box;margin-bottom:6px;font-family:inherit;letter-spacing:8px;">
+    <!-- Google Sign-In (primary) -->
+    <button onclick="doGoogleLogin()" id="google-signin-btn" style="width:100%;background:#fff;color:#1f1f1f;border:none;border-radius:12px;font-size:15px;font-weight:700;padding:14px 16px;cursor:pointer;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,0.3);">
+      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.1 0 5.6 1.1 7.6 2.8l5.7-5.7C33.8 3.5 29.2 1.5 24 1.5 14.8 1.5 7 7.4 3.8 15.5l6.7 5.2C12.2 14.2 17.6 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.4c-.5 2.8-2.1 5.2-4.4 6.8l6.8 5.3c4-3.7 6.3-9.2 6.3-16.1z"/><path fill="#FBBC05" d="M10.5 28.3c-.5-1.4-.8-2.8-.8-4.3s.3-2.9.8-4.3L3.8 14.5C2.1 17.7 1 21.2 1 24s1.1 6.3 2.8 9.5l6.7-5.2z"/><path fill="#34A853" d="M24 46.5c5.2 0 9.6-1.7 12.8-4.7l-6.8-5.3c-1.8 1.2-4 1.9-6 1.9-6.4 0-11.8-4.7-13.5-11l-6.7 5.2C7 40.6 14.8 46.5 24 46.5z"/></svg>
+      Continue with Google
+    </button>
+
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <div style="flex:1;height:1px;background:var(--border);"></div>
+      <div style="font-size:11px;color:var(--text3);white-space:nowrap;">or use username + PIN</div>
+      <div style="flex:1;height:1px;background:var(--border);"></div>
+    </div>
+
+    <div id="pin-login-section">
+      <input id="auth-username" type="text" placeholder="Username (e.g. jeff_lifts)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+        style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:16px;padding:14px;outline:none;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">
+      <input id="auth-pin" type="number" placeholder="4-digit PIN" inputmode="numeric" maxlength="4"
+        style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:22px;padding:14px;outline:none;box-sizing:border-box;margin-bottom:6px;font-family:inherit;letter-spacing:8px;">
+      <button onclick="doLogin()" style="width:100%;background:var(--yellow);color:#000;border:none;border-radius:12px;font-size:16px;font-weight:900;padding:14px;cursor:pointer;margin-bottom:10px;">Enter →</button>
+    </div>
+
     <div id="auth-error" style="font-size:13px;color:#ff6b6b;min-height:20px;margin-bottom:10px;text-align:center;"></div>
-
-    <button onclick="doLogin()" style="width:100%;background:var(--yellow);color:#000;border:none;border-radius:12px;font-size:16px;font-weight:900;padding:16px;cursor:pointer;margin-bottom:12px;">Enter →</button>
-
-    <div style="font-size:11px;color:var(--text3);text-align:center;line-height:1.6;margin-bottom:16px;">First time? Just enter a username and PIN — your account is created automatically.<br>Returning? Use the same username and PIN to pick up where you left off.</div>
 
     <button onclick="continueAsGuest()" style="width:100%;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;padding:8px;text-decoration:underline;">Skip — save locally only</button>
   </div>
@@ -1267,59 +1542,140 @@
 
   <!-- TOOLS VIEW -->
   <div id="view-tools" class="view">
-    <!-- Body Weight Log -->
-    <div class="section-header" style="margin-top:0">Body Weight</div>
-    <div class="bw-log-row">
-      <input type="number" id="bw-input" placeholder="lbs" step="0.1" min="0">
-      <button class="bw-log-btn" onclick="logBodyWeight()">Log</button>
+    <!-- Tools sub-nav -->
+    <div style="display:flex;gap:0;margin-bottom:14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;flex-shrink:0;">
+      <button class="tools-subnav active" data-tsub="weight"  onclick="switchToolsSub('weight')"  style="flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;color:var(--yellow);cursor:pointer;border-bottom:2px solid var(--yellow);">Weight</button>
+      <button class="tools-subnav"        data-tsub="orm"     onclick="switchToolsSub('orm')"     style="flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;">1RM</button>
+      <button class="tools-subnav"        data-tsub="calc"    onclick="switchToolsSub('calc')"    style="flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;">Calories</button>
+      <button class="tools-subnav"        data-tsub="body"    onclick="switchToolsSub('body')"    style="flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;">Body</button>
     </div>
-    <div class="bw-chart-wrap" id="bw-chart-wrap">
-      <div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No data yet — log your first weigh-in above.</div>
-    </div>
-    <div class="bw-stat" id="bw-stat"></div>
-    <div class="section-header">Past Entries</div>
-    <div class="bw-list" id="bw-list"></div>
 
-    <!-- 1RM Calculator -->
-    <div class="section-header" style="margin-top:20px;">1RM Calculator</div>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:4px;line-height:1.5;">Enter your 3-rep max to get your estimated 1RM and every training percentage you need.</p>
-    <p style="font-size:12px;color:var(--yellow);margin-bottom:16px;line-height:1.5;">Dumbbells: enter the weight of ONE dumbbell — 2×25 lbs = 25 lbs.</p>
-    <div id="orm-cards"></div>
-
-    <!-- Mass Gain Calculator -->
-    <div class="section-header" style="margin-top:20px;">Mass Gain Calculator</div>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:20px;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-        <div>
-          <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Current Weight</label>
-          <input id="mass-current" type="number" placeholder="lbs" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 10px;width:100%;outline:none;" oninput="calcMassGain()">
-        </div>
-        <div>
-          <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Goal Weight</label>
-          <input id="mass-goal" type="number" placeholder="lbs" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 10px;width:100%;outline:none;" oninput="calcMassGain()">
-        </div>
+    <!-- Weight sub-tab -->
+    <div id="tools-sub-weight" class="tools-sub">
+      <div class="section-header" style="margin-top:0">Body Weight</div>
+      <div class="bw-log-row">
+        <input type="number" id="bw-input" placeholder="lbs" step="0.1" min="0">
+        <button class="bw-log-btn" onclick="logBodyWeight()">Log</button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-        <div>
-          <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Height</label>
-          <div style="display:flex;gap:4px;">
-            <input id="mass-ft" type="number" placeholder="ft" min="4" max="7" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 6px;width:100%;outline:none;text-align:center;" oninput="calcMassGain()">
-            <input id="mass-in" type="number" placeholder="in" min="0" max="11" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 6px;width:100%;outline:none;text-align:center;" oninput="calcMassGain()">
+      <div class="bw-chart-wrap" id="bw-chart-wrap">
+        <div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No data yet — log your first weigh-in above.</div>
+      </div>
+      <div class="bw-stat" id="bw-stat"></div>
+      <div class="section-header">Past Entries</div>
+      <div class="bw-list" id="bw-list"></div>
+    </div>
+
+    <!-- 1RM sub-tab -->
+    <div id="tools-sub-orm" class="tools-sub" style="display:none;">
+      <div class="section-header" style="margin-top:0;">1RM Calculator</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:4px;line-height:1.5;">Enter your 3-rep max to get your estimated 1RM and every training percentage you need.</p>
+      <p style="font-size:12px;color:var(--yellow);margin-bottom:16px;line-height:1.5;">Dumbbells: enter the weight of ONE dumbbell — 2×25 lbs = 25 lbs.</p>
+      <div id="orm-cards"></div>
+    </div>
+
+    <!-- Calories sub-tab -->
+    <div id="tools-sub-calc" class="tools-sub" style="display:none;">
+      <div class="section-header" style="margin-top:0;">Mass Gain Calculator</div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:20px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div>
+            <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Current Weight</label>
+            <input id="mass-current" type="number" placeholder="lbs" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 10px;width:100%;outline:none;" oninput="calcMassGain();_mirrorMassToBc()">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Goal Weight</label>
+            <input id="mass-goal" type="number" placeholder="lbs" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 10px;width:100%;outline:none;" oninput="calcMassGain()">
           </div>
         </div>
-        <div>
-          <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Age</label>
-          <input id="mass-age" type="number" placeholder="yrs" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 10px;width:100%;outline:none;" oninput="calcMassGain()">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div>
+            <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Height</label>
+            <div style="display:flex;gap:4px;">
+              <input id="mass-ft" type="number" placeholder="ft" min="4" max="7" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 6px;width:100%;outline:none;text-align:center;" oninput="calcMassGain();_mirrorMassToBc()">
+              <input id="mass-in" type="number" placeholder="in" min="0" max="11" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 6px;width:100%;outline:none;text-align:center;" oninput="calcMassGain();_mirrorMassToBc()">
+            </div>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Age</label>
+            <input id="mass-age" type="number" placeholder="yrs" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 10px;width:100%;outline:none;" oninput="calcMassGain();_mirrorMassToBc()">
+          </div>
         </div>
-      </div>
-      <div style="margin-bottom:10px;">
-        <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Activity Level</label>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;" id="activity-btns">
-          <button class="activity-btn active" data-val="1.55" onclick="selectActivity(this)">Moderate<br><span style="font-size:10px;font-weight:400;">3-5 days/wk</span></button>
-          <button class="activity-btn" data-val="1.725" onclick="selectActivity(this)">Very Active<br><span style="font-size:10px;font-weight:400;">6-7 days/wk</span></button>
+        <div style="margin-bottom:10px;">
+          <label style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Activity Level</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;" id="activity-btns">
+            <button class="activity-btn active" data-val="1.55" onclick="selectActivity(this)">Moderate<br><span style="font-size:10px;font-weight:400;">3-5 days/wk</span></button>
+            <button class="activity-btn" data-val="1.725" onclick="selectActivity(this)">Very Active<br><span style="font-size:10px;font-weight:400;">6-7 days/wk</span></button>
+          </div>
         </div>
+        <div id="mass-result" style="display:none;margin-top:14px;border-top:1px solid var(--border);padding-top:14px;"></div>
       </div>
-      <div id="mass-result" style="display:none;margin-top:14px;border-top:1px solid var(--border);padding-top:14px;"></div>
+    </div>
+
+    <!-- Body Composition sub-tab -->
+    <div id="tools-sub-body" class="tools-sub" style="display:none;">
+      <div class="section-header" style="margin-top:0;">Body Composition</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.5;">Add neck and waist measurements for precise body fat via the U.S. Navy method.</p>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:20px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div>
+            <label class="bc-label">Weight (lbs)</label>
+            <input id="bc-weight" type="number" placeholder="lbs" step="0.5" min="0"
+              style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 10px;width:100%;outline:none;"
+              oninput="calcBodyComp()">
+          </div>
+          <div>
+            <label class="bc-label">Height</label>
+            <div style="display:flex;gap:4px;">
+              <input id="bc-ft" type="number" placeholder="ft" min="4" max="7"
+                style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 6px;width:100%;outline:none;text-align:center;"
+                oninput="calcBodyComp()">
+              <input id="bc-in" type="number" placeholder="in" min="0" max="11"
+                style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 6px;width:100%;outline:none;text-align:center;"
+                oninput="calcBodyComp()">
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div>
+            <label class="bc-label">Age</label>
+            <input id="bc-age" type="number" placeholder="yrs" min="10" max="99"
+              style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 10px;width:100%;outline:none;"
+              oninput="calcBodyComp()">
+          </div>
+          <div>
+            <label class="bc-label">Sex</label>
+            <div style="display:flex;gap:6px;margin-top:2px;">
+              <button class="bc-sex-btn active" id="bc-sex-m" onclick="setBCSex('m')">Male</button>
+              <button class="bc-sex-btn" id="bc-sex-f" onclick="setBCSex('f')">Female</button>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:11px;font-weight:800;color:var(--yellow);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">Navy Body Fat Measurements (inches)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px;">
+          <div>
+            <label class="bc-label">Neck circumference</label>
+            <input id="bc-neck" type="number" placeholder="in" step="0.25" min="0"
+              style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 10px;width:100%;outline:none;"
+              oninput="calcBodyComp()">
+          </div>
+          <div>
+            <label class="bc-label">Waist (at navel)</label>
+            <input id="bc-waist" type="number" placeholder="in" step="0.25" min="0"
+              style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 10px;width:100%;outline:none;"
+              oninput="calcBodyComp()">
+          </div>
+        </div>
+        <div id="bc-hip-row" style="display:none;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div>
+            <label class="bc-label">Hips (widest) <span style="color:var(--text3);font-weight:400;">women only</span></label>
+            <input id="bc-hip" type="number" placeholder="in" step="0.25" min="0"
+              style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 10px;width:100%;outline:none;"
+              oninput="calcBodyComp()">
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--text3);line-height:1.5;margin-bottom:14px;">Measure neck below larynx. Measure waist at navel, relaxed. BMI calculates from height + weight alone — Navy method requires neck + waist.</p>
+        <div id="bc-result"></div>
+      </div>
     </div>
   </div>
 </main>
@@ -1347,6 +1703,34 @@
   <div id="rest-next"></div>
   <div id="rest-goto"></div>
   <button id="rest-skip" onclick="skipRest()">Skip Rest</button>
+</div>
+
+<!-- PROGRESS PHOTOS OVERLAY -->
+<div id="photo-overlay">
+  <div class="photo-overlay-header">
+    <div class="photo-overlay-title">Progress Photos</div>
+    <button class="photo-overlay-close" onclick="closePhotoOverlay()">&times;</button>
+  </div>
+  <div class="photo-overlay-body" id="photo-overlay-body"></div>
+</div>
+
+<!-- BARCODE SCANNER OVERLAY -->
+<div id="barcode-overlay">
+  <video id="barcode-video" playsinline muted autoplay></video>
+  <div class="barcode-ui">
+    <div class="barcode-scan-line"></div>
+    <div class="barcode-instruction">Point camera at a food barcode</div>
+    <div id="barcode-result-box" class="barcode-result-box">
+      <div class="barcode-result-name" id="barcode-result-name"></div>
+      <div class="barcode-result-macros" id="barcode-result-macros"></div>
+      <button class="barcode-add-btn" onclick="addBarcodeFood()">Add to Food Log</button>
+    </div>
+    <div class="barcode-manual-row">
+      <input type="number" class="barcode-manual-input" id="barcode-manual-input" placeholder="Or enter barcode number..." inputmode="numeric">
+      <button class="barcode-lookup-btn" onclick="lookupBarcodeManual()">Look Up</button>
+    </div>
+    <button class="barcode-close-btn" onclick="closeBarcodeScanner()">Cancel</button>
+  </div>
 </div>
 
 <!-- BOTTOM NAV -->
@@ -2350,7 +2734,7 @@ function deleteBWByDate(dateISO) {
 function syncActiveView() {
   const v = state.activeView;
   if (v === 'home') { renderHome(); }
-  if (v === 'tools') { renderWeightView(); renderORM(); }
+  if (v === 'tools') { switchToolsSub(ls('tools_sub','weight')); }
 }
 
 // Refresh Home after goal/nutrition changes
@@ -3082,7 +3466,7 @@ function switchView(viewName) {
   if (viewName === 'home') renderHome();
   if (viewName === 'today') renderToday();
   if (viewName === 'program') renderProgram();
-  if (viewName === 'tools') { renderWeightView(); renderORM(); loadMassInputs(); }
+  if (viewName === 'tools') { switchToolsSub(ls('tools_sub','weight')); }
   updateHeader();
   const mainEl = document.getElementById('app-main');
   if (mainEl) mainEl.scrollTop = 0;
@@ -4590,6 +4974,24 @@ function switchProgSub(sub) {
   } else if (sub === 'nutrition') {
     renderNutritionMain();
   }
+}
+
+function switchToolsSub(sub) {
+  lsSet('tools_sub', sub);
+  document.querySelectorAll('.tools-subnav').forEach(b => {
+    const isActive = b.dataset.tsub === sub;
+    b.style.color = isActive ? 'var(--yellow)' : 'var(--text3)';
+    b.style.borderBottom = isActive ? '2px solid var(--yellow)' : '2px solid transparent';
+    b.classList.toggle('active', isActive);
+  });
+  document.querySelectorAll('.tools-sub').forEach(s => s.style.display = 'none');
+  const panel = document.getElementById('tools-sub-' + sub);
+  if (panel) panel.style.display = 'block';
+
+  if (sub === 'weight')  { renderWeightView(); }
+  if (sub === 'orm')     { renderORM(); }
+  if (sub === 'calc')    { loadMassInputs(); }
+  if (sub === 'body')    { setTimeout(_loadBCInputs, 30); }
 }
 
 function renderProgramOverview(container) {
@@ -6753,6 +7155,18 @@ function doLogin() {
     });
 }
 
+function doGoogleLogin() {
+  const btn = document.getElementById('google-signin-btn');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; btn.textContent = 'Redirecting to Google…'; }
+  setAuthError('');
+  const provider = new firebase.auth.GoogleAuthProvider();
+  provider.addScope('profile');
+  provider.addScope('email');
+  // YouTube scope — if user has Premium, embeds in the app won't show ads
+  provider.addScope('https://www.googleapis.com/auth/youtube.readonly');
+  auth.signInWithRedirect(provider);
+}
+
 function continueAsGuest() {
   document.getElementById('login-overlay').style.display = 'none';
   bootApp(false);
@@ -6761,6 +7175,8 @@ function continueAsGuest() {
 function doSignOut() {
   document.getElementById('account-menu-popup')?.remove();
   localStorage.removeItem('wapp_username');
+  localStorage.removeItem('wapp_google_name');
+  localStorage.removeItem('wapp_google_photo');
   auth.signOut();
   // onAuthStateChanged will show login overlay
 }
@@ -6781,15 +7197,23 @@ function showAccountMenu() {
   const sectionLabel = (text) => `<div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:1px;text-transform:uppercase;padding:18px 16px 8px;">${text}</div>`;
   const sheetBtn = (label, onclick, extra='') => `<button onclick="${onclick}" style="width:100%;background:none;border:none;border-top:1px solid var(--border);color:var(--text);font-size:15px;font-weight:600;padding:14px 16px;text-align:left;cursor:pointer;font-family:inherit;${extra}">${label}</button>`;
 
+  const googleName = localStorage.getItem('wapp_google_name');
+  const googlePhoto = localStorage.getItem('wapp_google_photo');
+  const isGoogleUser = user && user.providerData && user.providerData.some(p => p.providerId === 'google.com');
+  const displayName = googleName || username;
+  const avatarHtml = (isGoogleUser && googlePhoto)
+    ? `<img src="${googlePhoto}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">`
+    : `<div style="width:42px;height:42px;background:var(--yellow);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#000;flex-shrink:0;">${(displayName||'U')[0].toUpperCase()}</div>`;
+
   let accountSection = '';
   if (user) {
     accountSection = `
       ${sectionLabel('Account')}
       <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid var(--border);">
-        <div style="width:42px;height:42px;background:var(--yellow);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#000;flex-shrink:0;">${(username||'U')[0].toUpperCase()}</div>
+        ${avatarHtml}
         <div>
-          <div style="font-size:16px;font-weight:800;color:var(--text);">@${username || 'user'}</div>
-          <div style="font-size:12px;color:var(--text3);margin-top:2px;">Synced to cloud</div>
+          <div style="font-size:16px;font-weight:800;color:var(--text);">${isGoogleUser ? (googleName || user.email) : '@' + (username || 'user')}</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px;">${isGoogleUser ? 'Signed in with Google · Synced' : 'Synced to cloud'}</div>
         </div>
       </div>
       ${sheetBtn('Sign Out', "document.getElementById('settings-sheet-overlay')?.remove();doSignOut();", 'color:#ff6b6b;')}`;
@@ -6918,11 +7342,43 @@ function init() {
 
   let booted = false;
 
+  // Handle Google redirect result first — must be called before onAuthStateChanged
+  // resolves so we can store profile info from the credential
+  auth.getRedirectResult()
+    .then(result => {
+      if (result && result.user) {
+        const u = result.user;
+        if (u.displayName) localStorage.setItem('wapp_google_name', u.displayName);
+        if (u.photoURL)    localStorage.setItem('wapp_google_photo', u.photoURL);
+        // Derive a username from the Google display name for display purposes
+        const derived = (u.displayName || u.email || 'user')
+          .split(/\s+/)[0].toLowerCase().replace(/[^a-z0-9_]/g, '');
+        localStorage.setItem('wapp_username', derived);
+      }
+    })
+    .catch(err => {
+      // Redirect was cancelled or failed
+      if (err.code !== 'auth/credential-already-in-use') {
+        setAuthError('Google sign-in failed: ' + (err.message || err.code));
+      }
+    });
+
   // Firebase Auth persists the session — onAuthStateChanged resolves on every load
   auth.onAuthStateChanged(user => {
     const overlay = document.getElementById('login-overlay');
     if (user && !booted) {
       booted = true;
+      // Store Google profile if available and not already stored
+      if (user.displayName && !localStorage.getItem('wapp_google_name')) {
+        localStorage.setItem('wapp_google_name', user.displayName);
+      }
+      if (user.photoURL && !localStorage.getItem('wapp_google_photo')) {
+        localStorage.setItem('wapp_google_photo', user.photoURL);
+      }
+      if (!localStorage.getItem('wapp_username') && user.displayName) {
+        const derived = user.displayName.split(/\s+/)[0].toLowerCase().replace(/[^a-z0-9_]/g,'');
+        localStorage.setItem('wapp_username', derived);
+      }
       if (overlay) overlay.style.display = 'none';
       loadFromCloud(() => bootApp(true));
     } else if (!user) {
@@ -6931,6 +7387,1133 @@ function init() {
     }
   });
 }
+
+// ════════════════════════════════════════════════════════════
+// BODY COMPOSITION CALCULATOR
+// ════════════════════════════════════════════════════════════
+let _bcSex = localStorage.getItem('bc_sex') || 'm';
+
+function setBCSex(s) {
+  _bcSex = s;
+  localStorage.setItem('bc_sex', s);
+  document.getElementById('bc-sex-m').classList.toggle('active', s === 'm');
+  document.getElementById('bc-sex-f').classList.toggle('active', s === 'f');
+  // Show/hide hip row
+  const hipRow = document.getElementById('bc-hip-row');
+  if (hipRow) hipRow.style.display = s === 'f' ? 'grid' : 'none';
+  calcBodyComp();
+}
+
+function calcBodyComp() {
+  const weightLbs = parseFloat(document.getElementById('bc-weight')?.value) || 0;
+  const ft  = parseFloat(document.getElementById('bc-ft')?.value)  || 0;
+  const ins = parseFloat(document.getElementById('bc-in')?.value)  || 0;
+  const age = parseFloat(document.getElementById('bc-age')?.value) || 0;
+  const neck  = parseFloat(document.getElementById('bc-neck')?.value)  || 0;
+  const waist = parseFloat(document.getElementById('bc-waist')?.value) || 0;
+  const hip   = parseFloat(document.getElementById('bc-hip')?.value)   || 0;
+
+  const result = document.getElementById('bc-result');
+  if (!result) return;
+  if (!weightLbs || !ft) { result.innerHTML = ''; return; }
+
+  const totalInches = ft * 12 + ins;
+  const heightCm = totalInches * 2.54;
+  const weightKg = weightLbs * 0.453592;
+
+  // ── BMI ──
+  const bmi = weightKg / ((heightCm / 100) ** 2);
+  let bmiCat, bmiClass;
+  if      (bmi < 18.5) { bmiCat = 'Underweight'; bmiClass = 'warn'; }
+  else if (bmi < 25)   { bmiCat = 'Normal';       bmiClass = 'good'; }
+  else if (bmi < 30)   { bmiCat = 'Overweight';   bmiClass = 'warn'; }
+  else if (bmi < 35)   { bmiCat = 'Obese I';      bmiClass = 'bad';  }
+  else                 { bmiCat = 'Obese II+';     bmiClass = 'bad';  }
+  // BMI range bar position (scale 15–40)
+  const bmiPct = Math.min(100, Math.max(0, (bmi - 15) / 25 * 100));
+
+  // ── Navy Body Fat % ──
+  let navyBF = null, navyNote = '';
+  if (neck > 0 && waist > 0 && totalInches > 0) {
+    const heightIn = totalInches;
+    if (_bcSex === 'm') {
+      // Male: %BF = 86.010 × log10(abdomen − neck) − 70.041 × log10(height) + 36.76
+      const val = 86.010 * Math.log10(waist - neck) - 70.041 * Math.log10(heightIn) + 36.76;
+      navyBF = Math.max(2, Math.round(val * 10) / 10);
+    } else {
+      // Female: %BF = 163.205 × log10(waist + hip − neck) − 97.684 × log10(height) − 78.387
+      if (hip > 0) {
+        const val = 163.205 * Math.log10(waist + hip - neck) - 97.684 * Math.log10(heightIn) - 78.387;
+        navyBF = Math.max(8, Math.round(val * 10) / 10);
+      } else {
+        navyNote = 'Add hip measurement for female body fat';
+      }
+    }
+  }
+
+  // ── Lean Body Mass & Fat Mass ──
+  let lbm = null, fatMass = null;
+  let bfClass = '', bfCat = '';
+  if (navyBF !== null) {
+    fatMass = Math.round(weightLbs * navyBF / 100 * 10) / 10;
+    lbm     = Math.round((weightLbs - fatMass) * 10) / 10;
+    // Body fat categories (ACE guidelines)
+    if (_bcSex === 'm') {
+      if      (navyBF < 6)  { bfCat = 'Essential fat'; bfClass = 'warn'; }
+      else if (navyBF < 14) { bfCat = 'Athlete';       bfClass = 'great'; }
+      else if (navyBF < 18) { bfCat = 'Fitness';       bfClass = 'good'; }
+      else if (navyBF < 25) { bfCat = 'Average';       bfClass = ''; }
+      else                  { bfCat = 'Above average';  bfClass = 'bad'; }
+    } else {
+      if      (navyBF < 14) { bfCat = 'Essential fat'; bfClass = 'warn'; }
+      else if (navyBF < 21) { bfCat = 'Athlete';       bfClass = 'great'; }
+      else if (navyBF < 25) { bfCat = 'Fitness';       bfClass = 'good'; }
+      else if (navyBF < 32) { bfCat = 'Average';       bfClass = ''; }
+      else                  { bfCat = 'Above average';  bfClass = 'bad'; }
+    }
+  }
+
+  // ── FFMI (Fat-Free Mass Index) — only if we have body fat ──
+  // FFMI = LBM(kg) / height(m)² — normalized FFMI adds 6.1 × (1.8 − height_m)
+  let ffmi = null, ffmiNorm = null, ffmiCat = '', ffmiClass = '';
+  if (lbm !== null) {
+    const lbmKg = lbm * 0.453592;
+    const hm = heightCm / 100;
+    ffmi     = Math.round(lbmKg / (hm * hm) * 10) / 10;
+    ffmiNorm = Math.round((ffmi + 6.1 * (1.8 - hm)) * 10) / 10;
+    if (_bcSex === 'm') {
+      if      (ffmiNorm < 18) { ffmiCat = 'Below avg';    ffmiClass = 'warn'; }
+      else if (ffmiNorm < 20) { ffmiCat = 'Average';      ffmiClass = ''; }
+      else if (ffmiNorm < 22) { ffmiCat = 'Above average'; ffmiClass = 'good'; }
+      else if (ffmiNorm < 24) { ffmiCat = 'Excellent';    ffmiClass = 'great'; }
+      else if (ffmiNorm < 26) { ffmiCat = 'Superior';     ffmiClass = 'great'; }
+      else                    { ffmiCat = 'Elite (rare)'; ffmiClass = 'great'; }
+    } else {
+      if      (ffmiNorm < 14) { ffmiCat = 'Below avg';    ffmiClass = 'warn'; }
+      else if (ffmiNorm < 16) { ffmiCat = 'Average';      ffmiClass = ''; }
+      else if (ffmiNorm < 18) { ffmiCat = 'Above average'; ffmiClass = 'good'; }
+      else if (ffmiNorm < 20) { ffmiCat = 'Excellent';    ffmiClass = 'great'; }
+      else                    { ffmiCat = 'Elite';        ffmiClass = 'great'; }
+    }
+  }
+
+  // ── Ideal Body Weight (multiple formulas, show range) ──
+  // Devine: male 50 kg + 2.3 kg/in over 5ft; female 45.5 kg + 2.3 kg/in over 5ft
+  const inchesOver5ft = Math.max(0, totalInches - 60);
+  const devineKg = _bcSex === 'm' ? 50 + 2.3 * inchesOver5ft : 45.5 + 2.3 * inchesOver5ft;
+  // Robinson: male 52 + 1.9/in; female 49 + 1.7/in
+  const robinsonKg = _bcSex === 'm' ? 52 + 1.9 * inchesOver5ft : 49 + 1.7 * inchesOver5ft;
+  const ibwLow  = Math.round(Math.min(devineKg, robinsonKg) * 2.205);
+  const ibwHigh = Math.round(Math.max(devineKg, robinsonKg) * 2.205);
+
+  // ── Waist-to-Height Ratio ──
+  const wthr = waist > 0 ? Math.round(waist / totalInches * 1000) / 1000 : null;
+  let wthrCat = '', wthrClass = '';
+  if (wthr !== null) {
+    if      (wthr < 0.43) { wthrCat = 'Very slim';    wthrClass = 'warn'; }
+    else if (wthr < 0.53) { wthrCat = 'Healthy';      wthrClass = 'good'; }
+    else if (wthr < 0.58) { wthrCat = 'Overweight';   wthrClass = 'warn'; }
+    else if (wthr < 0.63) { wthrCat = 'Obese';        wthrClass = 'bad';  }
+    else                  { wthrCat = 'High risk';     wthrClass = 'bad';  }
+  }
+
+  // ── Basal Metabolic Rate (Mifflin-St Jeor) ──
+  let bmr = null;
+  if (age > 0) {
+    bmr = _bcSex === 'm'
+      ? Math.round(10 * weightKg + 6.25 * heightCm - 5 * age + 5)
+      : Math.round(10 * weightKg + 6.25 * heightCm - 5 * age - 161);
+  }
+
+  // ── Build output HTML ──
+  const bmiMarkerPct = bmiPct.toFixed(1);
+  // BF bar: scale 3–40% for men, 10–50% for women
+  const bfMin = _bcSex === 'm' ? 3 : 10;
+  const bfMax = _bcSex === 'm' ? 40 : 50;
+  const bfBarPct = navyBF !== null ? Math.min(100, Math.max(0, (navyBF - bfMin) / (bfMax - bfMin) * 100)).toFixed(1) : null;
+
+  let html = `<div class="bc-result-grid">`;
+
+  // BMI card
+  html += `
+    <div class="bc-card ${bmiClass}">
+      <div class="bc-card-label">BMI</div>
+      <div class="bc-card-val">${bmi.toFixed(1)}</div>
+      <div class="bc-card-sub">${bmiCat}</div>
+      <div class="bc-range-bar" title="BMI scale 15–40">
+        <div class="bc-range-marker" style="left:${bmiMarkerPct}%"></div>
+      </div>
+      <div class="bc-range-labels"><span>15</span><span>25</span><span>30</span><span>40</span></div>
+    </div>`;
+
+  // Ideal weight card
+  html += `
+    <div class="bc-card">
+      <div class="bc-card-label">Ideal Weight</div>
+      <div class="bc-card-val" style="font-size:17px;">${ibwLow}–${ibwHigh}</div>
+      <div class="bc-card-sub">lbs (Devine / Robinson)</div>
+    </div>`;
+
+  // Navy body fat card
+  if (navyBF !== null) {
+    html += `
+      <div class="bc-card ${bfClass}">
+        <div class="bc-card-label">Body Fat %</div>
+        <div class="bc-card-val">${navyBF}%</div>
+        <div class="bc-card-sub">${bfCat} · Navy method</div>
+        <div class="bc-range-bar" title="Body fat scale">
+          <div class="bc-range-marker" style="left:${bfBarPct}%"></div>
+        </div>
+        <div class="bc-range-labels"><span>${bfMin}%</span><span>${Math.round((bfMin+bfMax)/2)}%</span><span>${bfMax}%</span></div>
+      </div>`;
+
+    // Lean / fat mass card
+    html += `
+      <div class="bc-card">
+        <div class="bc-card-label">Lean / Fat Mass</div>
+        <div class="bc-card-val" style="font-size:17px;">${lbm} lbs</div>
+        <div class="bc-card-sub">lean &nbsp;·&nbsp; ${fatMass} lbs fat</div>
+      </div>`;
+  } else if (navyNote) {
+    html += `<div class="bc-card full"><div class="bc-card-sub" style="color:var(--yellow);">${navyNote}</div></div>`;
+  }
+
+  // FFMI card (full width — it's the most important metric for lifters)
+  if (ffmi !== null) {
+    const ffmiMin = _bcSex === 'm' ? 16 : 12;
+    const ffmiMax = _bcSex === 'm' ? 28 : 22;
+    const ffmiPct = Math.min(100, Math.max(0, (ffmiNorm - ffmiMin) / (ffmiMax - ffmiMin) * 100)).toFixed(1);
+    html += `
+      <div class="bc-card full ${ffmiClass}">
+        <div class="bc-card-label">FFMI — Fat-Free Mass Index</div>
+        <div style="display:flex;align-items:baseline;gap:10px;">
+          <div class="bc-card-val">${ffmiNorm}</div>
+          <div class="bc-card-sub">(raw ${ffmi}) · ${ffmiCat}</div>
+        </div>
+        <div class="bc-ffmi-gauge" style="margin-top:8px;">
+          <div class="bc-range-marker" style="left:${ffmiPct}%"></div>
+        </div>
+        <div class="bc-range-labels" style="margin-top:3px;">
+          <span>Below avg</span><span>Average</span><span>Excellent</span><span>Elite</span>
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:6px;line-height:1.4;">
+          FFMI measures muscle mass relative to height — the gold standard for lifters. Natural limit ≈ 25 for men / 21 for women.
+        </div>
+      </div>`;
+  }
+
+  // Waist-to-height ratio
+  if (wthr !== null) {
+    const wthrPct = Math.min(100, Math.max(0, (wthr - 0.35) / 0.35 * 100)).toFixed(1);
+    html += `
+      <div class="bc-card ${wthrClass}">
+        <div class="bc-card-label">Waist-to-Height</div>
+        <div class="bc-card-val">${wthr.toFixed(3)}</div>
+        <div class="bc-card-sub">${wthrCat}</div>
+        <div class="bc-range-bar" style="margin-top:8px;">
+          <div class="bc-range-marker" style="left:${wthrPct}%"></div>
+        </div>
+        <div class="bc-range-labels"><span>0.35</span><span>0.50</span><span>0.60</span><span>0.70</span></div>
+      </div>`;
+  }
+
+  // BMR card
+  if (bmr !== null) {
+    html += `
+      <div class="bc-card ${wthr !== null ? '' : 'full'}">
+        <div class="bc-card-label">BMR (Mifflin)</div>
+        <div class="bc-card-val" style="font-size:18px;">${bmr.toLocaleString()}</div>
+        <div class="bc-card-sub">kcal/day at rest</div>
+      </div>`;
+  }
+
+  html += `</div>`;
+
+  // Save inputs for persistence
+  lsSet('bc_inputs', { weight: weightLbs, ft, ins, age, neck, waist, hip, sex: _bcSex });
+
+  result.innerHTML = html;
+}
+
+function _mirrorMassToBc() {
+  const map = [['mass-current','bc-weight'],['mass-ft','bc-ft'],['mass-in','bc-in'],['mass-age','bc-age']];
+  map.forEach(([src, dst]) => {
+    const s = document.getElementById(src), d = document.getElementById(dst);
+    if (s && d && s.value && !d.value) d.value = s.value;
+    else if (s && d && s.value) d.value = s.value;
+  });
+  calcBodyComp();
+}
+
+function _loadBCInputs() {
+  // Pre-fill from mass gain calc if body comp fields are empty
+  const saved = ls('bc_inputs', null);
+  const setIfEmpty = (id, val) => {
+    const el = document.getElementById(id);
+    if (el && !el.value && val) el.value = val;
+  };
+  if (saved) {
+    setIfEmpty('bc-weight', saved.weight);
+    setIfEmpty('bc-ft', saved.ft);
+    setIfEmpty('bc-in', saved.ins);
+    setIfEmpty('bc-age', saved.age);
+    setIfEmpty('bc-neck', saved.neck);
+    setIfEmpty('bc-waist', saved.waist);
+    setIfEmpty('bc-hip', saved.hip);
+    if (saved.sex) { _bcSex = saved.sex; setBCSex(saved.sex); }
+  }
+  // Also mirror from mass calc inputs if they have values
+  setIfEmpty('bc-weight', document.getElementById('mass-current')?.value);
+  setIfEmpty('bc-ft',     document.getElementById('mass-ft')?.value);
+  setIfEmpty('bc-in',     document.getElementById('mass-in')?.value);
+  setIfEmpty('bc-age',    document.getElementById('mass-age')?.value);
+
+  // Apply initial sex state
+  setBCSex(_bcSex);
+  calcBodyComp();
+}
+
+// ════════════════════════════════════════════════════════════
+// REST TIMER COUNTDOWN BEEPS (3-2-1)
+// ════════════════════════════════════════════════════════════
+let _lastCountdownBeep = -1;
+
+function playCountdownBeep(n) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.value = n === 1 ? 1320 : 880;
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.12);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.15);
+  } catch(e) {}
+}
+
+// Patch tickRest to add countdown beeps
+const _origTickRest = tickRest;
+(function patchTickRest() {
+  const origInterval = () => {
+    const remaining = Math.max(0, Math.ceil((restEndTime - Date.now()) / 1000));
+    if (remaining !== restRemaining) {
+      restRemaining = remaining;
+      updateRestDisplay();
+      // Countdown beeps at 3, 2, 1
+      if (remaining > 0 && remaining <= 3 && remaining !== _lastCountdownBeep) {
+        _lastCountdownBeep = remaining;
+        playCountdownBeep(remaining);
+        if (navigator.vibrate) navigator.vibrate(50);
+      }
+    }
+    if (restRemaining <= 0) {
+      clearInterval(restTimer);
+      _lastCountdownBeep = -1;
+      playAlarm();
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+      const gotoEl = document.getElementById('rest-goto');
+      if (restCallback) {
+        gotoEl.textContent = '→ Go to next set';
+        gotoEl.classList.add('show');
+        setTimeout(() => {
+          document.getElementById('rest-overlay').classList.remove('show');
+          gotoEl.classList.remove('show');
+          if (restCallback) { restCallback(); restCallback = null; }
+        }, 1200);
+      } else {
+        setTimeout(() => document.getElementById('rest-overlay').classList.remove('show'), 1200);
+      }
+    }
+  };
+  // Override startRest to reset countdown state and use patched tick
+  const _origStartRest = startRest;
+  window.startRest = function(seconds, exerciseName, nextInfo, onDone) {
+    _lastCountdownBeep = -1;
+    clearInterval(restTimer);
+    restTotal = seconds;
+    restRemaining = seconds;
+    restEndTime = Date.now() + seconds * 1000;
+    restCallback = onDone || null;
+    document.getElementById('rest-arc').style.strokeDasharray = CIRCUMFERENCE;
+    document.getElementById('rest-exercise').textContent = exerciseName;
+    document.getElementById('rest-next').textContent = nextInfo || '';
+    const gotoEl = document.getElementById('rest-goto');
+    gotoEl.textContent = '';
+    gotoEl.classList.remove('show');
+    updateRestDisplay();
+    document.getElementById('rest-overlay').classList.add('show');
+    restTimer = setInterval(origInterval, 250);
+  };
+})();
+
+// ════════════════════════════════════════════════════════════
+// WORKOUT HISTORY CALENDAR
+// ════════════════════════════════════════════════════════════
+let _calDisplayYear = new Date().getFullYear();
+let _calDisplayMonth = new Date().getMonth();
+
+function renderCalendar(year, month) {
+  const history = getHistory();
+  const trainedDates = new Set(
+    history.map(s => {
+      const d = new Date(s.dateRaw);
+      return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    })
+  );
+  const now = new Date();
+  const todayKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const first = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0).getDate();
+  const startDow = first.getDay(); // 0=Sun
+
+  let dows = ['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => `<div class="cal-dow">${d}</div>`).join('');
+
+  let cells = '';
+  // Blank cells before first
+  for (let i = 0; i < startDow; i++) {
+    const prevDate = new Date(year, month, -(startDow - i - 1));
+    cells += `<div class="cal-day other-month">${prevDate.getDate()}</div>`;
+  }
+  for (let d = 1; d <= lastDay; d++) {
+    const key = `${year}-${month}-${d}`;
+    const isTrained = trainedDates.has(key);
+    const isToday = key === todayKey;
+    let cls = 'cal-day';
+    if (isTrained) cls += ' trained';
+    if (isToday) cls += ' today';
+    cells += `<div class="${cls}">${d}</div>`;
+  }
+  // Fill remaining cells
+  const totalCells = startDow + lastDay;
+  const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for (let d = 1; d <= remaining; d++) {
+    cells += `<div class="cal-day other-month">${d}</div>`;
+  }
+
+  // Streak calc
+  let streak = 0, longest = 0;
+  if (history.length) {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const sorted = [...history].sort((a,b) => b.dateRaw - a.dateRaw);
+    let check = today.getTime();
+    for (const s of sorted) {
+      const d = new Date(s.dateRaw); d.setHours(0,0,0,0);
+      if (d.getTime() === check || d.getTime() === check - 86400000) {
+        streak++;
+        check = d.getTime() - 86400000;
+      } else break;
+    }
+    // longest streak
+    let cur = 1;
+    const sortedAsc = [...history].sort((a,b) => a.dateRaw - b.dateRaw);
+    for (let i = 1; i < sortedAsc.length; i++) {
+      const prev = new Date(sortedAsc[i-1].dateRaw); prev.setHours(0,0,0,0);
+      const curr = new Date(sortedAsc[i].dateRaw);   curr.setHours(0,0,0,0);
+      if (curr.getTime() - prev.getTime() === 86400000) { cur++; longest = Math.max(longest, cur); }
+      else cur = 1;
+    }
+    longest = Math.max(longest, cur, streak);
+  }
+
+  return `
+    <div class="home-calendar-card">
+      <div class="home-calendar-header">
+        <div class="home-calendar-title">Workout Calendar</div>
+        <div class="home-calendar-nav">
+          <button class="cal-nav-btn" onclick="calPrev()">‹</button>
+          <div class="cal-month-label" id="cal-month-label">${monthNames[month]} ${year}</div>
+          <button class="cal-nav-btn" onclick="calNext()">›</button>
+        </div>
+      </div>
+      <div class="cal-grid" id="cal-grid-days">
+        ${dows}${cells}
+      </div>
+      <div class="cal-streak-row">
+        <div class="cal-streak-chip">
+          <div class="csc-val">${streak}</div>
+          <div class="csc-label">Current Streak</div>
+        </div>
+        <div class="cal-streak-chip">
+          <div class="csc-val">${longest}</div>
+          <div class="csc-label">Longest Streak</div>
+        </div>
+        <div class="cal-streak-chip">
+          <div class="csc-val">${history.length}</div>
+          <div class="csc-label">Total Sessions</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function calPrev() {
+  _calDisplayMonth--;
+  if (_calDisplayMonth < 0) { _calDisplayMonth = 11; _calDisplayYear--; }
+  _refreshCalendarInDOM();
+}
+function calNext() {
+  _calDisplayMonth++;
+  if (_calDisplayMonth > 11) { _calDisplayMonth = 0; _calDisplayYear++; }
+  _refreshCalendarInDOM();
+}
+function _refreshCalendarInDOM() {
+  const card = document.querySelector('.home-calendar-card');
+  if (!card) return;
+  const newHtml = renderCalendar(_calDisplayYear, _calDisplayMonth);
+  const tmp = document.createElement('div');
+  tmp.innerHTML = newHtml;
+  card.parentNode.replaceChild(tmp.firstElementChild, card);
+}
+
+// ════════════════════════════════════════════════════════════
+// PERSONAL RECORDS BOARD
+// ════════════════════════════════════════════════════════════
+
+function getPRBoard() { return ls('pr_board', {}); }
+function savePRBoard(b) { lsSet('pr_board', b); }
+
+// Call this whenever a workout weight is logged
+function checkAndUpdatePR(liftName, weightLbs, dateLabel) {
+  if (!liftName || !weightLbs) return;
+  const board = getPRBoard();
+  const current = board[liftName];
+  const w = parseFloat(weightLbs);
+  if (!current || w > current.weight) {
+    board[liftName] = { weight: w, date: dateLabel || new Date().toLocaleDateString(), ts: Date.now(), isNew: true };
+    savePRBoard(board);
+    if (current) showToast(`New PR! ${liftName}: ${w} lbs`);
+    return true;
+  }
+  return false;
+}
+
+function renderPRBoard() {
+  const board = getPRBoard();
+  const entries = Object.entries(board).sort((a,b) => b[1].weight - a[1].weight);
+  if (!entries.length) return '';
+
+  const rows = entries.map(([name, data]) => {
+    const isNew = data.isNew;
+    return `
+      <div class="pr-board-row">
+        <div class="pr-board-name">${name}</div>
+        <div class="pr-board-right">
+          ${isNew ? `<span class="pr-board-badge new-pr">PR</span>` : `<span class="pr-board-badge">Best</span>`}
+          <div>
+            <div class="pr-board-val">${data.weight} lbs</div>
+            <div class="pr-board-date">${data.date}</div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="pr-board-card">
+      <div class="pr-board-header">
+        <div style="font-size:13px;font-weight:800;">Personal Records</div>
+        <div style="font-size:11px;color:var(--text3);">Auto-tracked from workouts</div>
+      </div>
+      ${rows}
+    </div>`;
+}
+
+// Clear "isNew" flags when home is viewed
+function clearNewPRFlags() {
+  const board = getPRBoard();
+  let changed = false;
+  Object.values(board).forEach(v => { if (v.isNew) { v.isNew = false; changed = true; } });
+  if (changed) savePRBoard(board);
+}
+
+// ════════════════════════════════════════════════════════════
+// DELOAD WEEK DETECTION
+// ════════════════════════════════════════════════════════════
+
+function isDeloadWeek() {
+  // Deload after every 4th week of Phase 1 (weeks 4 and 8)
+  // and end of Phase 2/3 blocks
+  if (activeMensProgram === 'hc12' || !activeMensProgram) {
+    const w = (ls('hc_state', {}).week || 1);
+    return w === 4 || w === 8;
+  }
+  if (activeMensProgram === 'growth') {
+    const gw = getGrowthState().week;
+    return gw === 4;
+  }
+  return false;
+}
+
+function renderDeloadBanner() {
+  if (!isDeloadWeek()) return '';
+  return `
+    <div class="deload-banner">
+      <div class="deload-banner-icon">🔄</div>
+      <div class="deload-banner-text">
+        <div class="deload-banner-title">Deload Week — Active Recovery</div>
+        <div class="deload-banner-sub">Reduce all weights by 40–50%. Focus on movement quality and recovery. You've earned it.</div>
+      </div>
+    </div>`;
+}
+
+// ════════════════════════════════════════════════════════════
+// PROGRESS PHOTOS
+// ════════════════════════════════════════════════════════════
+
+function getPhotoStore() { return ls('progress_photos', {}); }
+function savePhotoStore(s) { lsSet('progress_photos', s); }
+
+function openPhotoOverlay() {
+  const overlay = document.getElementById('photo-overlay');
+  overlay.classList.add('show');
+  renderPhotoOverlay();
+}
+function closePhotoOverlay() {
+  document.getElementById('photo-overlay').classList.remove('show');
+}
+
+function renderPhotoOverlay() {
+  const body = document.getElementById('photo-overlay-body');
+  const store = getPhotoStore();
+  const history = getHistory();
+
+  // Build week list: determine all weeks we know about
+  const weekSet = new Set();
+  for (let w = 1; w <= 16; w++) weekSet.add(w);
+  const weeks = Array.from(weekSet);
+
+  // Compare section — pick first and latest photos
+  const allPhotos = Object.entries(store).sort((a,b) => parseInt(a[0].replace('w','')) - parseInt(b[0].replace('w','')));
+  const firstPhoto = allPhotos[0];
+  const latestPhoto = allPhotos.length > 1 ? allPhotos[allPhotos.length - 1] : null;
+
+  let compareHtml = '';
+  if (firstPhoto && latestPhoto) {
+    compareHtml = `
+      <div style="font-size:13px;font-weight:800;margin-bottom:10px;">Side-by-Side Comparison</div>
+      <div class="photo-compare-wrap">
+        <div class="photo-compare-img">
+          <img src="${firstPhoto[1]}" alt="Week ${firstPhoto[0]}">
+          <div class="pcl">Week ${firstPhoto[0].replace('w','')}</div>
+        </div>
+        <div class="photo-compare-img">
+          <img src="${latestPhoto[1]}" alt="Week ${latestPhoto[0]}">
+          <div class="pcl">Week ${latestPhoto[0].replace('w','')} (Latest)</div>
+        </div>
+      </div>`;
+  }
+
+  // Week slots grid
+  let slotsHtml = `<div style="font-size:13px;font-weight:800;margin-bottom:10px;">Weekly Check-Ins</div><div class="photo-week-grid">`;
+  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16].forEach(w => {
+    const key = `w${w}`;
+    const photo = store[key];
+    if (photo) {
+      slotsHtml += `
+        <div class="photo-week-slot" onclick="viewOrReplacePhoto(${w})">
+          <img src="${photo}" alt="Week ${w}">
+          <div class="photo-label">Wk ${w} ✓</div>
+        </div>`;
+    } else {
+      slotsHtml += `
+        <div class="photo-week-slot" onclick="capturePhoto(${w})">
+          <div class="photo-add-icon">📷</div>
+          <div class="photo-label">Week ${w}</div>
+        </div>`;
+    }
+  });
+  slotsHtml += '</div>';
+
+  body.innerHTML = `
+    <p style="font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:16px;">Photos are stored only on your device. Tap a week slot to capture your check-in photo.</p>
+    ${compareHtml}
+    ${slotsHtml}
+    <div style="height:16px;"></div>`;
+}
+
+function capturePhoto(weekNum) {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.capture = 'user';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const store = getPhotoStore();
+      store[`w${weekNum}`] = ev.target.result;
+      savePhotoStore(store);
+      renderPhotoOverlay();
+      showToast(`Week ${weekNum} photo saved`);
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+function viewOrReplacePhoto(weekNum) {
+  const store = getPhotoStore();
+  const photo = store[`w${weekNum}`];
+  if (!photo) { capturePhoto(weekNum); return; }
+  if (confirm(`Week ${weekNum} photo — replace it?`)) capturePhoto(weekNum);
+}
+
+// ════════════════════════════════════════════════════════════
+// BARCODE SCANNER
+// ════════════════════════════════════════════════════════════
+
+let _barcodeStream = null;
+let _barcodeDetector = null;
+let _barcodeAnimFrame = null;
+let _barcodeResult = null;
+
+async function openBarcodeScanner() {
+  const overlay = document.getElementById('barcode-overlay');
+  overlay.classList.add('show');
+  document.getElementById('barcode-result-box').classList.remove('show');
+  document.getElementById('barcode-manual-input').value = '';
+  _barcodeResult = null;
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    _barcodeStream = stream;
+    const video = document.getElementById('barcode-video');
+    video.srcObject = stream;
+    await video.play();
+
+    if ('BarcodeDetector' in window) {
+      _barcodeDetector = new BarcodeDetector({ formats: ['ean_13','ean_8','upc_a','upc_e','code_128','code_39'] });
+      _barcodeScanLoop();
+    }
+  } catch(e) {
+    // Camera unavailable — show manual fallback message
+    document.querySelector('.barcode-instruction').textContent = 'Camera unavailable — enter barcode manually below';
+  }
+}
+
+function _barcodeScanLoop() {
+  if (!_barcodeDetector) return;
+  const video = document.getElementById('barcode-video');
+  _barcodeAnimFrame = requestAnimationFrame(async () => {
+    try {
+      const codes = await _barcodeDetector.detect(video);
+      if (codes.length > 0) {
+        const barcode = codes[0].rawValue;
+        await _fetchBarcodeData(barcode);
+        return;
+      }
+    } catch(e) {}
+    if (_barcodeStream) _barcodeScanLoop();
+  });
+}
+
+async function _fetchBarcodeData(barcode) {
+  try {
+    const resp = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+    const data = await resp.json();
+    if (data.status === 1) {
+      const p = data.product;
+      const name = p.product_name || 'Unknown Food';
+      const n = p.nutriments || {};
+      const cal = Math.round(n['energy-kcal_100g'] || n['energy_100g'] / 4.184 || 0);
+      const protein = Math.round((n['proteins_100g'] || 0) * 10) / 10;
+      const carbs = Math.round((n['carbohydrates_100g'] || 0) * 10) / 10;
+      const fat = Math.round((n['fat_100g'] || 0) * 10) / 10;
+      const serving = Math.round(p.serving_size_g || 100);
+
+      _barcodeResult = { name, cal: Math.round(cal * serving / 100), protein: Math.round(protein * serving / 100 * 10)/10, carbs: Math.round(carbs * serving / 100 * 10)/10, fat: Math.round(fat * serving / 100 * 10)/10 };
+
+      document.getElementById('barcode-result-name').textContent = name;
+      document.getElementById('barcode-result-macros').textContent = `${serving}g serving · ${_barcodeResult.cal} kcal · ${_barcodeResult.protein}g protein · ${_barcodeResult.carbs}g carbs · ${_barcodeResult.fat}g fat`;
+      document.getElementById('barcode-result-box').classList.add('show');
+      if (navigator.vibrate) navigator.vibrate([100]);
+      stopBarcodeStream();
+    } else {
+      showToast('Product not found — try searching by name');
+    }
+  } catch(e) {
+    showToast('Could not look up product');
+  }
+}
+
+async function lookupBarcodeManual() {
+  const val = document.getElementById('barcode-manual-input').value.trim();
+  if (!val) return;
+  await _fetchBarcodeData(val);
+}
+
+function addBarcodeFood() {
+  if (!_barcodeResult) return;
+  const log = getTodayLog();
+  log.push({
+    name: _barcodeResult.name,
+    qty: 1,
+    cal: _barcodeResult.cal,
+    protein: _barcodeResult.protein,
+    fat: _barcodeResult.fat,
+    carbs: _barcodeResult.carbs,
+    addedAt: Date.now()
+  });
+  saveTodayLog(log);
+  renderDailyLog();
+  renderTodayNutritionBar();
+  closeBarcodeScanner();
+  showToast(`${_barcodeResult.name} added`);
+}
+
+function stopBarcodeStream() {
+  if (_barcodeAnimFrame) { cancelAnimationFrame(_barcodeAnimFrame); _barcodeAnimFrame = null; }
+  if (_barcodeStream) { _barcodeStream.getTracks().forEach(t => t.stop()); _barcodeStream = null; }
+  _barcodeDetector = null;
+}
+
+function closeBarcodeScanner() {
+  stopBarcodeStream();
+  document.getElementById('barcode-overlay').classList.remove('show');
+}
+
+// ════════════════════════════════════════════════════════════
+// PUSH NOTIFICATIONS
+// ════════════════════════════════════════════════════════════
+
+async function requestNotifPermission() {
+  if (!('Notification' in window)) { showToast('Notifications not supported on this device'); return; }
+  const perm = await Notification.requestPermission();
+  lsSet('notif_permission', perm);
+  if (perm === 'granted') {
+    showToast('Notifications enabled!');
+    scheduleNotifications();
+    renderHome();
+  } else {
+    showToast('Notifications blocked — enable in browser settings');
+  }
+}
+
+function scheduleNotifications() {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  // Use localStorage to track scheduled state — actual scheduling happens via service worker
+  // For PWA, we schedule via setTimeout for same-session, and on next load
+  _scheduleWorkoutReminder();
+  _scheduleFoodReminder();
+}
+
+function _scheduleWorkoutReminder() {
+  if (Notification.permission !== 'granted') return;
+  const now = new Date();
+  // Remind at 7am if not yet trained today
+  const target = new Date(now);
+  target.setHours(7, 0, 0, 0);
+  if (target <= now) target.setDate(target.getDate() + 1);
+  const ms = target.getTime() - now.getTime();
+  if (ms < 86400000 * 2) {
+    setTimeout(() => {
+      const history = getHistory();
+      const todayStr = new Date().toISOString().slice(0,10);
+      const trainedToday = history.some(s => new Date(s.dateRaw).toISOString().slice(0,10) === todayStr);
+      if (!trainedToday && Notification.permission === 'granted') {
+        new Notification('Takeover — Time to train', {
+          body: "You haven't logged a workout yet today. Let's go.",
+          icon: './icon-192.png',
+          badge: './icon-192.png'
+        });
+      }
+      _scheduleWorkoutReminder();
+    }, ms);
+  }
+}
+
+function _scheduleFoodReminder() {
+  if (Notification.permission !== 'granted') return;
+  const now = new Date();
+  // Food log reminder at 8pm
+  const target = new Date(now);
+  target.setHours(20, 0, 0, 0);
+  if (target <= now) target.setDate(target.getDate() + 1);
+  const ms = target.getTime() - now.getTime();
+  if (ms < 86400000 * 2) {
+    setTimeout(() => {
+      const log = getTodayLog();
+      if (log.length < 3 && Notification.permission === 'granted') {
+        new Notification('Takeover — Hit your nutrition', {
+          body: "Don't forget to log your meals today. Fuel matters.",
+          icon: './icon-192.png',
+          badge: './icon-192.png'
+        });
+      }
+      _scheduleFoodReminder();
+    }, ms);
+  }
+}
+
+// Notification permission card (shown in Home if not granted)
+function renderNotifCard() {
+  if (!('Notification' in window)) return '';
+  const perm = Notification.permission;
+  if (perm === 'granted') return '';
+  if (ls('notif_dismissed', false)) return '';
+  return `
+    <div class="notif-permission-card">
+      <div class="notif-permission-icon">🔔</div>
+      <div class="notif-permission-text">
+        <div class="notif-permission-title">Workout Reminders</div>
+        <div class="notif-permission-sub">Get notified to train and log food daily</div>
+      </div>
+      <button class="notif-enable-btn" onclick="requestNotifPermission()">Enable</button>
+    </div>`;
+}
+
+// ════════════════════════════════════════════════════════════
+// PATCH renderHome TO ADD NEW SECTIONS
+// ════════════════════════════════════════════════════════════
+const _origRenderHome = renderHome;
+renderHome = function() {
+  _origRenderHome();
+  const container = document.getElementById('home-content');
+  if (!container) return;
+
+  // Reset calendar to current month when home is re-rendered
+  _calDisplayYear = new Date().getFullYear();
+  _calDisplayMonth = new Date().getMonth();
+
+  // Build new sections HTML
+  const calHtml = renderCalendar(_calDisplayYear, _calDisplayMonth);
+  const prHtml = renderPRBoard();
+  const deloadHtml = renderDeloadBanner();
+  const notifHtml = renderNotifCard();
+
+  // Inject deload banner right after start button (before stat grid)
+  const statGrid = container.querySelector('.home-stat-grid');
+  if (statGrid && deloadHtml) {
+    statGrid.insertAdjacentHTML('beforebegin', deloadHtml);
+  }
+
+  // Inject notification card before the start button
+  const gotoBtn = container.querySelector('.home-goto-today');
+  if (gotoBtn && notifHtml) {
+    gotoBtn.insertAdjacentHTML('afterend', notifHtml);
+  }
+
+  // Inject calendar after progress card
+  const progressCard = container.querySelector('.home-progress-card');
+  if (progressCard) {
+    progressCard.insertAdjacentHTML('afterend', calHtml);
+  }
+
+  // Inject PR board after calendar (or after progress card)
+  const calCard = container.querySelector('.home-calendar-card');
+  const insertAfter = calCard || progressCard;
+  if (insertAfter && prHtml) {
+    insertAfter.insertAdjacentHTML('afterend', prHtml);
+  }
+
+  clearNewPRFlags();
+
+  // Add Photos button to Home
+  const sectionHeaderEls = container.querySelectorAll('.section-header');
+  const lastHeader = sectionHeaderEls[sectionHeaderEls.length - 1];
+  if (lastHeader) {
+    lastHeader.insertAdjacentHTML('beforebegin', `
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <button onclick="openPhotoOverlay()" style="flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:11px 8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
+          📷 Progress Photos
+        </button>
+      </div>`);
+  }
+
+  // Schedule notifications on every home render
+  scheduleNotifications();
+};
+
+// ════════════════════════════════════════════════════════════
+// PATCH completeWorkout / completeWorkoutGrowth / completeWorkoutMansour
+// TO AUTO-CHECK PRs FROM LOGGED WEIGHTS
+// ════════════════════════════════════════════════════════════
+function _checkWorkoutPRs() {
+  const inputs = document.querySelectorAll('#workout-content input[type=number][id^=weight-]');
+  const today = new Date().toLocaleDateString();
+  inputs.forEach(input => {
+    const val = parseFloat(input.value);
+    if (!val || val <= 0) return;
+    const card = input.closest('.ex-card');
+    if (!card) return;
+    const nameEl = card.querySelector('.ex-name');
+    if (!nameEl) return;
+    checkAndUpdatePR(nameEl.textContent.trim(), val, today);
+  });
+}
+
+const _origCompleteWorkout = completeWorkout;
+window.completeWorkout = function() {
+  _checkWorkoutPRs();
+  _origCompleteWorkout.apply(this, arguments);
+};
+if (typeof completeWorkoutGrowth === 'function') {
+  const _origCWG = completeWorkoutGrowth;
+  window.completeWorkoutGrowth = function() { _checkWorkoutPRs(); _origCWG.apply(this, arguments); };
+}
+if (typeof completeWorkoutMansour === 'function') {
+  const _origCWM = completeWorkoutMansour;
+  window.completeWorkoutMansour = function() { _checkWorkoutPRs(); _origCWM.apply(this, arguments); };
+}
+
+// Also expose a barcode scanner button in renderDailyLog — patch it
+const _origRenderDailyLog = renderDailyLog;
+window.renderDailyLog = function() {
+  _origRenderDailyLog.apply(this, arguments);
+  const container = document.getElementById('nutr-daily-log');
+  if (!container) return;
+  // Add barcode scanner button next to the Add Food button
+  const addFoodBtn = container.querySelector('button');
+  if (addFoodBtn && addFoodBtn.textContent.includes('Add Food')) {
+    addFoodBtn.insertAdjacentHTML('afterend', `
+      <button onclick="openBarcodeScanner()" style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);font-size:14px;font-weight:800;padding:12px;cursor:pointer;margin-bottom:16px;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h3v3h-3v-3h-3v3h-3v-3h3v-3z"/></svg>
+        Scan Barcode
+      </button>`);
+  }
+};
+
+// ════════════════════════════════════════════════════════════
+// PATCH SETTINGS SHEET TO ADD PHOTOS + NOTIFICATIONS
+// ════════════════════════════════════════════════════════════
+const _origShowSettings = typeof showSettings === 'function' ? showSettings : null;
+if (_origShowSettings) {
+  window.showSettings = function() {
+    _origShowSettings.apply(this, arguments);
+    // Wait for DOM, then inject extra buttons
+    setTimeout(() => {
+      const sheet = document.getElementById('settings-sheet');
+      if (!sheet) return;
+      const privacySection = sheet.querySelector('div[style*="font-size:13px"][style*="line-height:1.6"]');
+      if (privacySection && privacySection.parentNode) {
+        const notifLabel = ('Notification' in window && Notification.permission === 'granted') ? 'Notifications: Enabled ✓' : 'Enable Workout Reminders';
+        privacySection.insertAdjacentHTML('beforebegin', `
+          <button onclick="document.getElementById('settings-sheet-overlay')?.remove();openPhotoOverlay();" style="width:100%;background:none;border:none;border-top:1px solid var(--border);color:var(--text);font-size:15px;font-weight:600;padding:14px 16px;text-align:left;cursor:pointer;font-family:inherit;">📷 Progress Photos</button>
+          <button onclick="requestNotifPermission();document.getElementById('settings-sheet-overlay')?.remove();" style="width:100%;background:none;border:none;border-top:1px solid var(--border);color:var(--text);font-size:15px;font-weight:600;padding:14px 16px;text-align:left;cursor:pointer;font-family:inherit;">🔔 ${notifLabel}</button>`);
+      }
+    }, 50);
+  };
+}
+
+// ════════════════════════════════════════════════════════════
+// VIDEO DEMOS — ADDITIONAL EXERCISES
+// ════════════════════════════════════════════════════════════
+Object.assign(YT_VIDEOS, {
+  // Mansour / Phase 3 extras
+  "Cable Row": "GZbfZ033f74",
+  "Cable Fly": "Iwe6AmxVf7o",
+  "Pec Deck": "Iwe6AmxVf7o",
+  "Incline Cable Fly": "Iwe6AmxVf7o",
+  "Cable Lateral Raise": "3VcKaXpzqRo",
+  "Cable Rear Delt Fly": "rep-qVOkqgk",
+  "Lat Pulldown": "CAwf7n6Luuc",
+  "Wide Grip Lat Pulldown": "CAwf7n6Luuc",
+  "Close Grip Lat Pulldown": "CAwf7n6Luuc",
+  "Single Arm Lat Pulldown": "CAwf7n6Luuc",
+  "Hammer Strength Chest Press": "vcBig73ojpE",
+  "Smith Machine Bench Press": "vcBig73ojpE",
+  "Smith Machine Incline Press": "8iPEnn-ltC8",
+  "Smith Machine Squat": "bs_Ej32IYgo",
+  "Leg Press (High Foot Placement)": "IZxyjW7MPJQ",
+  "Leg Press (Low Foot Placement)": "IZxyjW7MPJQ",
+  "Bulgarian Split Squat": "hiLF_pF3EJM",
+  "Walking Lunges": "1W0eILYvbM0",
+  "Barbell Lunges": "1W0eILYvbM0",
+  "DB Lunges": "1W0eILYvbM0",
+  "Sissy Squat": "sLOcbopVdOk",
+  "Goblet Squat": "MeIiIdhvXT4",
+  "Hip Thrust": "S_uZP4UH6J0",
+  "Single Leg Hip Thrust": "S_uZP4UH6J0",
+  "Cable Pull Through": "thlq3iqUc1E",
+  "Stiff Leg Deadlift": "2SHsk9374wo",
+  "Nordic Curl": "6RM59GxfGWo",
+  "Glute Kickback": "2SHsk9374wo",
+  "Seated Leg Curl": "ELOCsoDSmrg",
+  "Lying Leg Curl": "ELOCsoDSmrg",
+  "Donkey Calf Raise": "JbyjNymZOt0",
+  "Single Leg Calf Raise": "JbyjNymZOt0",
+  "EZ Bar Curl": "QZEqB6wUPxQ",
+  "Cable Curl": "DgTlETfEuEU",
+  "Spider Curl": "fIWP-FRFNU0",
+  "Concentration Curl": "0AUGkch3tzc",
+  "Incline DB Curl": "DgTlETfEuEU",
+  "Close Grip Bench Press": "nEF0bv2qvLA",
+  "Skull Crushers": "tj81tVq3wLo",
+  "Tricep Dips": "vi1-BOcj3cQ",
+  "Overhead DB Extension": "jO2Jl9eZpXk",
+  "Rope Pushdown": "94DXwlcX8Po",
+  "Reverse Grip Pushdown": "94DXwlcX8Po",
+  "Seated DB Press": "qEwKCR5JCog",
+  "Cable Upright Row": "NAqCFlxy0gg",
+  "DB Upright Row": "NAqCFlxy0gg",
+  "Rear Delt Machine": "GyhFsjrn7dw",
+  "Chest Supported Row": "GZbfZ033f74",
+  "Pendlay Row": "j3Igk5nyZE4",
+  "Meadows Row": "1-Arm DB Row",
+  "Inverted Row": "v4zbFQr4LwA",
+  "Ring Row": "v4zbFQr4LwA",
+  "DB Pullover": "FK4rNjSRBcE",
+  "Cable Pullover": "DC0GQBjcFng",
+  "Straight Arm Pulldown": "DC0GQBjcFng",
+  "Plank": "ASdvN_XEl_c",
+  "Ab Wheel Rollout": "5zXm6dPXBk4",
+  "Hanging Leg Raise": "hdng3v1tFiA",
+  "Cable Crunch": "2fbujeH3F0E",
+  "Decline Sit Up": "jDwoBqPH0jk",
+  "Russian Twist": "wkD8rjkodUI",
+  "Landmine Row": "QTVMgZS7bHg",
+  "Landmine Press": "Sjb5meztfSE",
+  "Landmine Squat": "MeIiIdhvXT4",
+  "Single Leg Romanian Deadlift": "2SHsk9374wo",
+  "RDL": "2SHsk9374wo",
+  "Good Morning": "0Syp9iyINZ4",
+  "Overhead Press": "eNFXEEdfQp4",
+  "Push Press": "4qTaJqfriNE",
+  "Strict Press": "eNFXEEdfQp4",
+  "Dumbbell Flys": "Iwe6AmxVf7o",
+  "Incline Dumbbell Flys": "Iwe6AmxVf7o",
+  "DB Fly": "Iwe6AmxVf7o",
+  "Chest Fly": "Iwe6AmxVf7o",
+  "Pec Fly": "Iwe6AmxVf7o",
+  "Barbell Row": "j3Igk5nyZE4",
+  "T-Bar Row": "j3Igk5nyZE4",
+  "Machine Row": "GZbfZ033f74",
+  "Machine Chest Press": "vcBig73ojpE",
+  "Machine Shoulder Press": "qEwKCR5JCog",
+  "Machine Curl": "DgTlETfEuEU",
+  "Machine Tricep Extension": "jO2Jl9eZpXk",
+  "Machine Lateral Raise": "3VcKaXpzqRo",
+  "Hip Abduction": "2SHsk9374wo",
+  "Adductor Machine": "2SHsk9374wo",
+  "Calf Press on Leg Press": "JbyjNymZOt0",
+  "Trap Bar Shrug": "NAqCFlxy0gg",
+  "Barbell Shrug": "NAqCFlxy0gg",
+  "DB Shrug": "NAqCFlxy0gg",
+  "Push Up Variations": "Zi6c09DRGxk",
+  "Diamond Push Up": "Zi6c09DRGxk",
+  "Wide Push Up": "Zi6c09DRGxk",
+  "Decline Push Up": "Zi6c09DRGxk",
+  "Jump Squat": "if19-Pd_MUk",
+  "Box Jump": "if19-Pd_MUk",
+  "Depth Jump": "if19-Pd_MUk",
+  "Single Leg Box Jump": "if19-Pd_MUk",
+  "Broad Jump": "rZGkx5PaZSM",
+  "Vertical Jump": "rZGkx5PaZSM",
+  "Power Clean": "rZGkx5PaZSM",
+  "Hang Clean": "rZGkx5PaZSM",
+  "Push Jerk": "4qTaJqfriNE",
+  "Split Jerk": "4qTaJqfriNE",
+});
+
+// Start notifications on load if already granted
+(function() {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    scheduleNotifications();
+  }
+})();
 
 init();
 </script>
