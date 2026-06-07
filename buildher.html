@@ -569,6 +569,58 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
         <button onclick="saveBP()" style="background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer;">Log</button>
       </div>
       <div id="bp-status" style="font-size:12px;margin-bottom:10px;"></div>
+
+      <!-- BP Chart -->
+      <div id="bp-chart-wrap" style="display:none;margin-bottom:16px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;">Trend</div>
+        <div style="display:flex;gap:12px;margin-bottom:8px;">
+          <span style="font-size:11px;font-weight:700;color:#e91e8c;">— Systolic</span>
+          <span style="font-size:11px;font-weight:700;color:#9b59b6;">— Diastolic</span>
+        </div>
+        <div style="position:relative;overflow:hidden;border-radius:8px;background:var(--bg3);">
+          <svg id="bp-chart" viewBox="0 0 300 140" style="width:100%;display:block;"></svg>
+        </div>
+        <!-- Zone legend -->
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
+          <span style="font-size:10px;font-weight:700;background:rgba(76,175,80,0.15);color:#4caf50;border-radius:4px;padding:2px 7px;">Normal &lt;120/80</span>
+          <span style="font-size:10px;font-weight:700;background:rgba(255,152,0,0.15);color:#ff9800;border-radius:4px;padding:2px 7px;">Elevated 120–129</span>
+          <span style="font-size:10px;font-weight:700;background:rgba(244,67,54,0.15);color:#f44336;border-radius:4px;padding:2px 7px;">High Stage 1 130–139</span>
+          <span style="font-size:10px;font-weight:700;background:rgba(183,28,28,0.2);color:#b71c1c;border-radius:4px;padding:2px 7px;">High Stage 2 ≥140</span>
+        </div>
+      </div>
+
+      <!-- How to improve -->
+      <div id="bp-tips-wrap" style="display:none;margin-bottom:16px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;">How to Improve Your BP</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="background:var(--bg3);border-radius:8px;padding:12px;border-left:3px solid #e91e8c;">
+            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;">💪 Exercise 30 min/day</div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.5;">Cardio (walking, cycling, swimming) lowers systolic by 5–8 mmHg. Strength training adds another 2–4 mmHg reduction. Consistency matters more than intensity.</div>
+          </div>
+          <div style="background:var(--bg3);border-radius:8px;padding:12px;border-left:3px solid #9b59b6;">
+            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;">🥗 Reduce sodium, eat potassium</div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.5;">Keep sodium under 2,300mg/day. Foods high in potassium (bananas, spinach, avocado) counter sodium's effects and can lower BP by 4–5 mmHg.</div>
+          </div>
+          <div style="background:var(--bg3);border-radius:8px;padding:12px;border-left:3px solid #4caf50;">
+            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;">😴 Prioritize sleep</div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.5;">Less than 6 hours raises BP significantly. Aim for 7–9 hours. Your body regulates blood pressure during deep sleep — poor sleep disrupts this.</div>
+          </div>
+          <div style="background:var(--bg3);border-radius:8px;padding:12px;border-left:3px solid #ff9800;">
+            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;">🧘 Manage stress</div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.5;">Chronic stress keeps cortisol elevated, which raises BP. Box breathing (4-4-4-4) activates your parasympathetic system within minutes. Use the Meditate tab daily.</div>
+          </div>
+          <div style="background:var(--bg3);border-radius:8px;padding:12px;border-left:3px solid #2196f3;">
+            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;">💧 Stay hydrated</div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.5;">Dehydration thickens blood, forcing your heart to pump harder. Aim for 8 cups of water daily. Limit alcohol to 1 drink/day max.</div>
+          </div>
+          <div style="background:var(--bg3);border-radius:8px;padding:12px;border-left:3px solid #e91e8c;">
+            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;">📉 Lose 5–10 lbs if needed</div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.5;">Every 2.2 lbs lost can lower systolic by 1 mmHg. Even modest weight loss has a meaningful impact — you don't need to reach your goal weight to see BP improvements.</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.5;">⚠️ Always consult your doctor before making changes if you are on medication or have Stage 2 hypertension.</div>
+      </div>
+
       <div id="bp-log-list"></div>
     </div>
 
@@ -1164,14 +1216,81 @@ function saveBP() {
   renderBPLog();
 }
 
+function drawBPChart(log) {
+  const svg = document.getElementById('bp-chart');
+  const wrap = document.getElementById('bp-chart-wrap');
+  const tipsWrap = document.getElementById('bp-tips-wrap');
+  if (!svg) return;
+  const pts = [...log].reverse().slice(0, 20);
+  if (pts.length < 2) { if (wrap) wrap.style.display = 'none'; return; }
+  if (wrap) wrap.style.display = '';
+  if (tipsWrap) tipsWrap.style.display = '';
+  const W = 300, H = 140, padL = 30, padR = 10, padT = 10, padB = 20;
+  const chartW = W - padL - padR, chartH = H - padT - padB;
+  const allVals = pts.flatMap(e => [e.systolic, e.diastolic]);
+  const minV = Math.max(50, Math.min(...allVals) - 10);
+  const maxV = Math.min(200, Math.max(...allVals) + 10);
+  const range = maxV - minV || 1;
+  const xOf = i => padL + (i / (pts.length - 1)) * chartW;
+  const yOf = v => padT + chartH - ((v - minV) / range) * chartH;
+
+  // Zone bands
+  const zones = [
+    { min: 140, max: 200, color: 'rgba(183,28,28,0.15)' },
+    { min: 130, max: 140, color: 'rgba(244,67,54,0.12)' },
+    { min: 120, max: 130, color: 'rgba(255,152,0,0.12)' },
+    { min: 50,  max: 120, color: 'rgba(76,175,80,0.10)' },
+  ];
+  const bands = zones.map(z => {
+    const y1 = Math.max(padT, yOf(Math.min(z.max, maxV)));
+    const y2 = Math.min(padT + chartH, yOf(Math.max(z.min, minV)));
+    if (y2 <= y1) return '';
+    return `<rect x="${padL}" y="${y1}" width="${chartW}" height="${y2 - y1}" fill="${z.color}"/>`;
+  }).join('');
+
+  // Lines
+  const sysPath = pts.map((e, i) => `${i === 0 ? 'M' : 'L'}${xOf(i)},${yOf(e.systolic)}`).join(' ');
+  const diaPath = pts.map((e, i) => `${i === 0 ? 'M' : 'L'}${xOf(i)},${yOf(e.diastolic)}`).join(' ');
+
+  // Dots
+  const sysDots = pts.map((e, i) => `<circle cx="${xOf(i)}" cy="${yOf(e.systolic)}" r="3.5" fill="#e91e8c"/>`).join('');
+  const diaDots = pts.map((e, i) => `<circle cx="${xOf(i)}" cy="${yOf(e.diastolic)}" r="3.5" fill="#9b59b6"/>`).join('');
+
+  // Y axis labels
+  const yLabels = [120, 140].filter(v => v >= minV && v <= maxV).map(v =>
+    `<text x="${padL - 4}" y="${yOf(v) + 4}" text-anchor="end" fill="#666" font-size="9" font-family="system-ui">${v}</text>`
+  ).join('');
+
+  // X labels (first and last date)
+  const xLabels = [
+    `<text x="${padL}" y="${H}" text-anchor="start" fill="#666" font-size="9" font-family="system-ui">${pts[0].date.replace(/,.*/, '')}</text>`,
+    `<text x="${W - padR}" y="${H}" text-anchor="end" fill="#666" font-size="9" font-family="system-ui">${pts[pts.length-1].date.replace(/,.*/, '')}</text>`,
+  ].join('');
+
+  svg.innerHTML = `
+    ${bands}
+    <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT+chartH}" stroke="#333" stroke-width="1"/>
+    ${yLabels}
+    ${xLabels}
+    <path d="${sysPath}" fill="none" stroke="#e91e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="${diaPath}" fill="none" stroke="#9b59b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    ${sysDots}${diaDots}
+  `;
+}
+
 function renderBPLog() {
   const list = document.getElementById('bp-log-list');
+  const tipsWrap = document.getElementById('bp-tips-wrap');
   if (!list) return;
   const log = getBPLog();
   if (log.length === 0) {
     list.innerHTML = '<div style="color:var(--text3);font-size:13px;">No entries yet.</div>';
+    document.getElementById('bp-chart-wrap').style.display = 'none';
+    if (tipsWrap) tipsWrap.style.display = 'none';
     return;
   }
+  drawBPChart(log);
+  if (tipsWrap) tipsWrap.style.display = '';
   list.innerHTML = log.slice(0, 30).map(e => {
     const cat = getBPCategory(e.systolic, e.diastolic);
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
