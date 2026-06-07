@@ -340,7 +340,10 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
   <div id="today-view" class="view active">
     <div class="hero">
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div class="hero-label" id="hero-prog-label">Build Her</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <img src="logo.png" alt="Build Her" style="height:36px;width:auto;flex-shrink:0;">
+          <div class="hero-label" id="hero-prog-label" style="margin-bottom:0;">Build Her</div>
+        </div>
         <div style="display:flex;align-items:center;gap:8px">
           <span id="sync-status" style="font-size:10px;color:var(--text3);font-weight:600">☁️</span>
           <button onclick="showProgramSelect()" style="background:rgba(255,255,255,.07);border:none;color:var(--text2);font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px;cursor:pointer;font-family:inherit">Switch Program</button>
@@ -789,8 +792,8 @@ function getCurrentGetPhase(week) {
 }
 
 // ==================== MEASUREMENT TRACKER ====================
-function getMeasurements() { return JSON.parse(localStorage.getItem('bh_measurements') || '[]'); }
-function saveMeasurementLog(arr) { localStorage.setItem('bh_measurements', JSON.stringify(arr)); syncToCloud(); }
+function getMeasurements() { return bhLs('bh_measurements', []); }
+function saveMeasurementLog(arr) { bhLsSet('bh_measurements', arr); syncToCloud(); }
 
 function logMeasurement() {
   const w = parseFloat(document.getElementById('t-weight').value);
@@ -1257,8 +1260,26 @@ function addHistory(entry) {
 function getNotes(week, day) { return localStorage.getItem(`bh_notes_${week}_${day}`) || ''; }
 function saveNotes(week, day, val) { localStorage.setItem(`bh_notes_${week}_${day}`, val); syncToCloud(); }
 
-function getNutrition() { return JSON.parse(localStorage.getItem('bh_nutrition') || '{}'); }
-function saveNutrition(obj) { localStorage.setItem('bh_nutrition', JSON.stringify(obj)); syncToCloud(); }
+function bhLs(key, def) {
+  try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : def; } catch(e) { return def; }
+}
+function bhLsSet(key, val) {
+  try {
+    localStorage.setItem(key, JSON.stringify(val));
+  } catch(e) {
+    // Storage full — clear old measurement logs then retry
+    try {
+      const logs = getMeasurements();
+      if (logs.length > 20) { localStorage.setItem('bh_measurements', JSON.stringify(logs.slice(0, 20))); }
+      localStorage.setItem(key, JSON.stringify(val));
+    } catch(e2) {
+      if (typeof showToast === 'function') showToast('Storage full — clear some app data');
+    }
+  }
+}
+
+function getNutrition() { return bhLs('bh_nutrition', {}); }
+function saveNutrition(obj) { bhLsSet('bh_nutrition', obj); syncToCloud(); }
 
 // ==================== TOAST ====================
 let toastTimer;
@@ -1819,7 +1840,8 @@ function getCalcInputs() {
 document.getElementById('calc-btn').addEventListener('click', () => {
   const { ft, ins, weightLbs, goalLbs, age, activity } = getCalcInputs();
   if (!ft || !weightLbs || !age) { showToast('Fill in all fields first'); return; }
-  saveNutrition({ heightFt: ft, heightIn: ins, weight: weightLbs, goalWeight: goalLbs, age, activity });
+  const nutr = { heightFt: ft, heightIn: ins, weight: weightLbs, goalWeight: goalLbs, age, activity };
+  saveNutrition(nutr);
 
   const heightCm = (ft * 12 + ins) * 2.54;
   const weightKg = weightLbs / 2.205;
