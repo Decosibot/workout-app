@@ -480,6 +480,9 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
       <div class="phase-name" id="phase-name-text">Phase 1: Foundation</div>
       <div class="phase-goal" id="phase-goal-text"></div>
     </div>
+    <div style="display:flex;justify-content:flex-end;padding:0 0 8px;">
+      <button onclick="openCustomize()" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;">✏️ Customize</button>
+    </div>
     <div id="exercise-list"></div>
     <div style="margin-top:16px">
       <div class="section-title">Workout Notes</div>
@@ -548,6 +551,15 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
     <div class="card">
       <div class="section-title">Measurement Log</div>
       <div id="measurement-log-list"></div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:16px;">
+      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px;">⏰ Daily Reminder</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <input type="time" id="reminder-time" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:15px;">
+        <button onclick="saveReminder()" style="background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer;">Set</button>
+      </div>
+      <div id="reminder-status" style="font-size:13px;color:var(--text2);"></div>
     </div>
   </div>
 
@@ -668,10 +680,43 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
   <div id="photos-view" class="view">
     <div class="section-head">Progress Photos</div>
     <div class="section-sub">8-week visual check-in</div>
+    <button onclick="shareProgress()" style="width:100%;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:20px;">📤 Share Progress</button>
     <div class="note-box" style="margin-bottom:16px;">Photos are stored only on your device. Tap a week slot to add or replace.</div>
     <div id="photos-compare-section"></div>
     <div class="section-title" style="margin-top:4px;">Weekly Check-Ins</div>
     <div class="photo-week-grid" id="photos-week-grid"></div>
+  </div>
+
+  <!-- MEDITATE VIEW -->
+  <div id="meditate-view" class="view">
+    <div style="padding:16px;">
+      <div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px;">Meditation</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:20px;">Dr. Joe Dispenza — mind &amp; body reset</div>
+
+      <!-- Breathing Timer -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:20px;text-align:center;">
+        <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:16px;">Guided Breathing</div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:16px;">
+          <button onclick="startBreathing('box')" style="flex:1;max-width:100px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;">Box<br><span style="color:var(--text2);font-weight:400">4-4-4-4</span></button>
+          <button onclick="startBreathing('478')" style="flex:1;max-width:100px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;">4-7-8<br><span style="color:var(--text2);font-weight:400">Calm</span></button>
+          <button onclick="startBreathing('power')" style="flex:1;max-width:100px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;">Power<br><span style="color:var(--text2);font-weight:400">6-2-6</span></button>
+        </div>
+        <div id="breath-circle-wrap" style="display:none;margin-bottom:16px;">
+          <svg width="160" height="160" viewBox="0 0 160 160" style="display:block;margin:0 auto;">
+            <circle cx="80" cy="80" r="60" fill="none" stroke="var(--border)" stroke-width="8"/>
+            <circle id="breath-ring" cx="80" cy="80" r="60" fill="none" stroke="url(#breathGrad)" stroke-width="8" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377" transform="rotate(-90 80 80)"/>
+            <defs><linearGradient id="breathGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="var(--pink)"/><stop offset="100%" stop-color="var(--purple)"/></linearGradient></defs>
+          </svg>
+          <div id="breath-label" style="font-size:28px;font-weight:800;color:var(--text);margin-top:8px;">Inhale</div>
+          <div id="breath-count" style="font-size:14px;color:var(--text2);"></div>
+        </div>
+        <button id="breath-stop-btn" onclick="stopBreathing()" style="display:none;background:none;border:1px solid var(--border);border-radius:8px;padding:8px 20px;color:var(--text2);font-size:13px;cursor:pointer;">Stop</button>
+      </div>
+
+      <!-- Dr. Joe Videos -->
+      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px;">Dr. Joe Dispenza</div>
+      <div id="meditation-videos"></div>
+    </div>
   </div>
 </div>
 
@@ -701,6 +746,10 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
     <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
     Photos
   </button>
+  <button class="nav-btn" data-view="meditate" onclick="showView('meditate')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/><path d="M12 11v4"/></svg>
+    <span>Meditate</span>
+  </button>
 </nav>
 
 <!-- REST OVERLAY -->
@@ -728,6 +777,42 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
       <button class="food-sheet-close" onclick="closeFoodPicker()">&times;</button>
     </div>
     <div id="food-picker-body"></div>
+  </div>
+</div>
+
+<!-- CUSTOMIZE WORKOUT SHEET -->
+<div id="customize-sheet" style="position:fixed;inset:0;z-index:200;display:none;flex-direction:column;justify-content:flex-end;background:rgba(0,0,0,0.6);" onclick="if(event.target===this)closeCustomize()">
+  <div style="background:var(--bg);border-radius:20px 20px 0 0;padding:20px;max-height:80vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div style="font-size:17px;font-weight:800;color:var(--text);">Customize Workout</div>
+      <button onclick="closeCustomize()" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;">✕</button>
+    </div>
+    <div id="customize-body"></div>
+    <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px;">
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">Add Custom Exercise</div>
+      <input id="custom-ex-name" placeholder="Exercise name" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:14px;margin-bottom:8px;">
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <input id="custom-ex-sets" type="number" placeholder="Sets" min="1" max="10" style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:14px;">
+        <input id="custom-ex-reps" placeholder="Reps" style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:14px;">
+        <select id="custom-ex-type" style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;">
+          <option value="pink">Main</option>
+          <option value="purple">Accessory</option>
+          <option value="red">Finisher</option>
+        </select>
+      </div>
+      <button onclick="addCustomExercise()" style="width:100%;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none;border-radius:10px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;">Add Exercise</button>
+    </div>
+  </div>
+</div>
+
+<!-- MILESTONE SHEET -->
+<div id="milestone-sheet" style="position:fixed;inset:0;z-index:300;display:none;flex-direction:column;justify-content:flex-end;background:rgba(0,0,0,0.7);">
+  <div style="background:var(--bg);border-radius:20px 20px 0 0;padding:24px;text-align:center;">
+    <div style="font-size:40px;margin-bottom:8px;" id="milestone-emoji">🏆</div>
+    <div style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px;" id="milestone-title">New Milestone!</div>
+    <div style="font-size:14px;color:var(--text2);margin-bottom:20px;" id="milestone-desc">You hit a new milestone. Capture this moment!</div>
+    <button onclick="captureMilestonePhoto()" style="width:100%;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:800;cursor:pointer;margin-bottom:10px;">📸 Take Photo</button>
+    <button onclick="closeMilestoneSheet()" style="width:100%;background:none;border:1px solid var(--border);border-radius:12px;padding:12px;font-size:14px;color:var(--text2);cursor:pointer;">Maybe Later</button>
   </div>
 </div>
 
@@ -988,6 +1073,11 @@ function renderTracker() {
   }
   // Draw weight chart
   drawWeightChart();
+  // Update reminder UI
+  const savedTime = bhLs('bh_reminder_time', null);
+  const tInput = document.getElementById('reminder-time');
+  if (tInput && savedTime) tInput.value = savedTime;
+  updateReminderStatus();
 }
 
 function drawWeightChart() {
@@ -1483,7 +1573,7 @@ document.getElementById('rest-skip').addEventListener('click', () => {
 });
 
 // ==================== NAVIGATION ====================
-const VIEWS = ['today', 'workout', 'history', 'nutrition', 'tracker', 'photos'];
+const VIEWS = ['today', 'workout', 'history', 'nutrition', 'tracker', 'photos', 'meditate'];
 
 function showView(name) {
   VIEWS.forEach(v => {
@@ -1497,6 +1587,7 @@ function showView(name) {
   if (name === 'today') renderToday();
   if (name === 'tracker') renderTracker();
   if (name === 'photos') renderPhotos();
+  if (name === 'meditate') renderMeditationVideos();
 }
 
 document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -1543,6 +1634,12 @@ function getStreakWeeks() {
     const allDone = isDone(w,'mon') && isDone(w,'wed') && isDone(w,'fri');
     if (allDone) streak++;
     else if (w < state.week) break;
+  }
+  const milestoneWeeks = [4, 8, 12];
+  const lastMilestone = bhLs('bh_last_streak_milestone', 0);
+  if (milestoneWeeks.includes(streak) && streak > lastMilestone) {
+    bhLsSet('bh_last_streak_milestone', streak);
+    setTimeout(() => showMilestoneSheet('🔥', streak + ' Week Streak!', 'You\'ve been consistent for ' + streak + ' weeks. Take a progress photo!'), 600);
   }
   return streak;
 }
@@ -1639,7 +1736,10 @@ function launchWorkout(week, day) {
   const phase = getCurrentGetPhase(week);
   const pIdx = getPhaseIdx(week);
   const wkData = getCurrentWorkouts()[day];
-  const exercises = wkData.phases[pIdx];
+  const _baseExercises = wkData.phases[pIdx];
+  const _hidden = getHiddenExs(activeProgram, week, day);
+  const _custom = getCustomExs(activeProgram, week, day);
+  const exercises = [..._baseExercises.filter(e => !_hidden.includes(e.id)), ..._custom];
 
   document.getElementById('workout-title').textContent = wkData.name + ' — Week ' + week;
 
@@ -2360,6 +2460,7 @@ function updatePRIfBetter(prog, exId, exName, weightStr, week) {
   if (!existing || weight > parseFloat(existing.weight)) {
     store[key] = { weight, week, name: exName, date: new Date().toLocaleDateString() };
     savePRStore(store);
+    setTimeout(() => showMilestoneSheet('🏆', 'New Personal Record!', exName + ' — ' + weightStr + ' lbs. Capture this moment!'), 800);
     return true;
   }
   return false;
@@ -2618,6 +2719,344 @@ function showBhRitual(exercises, onComplete) {
 
   render();
 }
+
+// ==================== FEATURE 1: PUSH NOTIFICATION REMINDERS ====================
+function saveReminder() {
+  const timeVal = document.getElementById('reminder-time').value;
+  if (!timeVal) return;
+  bhLsSet('bh_reminder_time', timeVal);
+  if ('Notification' in window && Notification.permission !== 'granted') {
+    Notification.requestPermission().then(p => {
+      if (p === 'granted') scheduleReminder(timeVal);
+      updateReminderStatus();
+    });
+  } else {
+    scheduleReminder(timeVal);
+    updateReminderStatus();
+  }
+}
+
+function scheduleReminder(timeVal) {
+  if (!('serviceWorker' in navigator)) return;
+  const [h, m] = timeVal.split(':').map(Number);
+  const now = new Date();
+  const next = new Date();
+  next.setHours(h, m, 0, 0);
+  if (next <= now) next.setDate(next.getDate() + 1);
+  const delay = next - now;
+  setTimeout(() => {
+    if (Notification.permission === 'granted') {
+      new Notification('Build Her 💪', { body: "Time to train! Your workout is waiting.", icon: './logo.png' });
+    }
+    scheduleReminder(timeVal);
+  }, delay);
+}
+
+function updateReminderStatus() {
+  const saved = bhLs('bh_reminder_time', null);
+  const statusEl = document.getElementById('reminder-status');
+  if (!statusEl) return;
+  if (!saved) { statusEl.textContent = 'No reminder set.'; return; }
+  const perm = 'Notification' in window ? Notification.permission : 'unsupported';
+  if (perm === 'denied') {
+    statusEl.textContent = '⚠️ Notifications blocked — enable in browser settings.';
+  } else if (perm === 'granted') {
+    statusEl.textContent = `✅ Reminder set for ${saved}`;
+  } else {
+    statusEl.textContent = `Reminder saved for ${saved} — tap Set to enable notifications.`;
+  }
+}
+
+// ==================== FEATURE 2: MEDITATION TAB ====================
+let breathInterval = null;
+const BREATH_PATTERNS = {
+  box:   { phases: ['Inhale','Hold','Exhale','Hold'], times: [4,4,4,4] },
+  '478': { phases: ['Inhale','Hold','Exhale'], times: [4,7,8] },
+  power: { phases: ['Inhale','Hold','Exhale'], times: [6,2,6] }
+};
+
+function startBreathing(type) {
+  stopBreathing();
+  const pattern = BREATH_PATTERNS[type];
+  if (!pattern) return;
+  document.getElementById('breath-circle-wrap').style.display = '';
+  document.getElementById('breath-stop-btn').style.display = '';
+  let phaseIdx = 0, remaining = pattern.times[0];
+  const ring = document.getElementById('breath-ring');
+  const circumference = 2 * Math.PI * 60;
+
+  function tick() {
+    const totalPhaseTime = pattern.times[phaseIdx];
+    const progress = 1 - (remaining / totalPhaseTime);
+    ring.style.strokeDashoffset = circumference * (1 - progress);
+    document.getElementById('breath-label').textContent = pattern.phases[phaseIdx];
+    document.getElementById('breath-count').textContent = remaining + 's';
+    remaining--;
+    if (remaining < 0) {
+      phaseIdx = (phaseIdx + 1) % pattern.phases.length;
+      remaining = pattern.times[phaseIdx];
+    }
+  }
+
+  tick();
+  breathInterval = setInterval(tick, 1000);
+}
+
+function stopBreathing() {
+  clearInterval(breathInterval);
+  breathInterval = null;
+  const cw = document.getElementById('breath-circle-wrap');
+  const sb = document.getElementById('breath-stop-btn');
+  if (cw) cw.style.display = 'none';
+  if (sb) sb.style.display = 'none';
+  const ring = document.getElementById('breath-ring');
+  if (ring) ring.style.strokeDashoffset = '377';
+}
+
+const BH_MEDITATION_VIDEOS = [
+  { id: 'EvGE4TFKbSc', title: 'Morning Meditation', desc: 'Start your day with intention' },
+  { id: 'La9oLLooBk4', title: 'Blessing of the Energy Centers', desc: 'Full body energy reset' },
+  { id: 'gDL0TTknGSc', title: 'Body-Mind Connection', desc: 'Rewire your thoughts' },
+  { id: 'oFoLFBdRlLo', title: 'Walking Meditation', desc: 'Move with presence' },
+  { id: '2eKZMBTFKNI', title: 'Becoming Supernatural', desc: 'Transcend limitations' },
+];
+
+function renderMeditationVideos() {
+  const container = document.getElementById('meditation-videos');
+  if (!container) return;
+  container.innerHTML = BH_MEDITATION_VIDEOS.map(v => `
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;" id="med-wrap-${v.id}">
+      <div onclick="expandMedVideo('${v.id}')" style="display:flex;align-items:center;gap:12px;padding:12px;cursor:pointer;">
+        <div style="position:relative;flex-shrink:0;width:96px;height:54px;border-radius:6px;overflow:hidden;">
+          <img src="https://img.youtube.com/vi/${v.id}/mqdefault.jpg" style="width:100%;height:100%;object-fit:cover;display:block;">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <div style="width:28px;height:28px;background:rgba(233,30,140,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="white"><polygon points="3,1 9,5 3,9"/></svg>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);">${v.title}</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px;">${v.desc}</div>
+        </div>
+      </div>
+      <div id="med-player-${v.id}" style="display:none;position:relative;padding-bottom:56.25%;height:0;">
+        <iframe id="med-iframe-${v.id}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen allow="autoplay;encrypted-media"></iframe>
+        <button onclick="collapseMedVideo('${v.id}')" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.7);border:none;color:#fff;border-radius:4px;padding:4px 8px;font-size:12px;font-weight:700;cursor:pointer;z-index:10;">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function expandMedVideo(id) {
+  const thumb = document.querySelector(`#med-wrap-${id} > div:first-child`);
+  const player = document.getElementById(`med-player-${id}`);
+  const iframe = document.getElementById(`med-iframe-${id}`);
+  if (!thumb || !player || !iframe) return;
+  thumb.style.display = 'none';
+  player.style.display = 'block';
+  iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1`;
+}
+
+function collapseMedVideo(id) {
+  const thumb = document.querySelector(`#med-wrap-${id} > div:first-child`);
+  const player = document.getElementById(`med-player-${id}`);
+  const iframe = document.getElementById(`med-iframe-${id}`);
+  if (!thumb || !player || !iframe) return;
+  iframe.src = '';
+  player.style.display = 'none';
+  thumb.style.display = 'flex';
+}
+
+// ==================== FEATURE 3: CUSTOM WORKOUT BUILDER ====================
+function getHiddenExs(prog, week, day) { const k = prog+'_'+week+'_'+day; return (bhLs('bh_hidden_exercises',{})[k] || []); }
+function saveHiddenExs(prog, week, day, arr) { const h = bhLs('bh_hidden_exercises',{}); h[prog+'_'+week+'_'+day] = arr; bhLsSet('bh_hidden_exercises', h); }
+function getCustomExs(prog, week, day) { const k = prog+'_'+week+'_'+day; return (bhLs('bh_custom_exercises',{})[k] || []); }
+function saveCustomExs(prog, week, day, arr) { const c = bhLs('bh_custom_exercises',{}); c[prog+'_'+week+'_'+day] = arr; bhLsSet('bh_custom_exercises', c); }
+
+function openCustomize() {
+  document.getElementById('customize-sheet').style.display = 'flex';
+  renderCustomizeBody();
+}
+function closeCustomize() {
+  document.getElementById('customize-sheet').style.display = 'none';
+  if (!currentWorkoutDay || !currentWorkoutWeek) return;
+  const pIdx = getPhaseIdx(currentWorkoutWeek);
+  const _baseExercises = getCurrentWorkouts()[currentWorkoutDay].phases[pIdx];
+  const _hidden = getHiddenExs(activeProgram, currentWorkoutWeek, currentWorkoutDay);
+  const _custom = getCustomExs(activeProgram, currentWorkoutWeek, currentWorkoutDay);
+  const allExs = [..._baseExercises.filter(e => !_hidden.includes(e.id)), ..._custom];
+  renderExerciseList(allExs, currentWorkoutWeek);
+}
+
+function renderCustomizeBody() {
+  if (!currentWorkoutDay || !currentWorkoutWeek) return;
+  const pIdx = getPhaseIdx(currentWorkoutWeek);
+  const baseExs = getCurrentWorkouts()[currentWorkoutDay].phases[pIdx];
+  const hidden = getHiddenExs(activeProgram, currentWorkoutWeek, currentWorkoutDay);
+  const custom = getCustomExs(activeProgram, currentWorkoutWeek, currentWorkoutDay);
+  const body = document.getElementById('customize-body');
+  let html = '<div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px;">Program Exercises</div>';
+  baseExs.forEach(ex => {
+    const isHidden = hidden.includes(ex.id);
+    html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:14px;color:${isHidden ? 'var(--text3)' : 'var(--text)'};text-decoration:${isHidden ? 'line-through' : 'none'}">${ex.name}</span>
+      <button onclick="toggleHideEx('${ex.id}')" style="background:${isHidden ? 'var(--bg3)' : 'rgba(233,30,140,0.15)'};border:1px solid ${isHidden ? 'var(--border)' : 'var(--pink)'};color:${isHidden ? 'var(--text2)' : 'var(--pink)'};border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;">${isHidden ? 'Add Back' : 'Remove'}</button>
+    </div>`;
+  });
+  if (custom.length > 0) {
+    html += '<div style="font-size:13px;font-weight:700;color:var(--text2);margin:12px 0 8px;">Custom Exercises</div>';
+    custom.forEach((ex, i) => {
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+        <span style="font-size:14px;color:var(--text)">${ex.name} (${ex.sets}×${ex.reps})</span>
+        <button onclick="removeCustomEx(${i})" style="background:rgba(192,57,43,0.15);border:1px solid #c0392b;color:#c0392b;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;">Remove</button>
+      </div>`;
+    });
+  }
+  body.innerHTML = html;
+}
+
+function toggleHideEx(exId) {
+  const hidden = getHiddenExs(activeProgram, currentWorkoutWeek, currentWorkoutDay);
+  const idx = hidden.indexOf(exId);
+  if (idx >= 0) hidden.splice(idx, 1); else hidden.push(exId);
+  saveHiddenExs(activeProgram, currentWorkoutWeek, currentWorkoutDay, hidden);
+  renderCustomizeBody();
+}
+
+function removeCustomEx(i) {
+  const custom = getCustomExs(activeProgram, currentWorkoutWeek, currentWorkoutDay);
+  custom.splice(i, 1);
+  saveCustomExs(activeProgram, currentWorkoutWeek, currentWorkoutDay, custom);
+  renderCustomizeBody();
+}
+
+function addCustomExercise() {
+  const name = document.getElementById('custom-ex-name').value.trim();
+  const sets = parseInt(document.getElementById('custom-ex-sets').value) || 3;
+  const reps = document.getElementById('custom-ex-reps').value.trim() || '10';
+  const type = document.getElementById('custom-ex-type').value;
+  if (!name) { showToast('Enter exercise name'); return; }
+  const custom = getCustomExs(activeProgram, currentWorkoutWeek, currentWorkoutDay);
+  const id = 'custom_' + Date.now();
+  custom.push({ id, name, sets, reps, type, notes: 'Custom exercise.' });
+  saveCustomExs(activeProgram, currentWorkoutWeek, currentWorkoutDay, custom);
+  document.getElementById('custom-ex-name').value = '';
+  document.getElementById('custom-ex-sets').value = '';
+  document.getElementById('custom-ex-reps').value = '';
+  renderCustomizeBody();
+  showToast('Exercise added!');
+}
+
+// ==================== FEATURE 4: SHARE PROGRESS ====================
+function shareProgress() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 800; canvas.height = 1000;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#0f0f0f';
+  ctx.fillRect(0, 0, 800, 1000);
+
+  const grad = ctx.createLinearGradient(0, 0, 800, 0);
+  grad.addColorStop(0, '#e91e8c');
+  grad.addColorStop(1, '#9b59b6');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 800, 8);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 56px system-ui, sans-serif';
+  ctx.fillText('BUILD HER', 40, 80);
+
+  const progName = activeProgram || 'Program';
+  const week = bhLs('bh_current_week', 1);
+  ctx.font = '28px system-ui, sans-serif';
+  ctx.fillStyle = '#aaaaaa';
+  ctx.fillText(progName + ' · Week ' + week, 40, 125);
+
+  const streak = getStreakWeeks ? getStreakWeeks() : 0;
+  ctx.font = 'bold 36px system-ui, sans-serif';
+  ctx.fillStyle = '#e91e8c';
+  ctx.fillText('🔥 ' + streak + ' week streak', 40, 185);
+
+  const prStore = getPRStore ? getPRStore() : {};
+  const prs = Object.values(prStore).sort((a,b) => b.weight - a.weight).slice(0,3);
+  ctx.font = 'bold 24px system-ui, sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('Top PRs:', 40, 250);
+  prs.forEach((pr, i) => {
+    ctx.font = '22px system-ui, sans-serif';
+    ctx.fillStyle = '#cccccc';
+    ctx.fillText(`${pr.name} — ${pr.weight} lbs`, 40, 290 + i * 40);
+  });
+
+  const photos = getBhPhotos();
+  const photoKeys = Object.keys(photos).sort((a,b) => b-a);
+  if (photoKeys.length > 0) {
+    const latestSrc = photos[photoKeys[0]];
+    const img = new Image();
+    img.onload = () => {
+      const photoY = 420;
+      const photoH = 500;
+      const photoW = 720;
+      const photoX = 40;
+      ctx.drawImage(img, photoX, photoY, photoW, photoH);
+      ctx.font = '20px system-ui, sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.fillText('Build Her App', 40, 960);
+      doShare(canvas);
+    };
+    img.src = latestSrc;
+  } else {
+    ctx.font = '20px system-ui, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillText('Build Her App', 40, 960);
+    doShare(canvas);
+  }
+}
+
+function doShare(canvas) {
+  canvas.toBlob(blob => {
+    if (!blob) { showToast('Could not generate image'); return; }
+    const file = new File([blob], 'buildher-progress.png', { type: 'image/png' });
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: 'My Build Her Progress' }).catch(() => downloadCanvas(canvas));
+    } else {
+      downloadCanvas(canvas);
+    }
+  }, 'image/png');
+}
+
+function downloadCanvas(canvas) {
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = 'buildher-progress.png';
+  a.click();
+  showToast('Progress image saved!');
+}
+
+// ==================== FEATURE 5: MILESTONE PHOTO PROMPT ====================
+function showMilestoneSheet(emoji, title, desc) {
+  document.getElementById('milestone-emoji').textContent = emoji;
+  document.getElementById('milestone-title').textContent = title;
+  document.getElementById('milestone-desc').textContent = desc;
+  document.getElementById('milestone-sheet').style.display = 'flex';
+}
+function closeMilestoneSheet() {
+  document.getElementById('milestone-sheet').style.display = 'none';
+}
+function captureMilestonePhoto() {
+  closeMilestoneSheet();
+  const week = bhLs('bh_current_week', 1);
+  bhCapturePhoto(week);
+}
+
+// ==================== ON-LOAD: SCHEDULE SAVED REMINDER ====================
+(function() {
+  const savedReminder = bhLs('bh_reminder_time', null);
+  if (savedReminder && 'Notification' in window && Notification.permission === 'granted') {
+    scheduleReminder(savedReminder);
+  }
+})();
 </script>
 </body>
 </html>
