@@ -564,6 +564,10 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
         <input type="number" id="bp-diastolic" placeholder="Diastolic" min="40" max="150" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:15px;">
         <span style="color:var(--text2);font-size:13px;">mmHg</span>
       </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
+        <input type="number" id="bp-pulse" placeholder="Pulse (bpm)" min="30" max="250" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:15px;">
+        <span style="color:var(--text2);font-size:13px;">❤️ bpm</span>
+      </div>
       <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;">
         <input type="date" id="bp-date" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:14px;">
         <button onclick="saveBP()" style="background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer;">Log</button>
@@ -576,6 +580,7 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
         <div style="display:flex;gap:12px;margin-bottom:8px;">
           <span style="font-size:11px;font-weight:700;color:#e91e8c;">— Systolic</span>
           <span style="font-size:11px;font-weight:700;color:#9b59b6;">— Diastolic</span>
+          <span style="font-size:11px;font-weight:700;color:#14b8a6;">- - Pulse</span>
         </div>
         <div style="position:relative;overflow:hidden;border-radius:8px;background:var(--bg3);">
           <svg id="bp-chart" viewBox="0 0 300 140" style="width:100%;display:block;"></svg>
@@ -1205,14 +1210,17 @@ function saveBP() {
   const dateLabel = d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
   const log = getBPLog();
   const existing = log.findIndex(e => e.dateISO === dateISO);
-  const entry = { systolic: sys, diastolic: dia, dateISO, date: dateLabel };
+  const pulse = parseInt(document.getElementById('bp-pulse').value) || null;
+  const entry = { systolic: sys, diastolic: dia, pulse, dateISO, date: dateLabel };
   if (existing >= 0) log[existing] = entry; else log.unshift(entry);
   log.sort((a, b) => b.dateISO.localeCompare(a.dateISO));
   saveBPLog(log);
   document.getElementById('bp-systolic').value = '';
   document.getElementById('bp-diastolic').value = '';
+  document.getElementById('bp-pulse').value = '';
   const cat = getBPCategory(sys, dia);
-  if (statusEl) statusEl.innerHTML = `<span style="color:${cat.color};font-weight:700;">✓ Logged: ${sys}/${dia} — ${cat.label}</span>`;
+  const pulseStr = pulse ? ` · ❤️ ${pulse} bpm` : '';
+  if (statusEl) statusEl.innerHTML = `<span style="color:${cat.color};font-weight:700;">✓ Logged: ${sys}/${dia} — ${cat.label}${pulseStr}</span>`;
   renderBPLog();
 }
 
@@ -1227,7 +1235,8 @@ function drawBPChart(log) {
   if (tipsWrap) tipsWrap.style.display = '';
   const W = 300, H = 140, padL = 30, padR = 10, padT = 10, padB = 20;
   const chartW = W - padL - padR, chartH = H - padT - padB;
-  const allVals = pts.flatMap(e => [e.systolic, e.diastolic]);
+  const hasPulse = pts.some(e => e.pulse);
+  const allVals = pts.flatMap(e => [e.systolic, e.diastolic, e.pulse].filter(Boolean));
   const minV = Math.max(50, Math.min(...allVals) - 10);
   const maxV = Math.min(200, Math.max(...allVals) + 10);
   const range = maxV - minV || 1;
@@ -1251,10 +1260,16 @@ function drawBPChart(log) {
   // Lines
   const sysPath = pts.map((e, i) => `${i === 0 ? 'M' : 'L'}${xOf(i)},${yOf(e.systolic)}`).join(' ');
   const diaPath = pts.map((e, i) => `${i === 0 ? 'M' : 'L'}${xOf(i)},${yOf(e.diastolic)}`).join(' ');
+  const pulsePts = pts.filter(e => e.pulse);
+  const pulsePathSegs = hasPulse ? pts.map((e, i) => e.pulse ? `${i === 0 || !pts[i-1].pulse ? 'M' : 'L'}${xOf(i)},${yOf(e.pulse)}` : '').filter(Boolean).join(' ') : '';
 
   // Dots
   const sysDots = pts.map((e, i) => `<circle cx="${xOf(i)}" cy="${yOf(e.systolic)}" r="3.5" fill="#e91e8c"/>`).join('');
   const diaDots = pts.map((e, i) => `<circle cx="${xOf(i)}" cy="${yOf(e.diastolic)}" r="3.5" fill="#9b59b6"/>`).join('');
+  const pulseDots = hasPulse ? pts.filter(e => e.pulse).map((e, i) => {
+    const idx = pts.indexOf(e);
+    return `<circle cx="${xOf(idx)}" cy="${yOf(e.pulse)}" r="3.5" fill="#14b8a6"/>`;
+  }).join('') : '';
 
   // Y axis labels
   const yLabels = [120, 140].filter(v => v >= minV && v <= maxV).map(v =>
@@ -1274,7 +1289,8 @@ function drawBPChart(log) {
     ${xLabels}
     <path d="${sysPath}" fill="none" stroke="#e91e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     <path d="${diaPath}" fill="none" stroke="#9b59b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    ${sysDots}${diaDots}
+    ${hasPulse ? `<path d="${pulsePathSegs}" fill="none" stroke="#14b8a6" stroke-width="2" stroke-dasharray="4,3" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
+    ${sysDots}${diaDots}${pulseDots}
   `;
 }
 
@@ -1296,7 +1312,7 @@ function renderBPLog() {
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
       <div>
         <div style="font-size:13px;color:var(--text2);">${e.date}</div>
-        <div style="font-size:16px;font-weight:700;color:var(--text);">${e.systolic}/${e.diastolic} <span style="font-size:11px;color:${cat.color};font-weight:700;">${cat.label}</span></div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);">${e.systolic}/${e.diastolic} <span style="font-size:11px;color:${cat.color};font-weight:700;">${cat.label}</span>${e.pulse ? `<span style="font-size:12px;color:#14b8a6;margin-left:8px;">❤️ ${e.pulse} bpm</span>` : ''}</div>
       </div>
       <button onclick="deleteBPEntry('${e.dateISO}')" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:4px 8px;">×</button>
     </div>`;
