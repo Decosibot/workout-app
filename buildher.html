@@ -2814,11 +2814,11 @@ function stopBreathing() {
 }
 
 const BH_MEDITATION_VIDEOS = [
-  { id: 'cpVZz8_CXcM', title: 'Morning Meditation', desc: 'FEEL It Now — powerful guided morning reset' },
-  { id: 'h73JYnPg-3o', title: 'Heart-Brain Coherence', desc: 'Two guided meditations for the heart' },
-  { id: 'd9-GDJlKuns', title: 'Elevate Your Emotions', desc: 'Transform your life through elevated states' },
-  { id: 'odzdENNR_IU', title: 'Let Go & Trust', desc: 'Release control and trust the universe' },
-  { id: 'HUfF-Tl2kd4', title: 'Sleep & Gratitude', desc: 'Reprogram your mind for a better life' },
+  { id: 'P8siX2dmX0I', title: 'Morning Manifestation', desc: 'Align your energy with your highest self' },
+  { id: 'iS3ZNnxHY_A', title: 'Body Scan & Healing', desc: '15 min deep relaxation and healing' },
+  { id: 'dkUqjH6O9Gw', title: 'Reprogram Your Mind', desc: 'Unlock your true potential, release blocks' },
+  { id: 'MQbpBJnJBR8', title: 'Gratitude Before Sleep', desc: 'Deep sleep with positive perspective' },
+  { id: 'bjC8UfDlSmU', title: 'Visualize Your Future', desc: 'Guided visualization to manifest your goals' },
 ];
 
 function renderMeditationVideos() {
@@ -2838,7 +2838,6 @@ function renderMeditationVideos() {
         <div>
           <div style="font-size:14px;font-weight:700;color:var(--text);">${v.title}</div>
           <div style="font-size:12px;color:var(--text2);margin-top:2px;">${v.desc}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px;">▶ Opens in YouTube</div>
         </div>
       </div>
     </div>
@@ -2846,7 +2845,10 @@ function renderMeditationVideos() {
 }
 
 function openMedVideo(id) {
-  window.open(`https://www.youtube.com/watch?v=${id}`, '_blank');
+  const overlay = document.getElementById('med-video-overlay');
+  const iframe = document.getElementById('med-video-iframe');
+  iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1`;
+  overlay.style.display = 'flex';
 }
 
 function closeMedVideo() {
