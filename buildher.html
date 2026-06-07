@@ -494,34 +494,19 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
   </div>
 
   <!-- HISTORY VIEW -->
-  <div id="history-view" class="view">
-    <div class="section-head">History</div>
-    <div class="section-sub">Track your progress</div>
-    <div class="hist-sub-tabs">
-      <button class="hist-sub-tab active" id="htab-log" onclick="switchHistTab('log')">Log</button>
-      <button class="hist-sub-tab" id="htab-prs" onclick="switchHistTab('prs')">PRs 🏆</button>
-    </div>
-    <div id="hist-panel-log">
-      <div class="chart-wrap" id="thrust-chart-wrap">
-        <div class="chart-title">Hip Thrust Progress (lbs)</div>
-        <svg class="progress-chart" id="thrust-chart" viewBox="0 0 300 120"></svg>
-      </div>
-      <div class="chart-wrap" id="squat-chart-wrap">
-        <div class="chart-title">Squat Progress (lbs)</div>
-        <svg class="progress-chart" id="squat-chart" viewBox="0 0 300 120"></svg>
-      </div>
-      <div id="history-list"></div>
-    </div>
-    <div id="hist-panel-prs" style="display:none;">
-      <div id="pr-board-list"></div>
-    </div>
-  </div>
 
   <!-- TRACKER VIEW -->
   <div id="tracker-view" class="view">
-    <div class="section-head">Progress Tracker</div>
-    <div class="section-sub" id="tracker-sub">Log your weight and measurements</div>
+    <div class="section-head">Track</div>
+    <div class="hist-sub-tabs">
+      <button class="hist-sub-tab active" id="ttab-body" onclick="switchTrackerTab('body')">Body</button>
+      <button class="hist-sub-tab" id="ttab-history" onclick="switchTrackerTab('history')">History</button>
+      <button class="hist-sub-tab" id="ttab-prs" onclick="switchTrackerTab('prs')">PRs 🏆</button>
+      <button class="hist-sub-tab" id="ttab-bp" onclick="switchTrackerTab('bp')">Blood Pressure</button>
+    </div>
 
+    <!-- Body sub-tab -->
+    <div id="tracker-panel-body">
     <div class="card" id="tracker-log-card">
       <div class="section-title">Log Today</div>
       <div class="measure-grid">
@@ -555,7 +540,18 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
       <div id="measurement-log-list"></div>
     </div>
 
-    <!-- Blood Pressure Log -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:16px;">
+      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px;">⏰ Daily Reminder</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <input type="time" id="reminder-time" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:15px;">
+        <button onclick="saveReminder()" style="background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer;">Set</button>
+      </div>
+      <div id="reminder-status" style="font-size:13px;color:var(--text2);"></div>
+    </div>
+    </div><!-- end tracker-panel-body -->
+
+    <!-- Blood Pressure sub-tab -->
+    <div id="tracker-panel-bp" style="display:none;">
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:16px;">
       <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px;">🩺 Blood Pressure</div>
       <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
@@ -628,15 +624,27 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
 
       <div id="bp-log-list"></div>
     </div>
+    </div><!-- end tracker-panel-bp -->
 
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:16px;">
-      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px;">⏰ Daily Reminder</div>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-        <input type="time" id="reminder-time" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:15px;">
-        <button onclick="saveReminder()" style="background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer;">Set</button>
+    <!-- History sub-tab -->
+    <div id="tracker-panel-history" style="display:none;">
+      <div class="chart-wrap" id="thrust-chart-wrap">
+        <div class="chart-title">Hip Thrust Progress (lbs)</div>
+        <svg class="progress-chart" id="thrust-chart" viewBox="0 0 300 120"></svg>
       </div>
-      <div id="reminder-status" style="font-size:13px;color:var(--text2);"></div>
+      <div class="chart-wrap" id="squat-chart-wrap">
+        <div class="chart-title">Squat Progress (lbs)</div>
+        <svg class="progress-chart" id="squat-chart" viewBox="0 0 300 120"></svg>
+      </div>
+      <div id="history-list"></div>
     </div>
+
+    <!-- PRs sub-tab -->
+    <div id="tracker-panel-prs" style="display:none;">
+      <div id="pr-board-list"></div>
+    </div>
+
+    <!-- Blood Pressure sub-tab (duplicate entry point — panels stay in body, this is a pointer) -->
   </div>
 
   <!-- NUTRITION VIEW -->
@@ -806,17 +814,13 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
     <svg viewBox="0 0 24 24"><path d="M6 4v16M18 4v16M6 12h12M3 6h3M18 6h3M3 18h3M18 18h3"/></svg>
     Workout
   </button>
-  <button class="nav-btn" data-view="history">
-    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-    History
-  </button>
   <button class="nav-btn" data-view="nutrition">
     <svg viewBox="0 0 24 24"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
     Nutrition
   </button>
   <button class="nav-btn" data-view="tracker">
     <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-    Tracker
+    Track
   </button>
   <button class="nav-btn" data-view="photos">
     <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
@@ -1797,7 +1801,7 @@ document.getElementById('rest-skip').addEventListener('click', () => {
 });
 
 // ==================== NAVIGATION ====================
-const VIEWS = ['today', 'workout', 'history', 'nutrition', 'tracker', 'photos', 'meditate'];
+const VIEWS = ['today', 'workout', 'nutrition', 'tracker', 'photos', 'meditate'];
 
 function showView(name) {
   VIEWS.forEach(v => {
@@ -1806,10 +1810,10 @@ function showView(name) {
   document.querySelectorAll('.nav-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.view === name);
   });
-  if (name === 'history') renderHistory();
+
   if (name === 'nutrition') loadNutritionInputs();
   if (name === 'today') renderToday();
-  if (name === 'tracker') renderTracker();
+  if (name === 'tracker') { renderTracker(); renderHistory(); renderPRBoard(); }
   if (name === 'photos') renderPhotos();
   if (name === 'meditate') renderMeditationVideos();
 }
@@ -2663,12 +2667,20 @@ function addBhFoodEntry() {
 
 // ==================== HISTORY SUB-TABS ====================
 function switchHistTab(tab) {
-  document.getElementById('hist-panel-log').style.display = tab === 'log' ? '' : 'none';
-  document.getElementById('hist-panel-prs').style.display = tab === 'prs' ? '' : 'none';
-  document.getElementById('htab-log').classList.toggle('active', tab === 'log');
-  document.getElementById('htab-prs').classList.toggle('active', tab === 'prs');
+  // Legacy — now handled by switchTrackerTab
+  switchTrackerTab(tab === 'prs' ? 'prs' : 'history');
+}
+
+function switchTrackerTab(tab) {
+  ['body','history','prs','bp'].forEach(t => {
+    const panel = document.getElementById('tracker-panel-' + t);
+    const btn = document.getElementById('ttab-' + t);
+    if (panel) panel.style.display = t === tab ? '' : 'none';
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  if (tab === 'history') { renderHistory(); drawProgressChart('thrust-chart','mon_p1'); drawProgressChart('squat-chart','wed_p1'); }
   if (tab === 'prs') renderPRBoard();
-  if (tab === 'log') { drawProgressChart('thrust-chart','mon_p1'); drawProgressChart('squat-chart','wed_p1'); }
+  if (tab === 'bp') renderBPLog();
 }
 
 // ==================== PERSONAL RECORDS ====================
