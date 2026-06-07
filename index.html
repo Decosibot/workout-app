@@ -6253,7 +6253,13 @@ const MEAL_TEMPLATES = [
   ]},
 ];
 
-function getTodayLogKey() { return 'food_log_' + new Date().toISOString().slice(0,10); }
+function getTodayLogKey() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return 'food_log_' + y + '-' + m + '-' + day;
+}
 function getTodayLog() { return ls(getTodayLogKey(), []); }
 function saveTodayLog(arr) { lsSet(getTodayLogKey(), arr); }
 
