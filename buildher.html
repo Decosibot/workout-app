@@ -2825,8 +2825,8 @@ function renderMeditationVideos() {
   const container = document.getElementById('meditation-videos');
   if (!container) return;
   container.innerHTML = BH_MEDITATION_VIDEOS.map(v => `
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;" id="med-wrap-${v.id}">
-      <div onclick="expandMedVideo('${v.id}')" style="display:flex;align-items:center;gap:12px;padding:12px;cursor:pointer;">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;">
+      <div onclick="openMedVideo('${v.id}')" style="display:flex;align-items:center;gap:12px;padding:12px;cursor:pointer;">
         <div style="position:relative;flex-shrink:0;width:96px;height:54px;border-radius:6px;overflow:hidden;">
           <img src="https://img.youtube.com/vi/${v.id}/mqdefault.jpg" style="width:100%;height:100%;object-fit:cover;display:block;">
           <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
@@ -2840,32 +2840,22 @@ function renderMeditationVideos() {
           <div style="font-size:12px;color:var(--text2);margin-top:2px;">${v.desc}</div>
         </div>
       </div>
-      <div id="med-player-${v.id}" style="display:none;position:relative;padding-bottom:56.25%;height:0;">
-        <iframe id="med-iframe-${v.id}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen allow="autoplay;encrypted-media"></iframe>
-        <button onclick="collapseMedVideo('${v.id}')" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.7);border:none;color:#fff;border-radius:4px;padding:4px 8px;font-size:12px;font-weight:700;cursor:pointer;z-index:10;">✕</button>
-      </div>
     </div>
   `).join('');
 }
 
-function expandMedVideo(id) {
-  const thumb = document.querySelector(`#med-wrap-${id} > div:first-child`);
-  const player = document.getElementById(`med-player-${id}`);
-  const iframe = document.getElementById(`med-iframe-${id}`);
-  if (!thumb || !player || !iframe) return;
-  thumb.style.display = 'none';
-  player.style.display = 'block';
-  iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1`;
+function openMedVideo(id) {
+  const overlay = document.getElementById('med-video-overlay');
+  const iframe = document.getElementById('med-video-iframe');
+  iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1`;
+  overlay.style.display = 'flex';
 }
 
-function collapseMedVideo(id) {
-  const thumb = document.querySelector(`#med-wrap-${id} > div:first-child`);
-  const player = document.getElementById(`med-player-${id}`);
-  const iframe = document.getElementById(`med-iframe-${id}`);
-  if (!thumb || !player || !iframe) return;
+function closeMedVideo() {
+  const overlay = document.getElementById('med-video-overlay');
+  const iframe = document.getElementById('med-video-iframe');
   iframe.src = '';
-  player.style.display = 'none';
-  thumb.style.display = 'flex';
+  overlay.style.display = 'none';
 }
 
 // ==================== FEATURE 3: CUSTOM WORKOUT BUILDER ====================
@@ -3058,5 +3048,12 @@ function captureMilestonePhoto() {
   }
 })();
 </script>
+
+<div id="med-video-overlay" style="display:none;position:fixed;inset:0;z-index:600;background:#000;flex-direction:column;">
+  <div style="display:flex;justify-content:flex-end;padding:12px;background:#000;">
+    <button onclick="closeMedVideo()" style="background:none;border:1px solid #444;color:#fff;border-radius:8px;padding:8px 16px;font-size:14px;font-weight:700;cursor:pointer;">✕ Close</button>
+  </div>
+  <iframe id="med-video-iframe" style="flex:1;width:100%;border:none;" allow="autoplay;encrypted-media;fullscreen" allowfullscreen></iframe>
+</div>
 </body>
 </html>
