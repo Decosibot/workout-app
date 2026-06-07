@@ -592,7 +592,11 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
 
       <!-- How to improve -->
       <div id="bp-tips-wrap" style="display:none;margin-bottom:16px;">
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;">How to Improve Your BP</div>
+        <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none';this.querySelector('.bp-chevron').style.transform=this.nextElementSibling.style.display===''?'rotate(180deg)':'rotate(0deg)'" style="width:100%;display:flex;justify-content:space-between;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;margin-bottom:0;">
+          <span style="font-size:13px;font-weight:700;color:var(--text);">How to Improve Your BP</span>
+          <span class="bp-chevron" style="color:var(--pink);font-size:14px;transition:transform .25s;">▼</span>
+        </button>
+        <div style="display:none;margin-top:8px;">
         <div style="display:flex;flex-direction:column;gap:8px;">
           <div style="background:var(--bg3);border-radius:8px;padding:12px;border-left:3px solid #e91e8c;">
             <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;">💪 Exercise 30 min/day</div>
@@ -620,6 +624,7 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
           </div>
         </div>
         <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.5;">⚠️ Always consult your doctor before making changes if you are on medication or have Stage 2 hypertension.</div>
+        </div><!-- end collapsible -->
       </div>
 
       <div id="bp-log-list"></div>
