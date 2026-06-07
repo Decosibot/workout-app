@@ -1,7 +1,8 @@
-const CACHE = 'hc12-v1';
+const CACHE = 'hc12-v2';
 const ASSETS = [
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './logo.png'
 ];
 
 self.addEventListener('install', e => {
