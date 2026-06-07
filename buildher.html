@@ -555,6 +555,23 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
       <div id="measurement-log-list"></div>
     </div>
 
+    <!-- Blood Pressure Log -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:16px;">
+      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px;">🩺 Blood Pressure</div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
+        <input type="number" id="bp-systolic" placeholder="Systolic" min="60" max="250" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:15px;">
+        <span style="color:var(--text2);font-weight:700;">/</span>
+        <input type="number" id="bp-diastolic" placeholder="Diastolic" min="40" max="150" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:15px;">
+        <span style="color:var(--text2);font-size:13px;">mmHg</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;">
+        <input type="date" id="bp-date" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:14px;">
+        <button onclick="saveBP()" style="background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer;">Log</button>
+      </div>
+      <div id="bp-status" style="font-size:12px;margin-bottom:10px;"></div>
+      <div id="bp-log-list"></div>
+    </div>
+
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:16px;">
       <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px;">⏰ Daily Reminder</div>
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
@@ -1080,6 +1097,12 @@ function renderTracker() {
   const tInput = document.getElementById('reminder-time');
   if (tInput && savedTime) tInput.value = savedTime;
   updateReminderStatus();
+  renderBPLog();
+  const bpDateInput = document.getElementById('bp-date');
+  if (bpDateInput && !bpDateInput.value) {
+    const now = new Date();
+    bpDateInput.value = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+  }
 }
 
 function drawWeightChart() {
@@ -1106,6 +1129,65 @@ function drawWeightChart() {
     <path d="${fillD}" fill="url(#wgrad)"/>
     <path d="${pathD}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
     ${dots}${labels}`;
+}
+
+function getBPLog() { return bhLs('bh_bp_log', []); }
+function saveBPLog(arr) { bhLsSet('bh_bp_log', arr); }
+
+function getBPCategory(sys, dia) {
+  if (sys < 120 && dia < 80) return { label: 'Normal', color: '#4caf50' };
+  if (sys < 130 && dia < 80) return { label: 'Elevated', color: '#ff9800' };
+  if (sys < 140 || dia < 90) return { label: 'High Stage 1', color: '#f44336' };
+  if (sys >= 140 || dia >= 90) return { label: 'High Stage 2', color: '#b71c1c' };
+  return { label: '', color: 'var(--text2)' };
+}
+
+function saveBP() {
+  const sys = parseInt(document.getElementById('bp-systolic').value);
+  const dia = parseInt(document.getElementById('bp-diastolic').value);
+  const dateVal = document.getElementById('bp-date').value;
+  const statusEl = document.getElementById('bp-status');
+  if (!sys || !dia || sys < 60 || dia < 40) { showToast('Enter valid blood pressure'); return; }
+  const d = dateVal ? new Date(dateVal + 'T12:00:00') : new Date();
+  const dateISO = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  const dateLabel = d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+  const log = getBPLog();
+  const existing = log.findIndex(e => e.dateISO === dateISO);
+  const entry = { systolic: sys, diastolic: dia, dateISO, date: dateLabel };
+  if (existing >= 0) log[existing] = entry; else log.unshift(entry);
+  log.sort((a, b) => b.dateISO.localeCompare(a.dateISO));
+  saveBPLog(log);
+  document.getElementById('bp-systolic').value = '';
+  document.getElementById('bp-diastolic').value = '';
+  const cat = getBPCategory(sys, dia);
+  if (statusEl) statusEl.innerHTML = `<span style="color:${cat.color};font-weight:700;">✓ Logged: ${sys}/${dia} — ${cat.label}</span>`;
+  renderBPLog();
+}
+
+function renderBPLog() {
+  const list = document.getElementById('bp-log-list');
+  if (!list) return;
+  const log = getBPLog();
+  if (log.length === 0) {
+    list.innerHTML = '<div style="color:var(--text3);font-size:13px;">No entries yet.</div>';
+    return;
+  }
+  list.innerHTML = log.slice(0, 30).map(e => {
+    const cat = getBPCategory(e.systolic, e.diastolic);
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
+      <div>
+        <div style="font-size:13px;color:var(--text2);">${e.date}</div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);">${e.systolic}/${e.diastolic} <span style="font-size:11px;color:${cat.color};font-weight:700;">${cat.label}</span></div>
+      </div>
+      <button onclick="deleteBPEntry('${e.dateISO}')" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:4px 8px;">×</button>
+    </div>`;
+  }).join('');
+}
+
+function deleteBPEntry(dateISO) {
+  const log = getBPLog().filter(e => e.dateISO !== dateISO);
+  saveBPLog(log);
+  renderBPLog();
 }
 
 // Full workout data keyed by phase index (0/1/2) and day (mon/wed/fri)
@@ -1472,6 +1554,11 @@ function getLastW(exId, week) {
     if (v) return { week: w, val: v };
   }
   return null;
+}
+function getSuggestedBhWeight(exId, week) {
+  const last = getLastW(exId, week);
+  if (!last || !last.val) return null;
+  return Math.round(parseFloat(last.val) * 1.05 / 2.5) * 2.5;
 }
 
 function getSets(exId, week) {
@@ -1860,7 +1947,7 @@ function buildExCard(ex, week, exercises, idx) {
       <div class="how-to-text" id="howto-${ex.id}">${ex.notes}</div>
       <div class="sets-row" id="sets-${ex.id}">${setsHtml}</div>
       <div class="weight-row">
-        <span class="weight-label">Weight:</span>
+        <span class="weight-label">Weight:${(() => { const s = getSuggestedBhWeight(ex.id, week); return s ? ` <span style="font-size:11px;font-weight:700;color:var(--pink);background:rgba(233,30,140,0.12);border-radius:4px;padding:2px 6px;">~${s} lbs</span>` : ''; })()}</span>
         <input type="number" class="weight-input" id="winput-${ex.id}" placeholder="lbs" value="${getW(ex.id, week)}" min="0" max="1000">
         <span class="weight-unit">lbs</span>
       </div>
@@ -1872,6 +1959,13 @@ function buildExCard(ex, week, exercises, idx) {
       </div>
     </div>
   `;
+
+  // Auto-fill suggested weight if no weight logged yet
+  const winputEl = card.querySelector(`#winput-${ex.id}`);
+  if (winputEl && !getW(ex.id, week)) {
+    const suggested = getSuggestedBhWeight(ex.id, week);
+    if (suggested) winputEl.value = suggested;
+  }
 
   // Toggle body
   card.querySelector('.ex-header').addEventListener('click', () => {
