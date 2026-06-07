@@ -2838,6 +2838,7 @@ function renderMeditationVideos() {
         <div>
           <div style="font-size:14px;font-weight:700;color:var(--text);">${v.title}</div>
           <div style="font-size:12px;color:var(--text2);margin-top:2px;">${v.desc}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;">▶ Opens in YouTube</div>
         </div>
       </div>
     </div>
@@ -2845,10 +2846,7 @@ function renderMeditationVideos() {
 }
 
 function openMedVideo(id) {
-  const overlay = document.getElementById('med-video-overlay');
-  const iframe = document.getElementById('med-video-iframe');
-  iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1`;
-  overlay.style.display = 'flex';
+  window.open(`https://www.youtube.com/watch?v=${id}`, '_blank');
 }
 
 function closeMedVideo() {
