@@ -300,6 +300,86 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
 .log-delta{font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px}
 .log-delta.loss{background:rgba(20,184,166,.15);color:#14b8a6}
 .log-delta.gain{background:rgba(245,66,66,.12);color:var(--red)}
+
+/* NUTRITION SUB-TABS */
+.nutr-sub-tabs{display:flex;gap:0;margin-bottom:16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:3px;}
+.nutr-sub-tab{flex:1;padding:9px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer;background:none;color:var(--text3);font-family:inherit;transition:all .2s;}
+.nutr-sub-tab.active{background:var(--bg2);color:var(--pink);box-shadow:0 1px 4px rgba(0,0,0,.4);}
+
+/* FOOD LOG */
+.macro-bar-wrap{margin-bottom:10px;}
+.macro-bar-label{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:4px;}
+.macro-bar-track{height:6px;background:var(--bg3);border-radius:100px;overflow:hidden;}
+.macro-bar-fill{height:100%;border-radius:100px;transition:width .4s;}
+.food-entry{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px;}
+.food-entry:last-child{border-bottom:none;}
+.food-entry-name{font-weight:600;color:var(--text);margin-bottom:2px;}
+.food-entry-macros{font-size:11px;color:var(--text3);}
+.food-entry-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:4px 8px;}
+#food-picker-sheet{position:fixed;inset:0;z-index:150;display:none;flex-direction:column;justify-content:flex-end;background:rgba(0,0,0,.6);}
+#food-picker-sheet.show{display:flex;}
+.food-sheet-inner{background:var(--bg2);border-radius:20px 20px 0 0;padding:16px 16px calc(32px + env(safe-area-inset-bottom));max-height:80vh;overflow-y:auto;}
+.food-sheet-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
+.food-sheet-close{background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:0 4px;}
+.food-cat-label{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin:12px 0 6px;}
+.food-item-btn{display:flex;justify-content:space-between;align-items:center;width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer;font-family:inherit;color:var(--text);font-size:13px;text-align:left;}
+.food-item-btn:active{border-color:var(--pink);}
+.food-item-macros{font-size:11px;color:var(--text3);}
+.food-qty-row{display:flex;align-items:center;gap:10px;margin:12px 0;}
+.food-qty-label{font-size:13px;color:var(--text2);white-space:nowrap;}
+.food-qty-input{flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-size:16px;font-weight:700;padding:10px 12px;border-radius:8px;outline:none;font-family:inherit;}
+.food-qty-input:focus{border-color:var(--pink);}
+
+/* HISTORY SUB-TABS */
+.hist-sub-tabs{display:flex;gap:0;margin-bottom:16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:3px;}
+.hist-sub-tab{flex:1;padding:9px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer;background:none;color:var(--text3);font-family:inherit;transition:all .2s;}
+.hist-sub-tab.active{background:var(--bg2);color:var(--pink);box-shadow:0 1px 4px rgba(0,0,0,.4);}
+.pr-item{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;}
+.pr-exercise-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.pr-detail{font-size:12px;color:var(--text3);}
+.pr-weight{font-size:20px;font-weight:800;color:var(--pink);}
+.pr-week{font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;background:rgba(224,102,163,.12);color:var(--pink);}
+.pr-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px;background:rgba(255,215,0,.15);color:#ffd700;margin-left:6px;}
+
+/* PROGRESS PHOTOS */
+.photo-week-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+.photo-week-slot{background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:pointer;aspect-ratio:3/4;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;}
+.photo-week-slot img{width:100%;height:100%;object-fit:cover;display:block;}
+.photo-slot-label{font-size:10px;font-weight:700;color:var(--text3);padding:4px;text-align:center;position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.5);}
+.photo-add-icon{font-size:20px;margin-bottom:4px;}
+.photo-compare-wrap{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.photo-compare-img{background:var(--bg3);border-radius:8px;overflow:hidden;}
+.photo-compare-img img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;}
+.pcl{font-size:11px;font-weight:700;color:var(--text3);padding:6px;text-align:center;}
+
+/* PRE-WORKOUT RITUAL */
+#bh-ritual-overlay{position:fixed;inset:0;z-index:500;background:var(--bg);display:none;flex-direction:column;}
+#bh-ritual-overlay.show{display:flex;}
+.bh-ritual-header{padding:16px 16px 0;display:flex;justify-content:center;}
+.bh-ritual-dots{display:flex;gap:8px;justify-content:center;padding:12px 0;}
+.bh-ritual-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .3s;}
+.bh-ritual-dot.active{background:var(--pink);transform:scale(1.3);}
+.bh-ritual-dot.done{background:var(--text3);}
+.bh-ritual-body{flex:1;overflow-y:auto;padding:0 16px 16px;}
+.bh-ritual-step-label{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--pink);margin-bottom:6px;}
+.bh-ritual-heading{font-size:26px;font-weight:800;color:var(--text);margin-bottom:4px;}
+.bh-ritual-sub{font-size:13px;color:var(--text2);margin-bottom:14px;}
+.bh-ritual-video-wrap{width:100%;border-radius:10px;overflow:hidden;background:#111;margin-bottom:14px;position:relative;cursor:pointer;}
+.bh-ritual-video-thumb{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;}
+.bh-ritual-play-btn{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.bh-ritual-instructions{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:14px;background:rgba(224,102,163,.06);border:1px solid rgba(224,102,163,.15);border-radius:8px;padding:12px;}
+.bh-ritual-timer-display{font-size:48px;font-weight:800;color:var(--text);text-align:center;margin:12px 0;}
+.bh-ritual-timer-btn{width:100%;padding:14px;border-radius:var(--radius);background:rgba(224,102,163,.12);border:1.5px solid var(--pink);color:var(--pink);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:12px;}
+.bh-ritual-timer-btn.running{background:#1a0a14;color:var(--pink);}
+.bh-ritual-ex-list{background:var(--bg3);border-radius:8px;padding:10px 12px;margin-bottom:14px;}
+.bh-ritual-ex-item{font-size:13px;color:var(--text2);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.bh-ritual-ex-item:last-child{border-bottom:none;}
+.bh-ritual-affirmation{font-size:18px;font-weight:700;color:var(--text);text-align:center;line-height:1.5;padding:20px;background:linear-gradient(135deg,#1a0a14,#110a1a);border:1px solid rgba(224,102,163,.2);border-radius:var(--radius);margin-bottom:14px;}
+.bh-ritual-new-btn{width:100%;padding:12px;border-radius:var(--radius);background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px;}
+.bh-ritual-begin-btn{width:100%;padding:16px;border-radius:var(--radius);background:linear-gradient(135deg,var(--pink),var(--purple));border:none;color:#fff;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.3px;}
+.bh-ritual-footer{padding:12px 16px calc(16px + env(safe-area-inset-bottom));display:flex;gap:10px;}
+.bh-ritual-next-btn{flex:2;background:linear-gradient(135deg,var(--pink),var(--purple));border:none;color:#fff;border-radius:var(--radius);padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;}
+.bh-ritual-skip-btn{flex:1;background:none;border:1px solid var(--border);color:var(--text3);border-radius:var(--radius);padding:14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
 </style>
 </head>
 <body>
@@ -347,6 +427,7 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
         <div style="display:flex;align-items:center;gap:8px">
           <span id="sync-status" style="font-size:10px;color:var(--text3);font-weight:600">☁️</span>
           <button onclick="showProgramSelect()" style="background:rgba(255,255,255,.07);border:none;color:var(--text2);font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px;cursor:pointer;font-family:inherit">Switch Program</button>
+          <button id="ritual-toggle-btn" onclick="toggleRitual()" style="background:rgba(255,255,255,.07);border:none;color:var(--text2);font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px;cursor:pointer;font-family:inherit">✨ Ritual: ON</button>
         </div>
       </div>
       <div class="hero-title" id="hero-day-name">Monday</div>
@@ -410,16 +491,25 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
   <!-- HISTORY VIEW -->
   <div id="history-view" class="view">
     <div class="section-head">History</div>
-    <div class="section-sub">Your completed sessions</div>
-    <div class="chart-wrap" id="thrust-chart-wrap">
-      <div class="chart-title">Hip Thrust Progress (lbs)</div>
-      <svg class="progress-chart" id="thrust-chart" viewBox="0 0 300 120"></svg>
+    <div class="section-sub">Track your progress</div>
+    <div class="hist-sub-tabs">
+      <button class="hist-sub-tab active" id="htab-log" onclick="switchHistTab('log')">Log</button>
+      <button class="hist-sub-tab" id="htab-prs" onclick="switchHistTab('prs')">PRs 🏆</button>
     </div>
-    <div class="chart-wrap" id="squat-chart-wrap">
-      <div class="chart-title">Squat Progress (lbs)</div>
-      <svg class="progress-chart" id="squat-chart" viewBox="0 0 300 120"></svg>
+    <div id="hist-panel-log">
+      <div class="chart-wrap" id="thrust-chart-wrap">
+        <div class="chart-title">Hip Thrust Progress (lbs)</div>
+        <svg class="progress-chart" id="thrust-chart" viewBox="0 0 300 120"></svg>
+      </div>
+      <div class="chart-wrap" id="squat-chart-wrap">
+        <div class="chart-title">Squat Progress (lbs)</div>
+        <svg class="progress-chart" id="squat-chart" viewBox="0 0 300 120"></svg>
+      </div>
+      <div id="history-list"></div>
     </div>
-    <div id="history-list"></div>
+    <div id="hist-panel-prs" style="display:none;">
+      <div id="pr-board-list"></div>
+    </div>
   </div>
 
   <!-- TRACKER VIEW -->
@@ -465,7 +555,11 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
   <div id="nutrition-view" class="view">
     <div class="section-head">Nutrition</div>
     <div class="section-sub" id="nutrition-sub">Mass gain calculator for women</div>
-
+    <div class="nutr-sub-tabs">
+      <button class="nutr-sub-tab active" id="ntab-cals" onclick="switchNutrTab('cals')">Calories</button>
+      <button class="nutr-sub-tab" id="ntab-log" onclick="switchNutrTab('log')">Food Log</button>
+    </div>
+    <div id="nutr-panel-cals">
     <div class="card">
       <div class="section-title">Your Stats</div>
       <div class="input-row">
@@ -554,6 +648,30 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
 
       <div class="note-box" id="nutrition-note-box">For women, a smaller surplus (200-350 cal) minimizes fat gain while maximizing muscle growth. Protein is your #1 lever — hit it every day.</div>
     </div>
+    </div><!-- end nutr-panel-cals -->
+    <div id="nutr-panel-log" style="display:none;">
+      <div class="card">
+        <div class="section-title">Today's Progress</div>
+        <div id="food-macro-bars"></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="section-title" style="margin-bottom:0;">Today's Food</div>
+          <button class="btn btn-primary btn-sm" onclick="openFoodPicker()">+ Add Food</button>
+        </div>
+        <div id="food-log-entries"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHOTOS VIEW -->
+  <div id="photos-view" class="view">
+    <div class="section-head">Progress Photos</div>
+    <div class="section-sub">8-week visual check-in</div>
+    <div class="note-box" style="margin-bottom:16px;">Photos are stored only on your device. Tap a week slot to add or replace.</div>
+    <div id="photos-compare-section"></div>
+    <div class="section-title" style="margin-top:4px;">Weekly Check-Ins</div>
+    <div class="photo-week-grid" id="photos-week-grid"></div>
   </div>
 </div>
 
@@ -579,6 +697,10 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
     <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
     Tracker
   </button>
+  <button class="nav-btn" data-view="photos">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+    Photos
+  </button>
 </nav>
 
 <!-- REST OVERLAY -->
@@ -597,6 +719,29 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
 
 <!-- TOAST -->
 <div id="toast"></div>
+
+<!-- FOOD PICKER SHEET -->
+<div id="food-picker-sheet">
+  <div class="food-sheet-inner">
+    <div class="food-sheet-title">
+      Add Food
+      <button class="food-sheet-close" onclick="closeFoodPicker()">&times;</button>
+    </div>
+    <div id="food-picker-body"></div>
+  </div>
+</div>
+
+<!-- PRE-WORKOUT RITUAL OVERLAY -->
+<div id="bh-ritual-overlay">
+  <div class="bh-ritual-header">
+    <div class="bh-ritual-dots" id="bh-ritual-dots"></div>
+  </div>
+  <div class="bh-ritual-body" id="bh-ritual-body"></div>
+  <div class="bh-ritual-footer">
+    <button class="bh-ritual-next-btn" id="bh-ritual-next">Next →</button>
+    <button class="bh-ritual-skip-btn" id="bh-ritual-skip-all">Skip All</button>
+  </div>
+</div>
 
 <script>
 // ==================== DATA ====================
@@ -1338,7 +1483,7 @@ document.getElementById('rest-skip').addEventListener('click', () => {
 });
 
 // ==================== NAVIGATION ====================
-const VIEWS = ['today', 'workout', 'history', 'nutrition', 'tracker'];
+const VIEWS = ['today', 'workout', 'history', 'nutrition', 'tracker', 'photos'];
 
 function showView(name) {
   VIEWS.forEach(v => {
@@ -1351,6 +1496,7 @@ function showView(name) {
   if (name === 'nutrition') loadNutritionInputs();
   if (name === 'today') renderToday();
   if (name === 'tracker') renderTracker();
+  if (name === 'photos') renderPhotos();
 }
 
 document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -1447,6 +1593,7 @@ function renderToday() {
     wr.appendChild(btn);
   }
 
+  updateRitualToggleBtn();
   // Rest day card (only show if today is a rest day and we're on today's week context)
   const restCard = document.getElementById('rest-day-card');
   if (!isWorkoutDay && dow in REST_TIPS) {
@@ -1462,9 +1609,13 @@ function renderToday() {
 }
 
 document.getElementById('start-today-btn').addEventListener('click', () => {
-  launchWorkout(state.week, state.day);
-  showView('workout');
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.view === 'workout'));
+  const pIdx = getPhaseIdx(state.week);
+  const exercises = getCurrentWorkouts()[state.day].phases[pIdx];
+  showBhRitual(exercises, () => {
+    launchWorkout(state.week, state.day);
+    showView('workout');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.view === 'workout'));
+  });
 });
 
 ['mon','wed','fri'].forEach(d => {
@@ -1625,7 +1776,6 @@ function buildExCard(ex, week, exercises, idx) {
   const winput = card.querySelector(`#winput-${ex.id}`);
   winput.addEventListener('input', () => {
     setW(ex.id, week, winput.value);
-    // update nudge
     const lastW2 = getLastW(ex.id, week);
     const nudgeEl = card.querySelector('.overload-nudge');
     if (nudgeEl && lastW2 && winput.value) {
@@ -1639,6 +1789,20 @@ function buildExCard(ex, week, exercises, idx) {
         nudgeEl.style.color = 'var(--text2)';
         nudgeEl.classList.add('show');
       }
+    }
+    // PR badge
+    const existingPR = getPR(activeProgram, ex.id);
+    const exNameEl = card.querySelector('.ex-name');
+    let prBadgeEl = exNameEl ? exNameEl.querySelector('.pr-badge') : null;
+    if (existingPR && winput.value && parseFloat(winput.value) > parseFloat(existingPR.weight)) {
+      if (!prBadgeEl && exNameEl) {
+        const badge = document.createElement('span');
+        badge.className = 'pr-badge';
+        badge.textContent = '🏆 New PR!';
+        exNameEl.appendChild(badge);
+      }
+    } else if (prBadgeEl) {
+      prBadgeEl.remove();
     }
   });
 
@@ -1728,7 +1892,9 @@ document.getElementById('complete-workout-btn').addEventListener('click', () => 
     sets: totalSets,
     phase: getCurrentGetPhase(currentWorkoutWeek).short
   });
-  showToast('Workout complete! Great work!');
+  const newPRs = scanAndSavePRsOnComplete(currentWorkoutWeek);
+  const prMsg = newPRs.length > 0 ? ` 🏆 ${newPRs.length} new PR${newPRs.length > 1 ? 's' : ''}!` : '';
+  showToast('Workout complete! Great work!' + prMsg);
   renderToday();
   setTimeout(() => showView('today'), 1200);
 });
@@ -1876,6 +2042,7 @@ function showNutritionResults(bmr, tdee, weightLbs, goalLbs, adjustment) {
   const proteinCals = proteinG * 4;
   const carbG = Math.round((cals - fatCals - proteinCals) / 4);
 
+  const _nutrSave = getNutrition(); _nutrSave._lastCals = cals; _nutrSave._lastProtein = proteinG; saveNutrition(_nutrSave);
   document.getElementById('r-bmr').textContent = bmr + ' cal';
   document.getElementById('r-tdee').textContent = tdee + ' cal';
   document.getElementById('r-cals').textContent = cals + ' cal';
@@ -1966,6 +2133,471 @@ loadFromCloud(() => {
   }
   renderToday();
 });
+
+// ==================== NUTRITION SUB-TABS ====================
+function switchNutrTab(tab) {
+  document.getElementById('nutr-panel-cals').style.display = tab === 'cals' ? '' : 'none';
+  document.getElementById('nutr-panel-log').style.display = tab === 'log' ? '' : 'none';
+  document.getElementById('ntab-cals').classList.toggle('active', tab === 'cals');
+  document.getElementById('ntab-log').classList.toggle('active', tab === 'log');
+  if (tab === 'log') renderFoodLog();
+}
+
+// ==================== FOOD LOG ====================
+const BH_FOOD_DB = [
+  { cat:'Protein', items:[
+    { name:'Chicken Breast (cooked)', cal:165, p:31, c:0, f:4, unit:'4oz' },
+    { name:'Greek Yogurt (plain, 2%)', cal:100, p:17, c:6, f:2, unit:'3/4 cup' },
+    { name:'Eggs (large)', cal:70, p:6, c:0, f:5, unit:'1 egg' },
+    { name:'Egg Whites', cal:25, p:5, c:0, f:0, unit:'2 whites' },
+    { name:'Canned Tuna (in water)', cal:100, p:22, c:0, f:1, unit:'3oz' },
+    { name:'Cottage Cheese (low-fat)', cal:90, p:12, c:5, f:2, unit:'1/2 cup' },
+    { name:'Protein Shake', cal:130, p:25, c:5, f:2, unit:'1 scoop' },
+    { name:'Salmon (cooked)', cal:175, p:25, c:0, f:8, unit:'4oz' }
+  ]},
+  { cat:'Carbs', items:[
+    { name:'White Rice (cooked)', cal:200, p:4, c:44, f:0, unit:'1 cup' },
+    { name:'Sweet Potato (medium)', cal:115, p:2, c:27, f:0, unit:'1 medium' },
+    { name:'Oatmeal (dry)', cal:150, p:5, c:27, f:3, unit:'1/2 cup' },
+    { name:'Banana', cal:105, p:1, c:27, f:0, unit:'1 medium' },
+    { name:'Whole Wheat Bread', cal:80, p:4, c:15, f:1, unit:'1 slice' },
+    { name:'Quinoa (cooked)', cal:220, p:8, c:39, f:4, unit:'1 cup' }
+  ]},
+  { cat:'Fats', items:[
+    { name:'Avocado', cal:160, p:2, c:9, f:15, unit:'1/2 avocado' },
+    { name:'Almond Butter', cal:190, p:7, c:7, f:16, unit:'2 tbsp' },
+    { name:'Olive Oil', cal:120, p:0, c:0, f:14, unit:'1 tbsp' },
+    { name:'Almonds', cal:160, p:6, c:6, f:14, unit:'1oz' }
+  ]},
+  { cat:'Snacks', items:[
+    { name:'Rice Cake (plain)', cal:35, p:1, c:7, f:0, unit:'1 cake' },
+    { name:'String Cheese', cal:80, p:6, c:1, f:5, unit:'1 stick' },
+    { name:'Apple', cal:95, p:0, c:25, f:0, unit:'1 medium' },
+    { name:'Baby Carrots', cal:35, p:1, c:8, f:0, unit:'3oz' }
+  ]}
+];
+
+// Build lookup map
+window._bhFoodMap = {};
+BH_FOOD_DB.forEach(cat => cat.items.forEach((item, i) => {
+  const key = cat.cat + '_' + i;
+  window._bhFoodMap[key] = item;
+}));
+
+let _bhSelectedFood = null;
+
+function getBhLocalDateKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function getBhFoodLog(dateKey) { return bhLs('bh_food_log_' + dateKey, []); }
+function saveBhFoodLog(dateKey, arr) {
+  try {
+    const now = new Date();
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('bh_food_log_')) {
+        const ds = k.replace('bh_food_log_', '');
+        const dd = new Date(ds);
+        if (!isNaN(dd) && (now - dd) > 14 * 24 * 60 * 60 * 1000) localStorage.removeItem(k);
+      }
+    }
+  } catch(e) {}
+  bhLsSet('bh_food_log_' + dateKey, arr);
+}
+
+function renderFoodLog() {
+  const dateKey = getBhLocalDateKey();
+  const entries = getBhFoodLog(dateKey);
+  const nutr = getNutrition();
+  const targetCal = nutr._lastCals || 0;
+  const targetProtein = nutr._lastProtein || 0;
+  let totCal = 0, totP = 0, totC = 0, totF = 0;
+  entries.forEach(e => { totCal += e.cal||0; totP += e.p||0; totC += e.c||0; totF += e.f||0; });
+  const calPct = targetCal ? Math.min(100, Math.round(totCal/targetCal*100)) : 0;
+  const protPct = targetProtein ? Math.min(100, Math.round(totP/targetProtein*100)) : 0;
+  const barsEl = document.getElementById('food-macro-bars');
+  if (barsEl) barsEl.innerHTML = `
+    <div class="macro-bar-wrap">
+      <div class="macro-bar-label"><span>Calories</span><span>${totCal} / ${targetCal||'—'} kcal</span></div>
+      <div class="macro-bar-track"><div class="macro-bar-fill" style="width:${calPct}%;background:linear-gradient(90deg,var(--pink),var(--purple))"></div></div>
+    </div>
+    <div class="macro-bar-wrap">
+      <div class="macro-bar-label"><span>Protein</span><span>${totP}g / ${targetProtein||'—'}g</span></div>
+      <div class="macro-bar-track"><div class="macro-bar-fill" style="width:${protPct}%;background:var(--pink)"></div></div>
+    </div>
+    <div style="display:flex;gap:16px;margin-top:8px;font-size:12px;color:var(--text3);">
+      <span>Carbs: <strong style="color:var(--purple)">${totC}g</strong></span>
+      <span>Fat: <strong style="color:#f0a500">${totF}g</strong></span>
+    </div>`;
+  const listEl = document.getElementById('food-log-entries');
+  if (!listEl) return;
+  if (entries.length === 0) {
+    listEl.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px 0">No food logged yet today. Tap + Add Food.</div>';
+    return;
+  }
+  listEl.innerHTML = entries.map((e,i) => `
+    <div class="food-entry">
+      <div>
+        <div class="food-entry-name">${e.name} <span style="font-weight:400;color:var(--text3)">&times;${e.qty}</span></div>
+        <div class="food-entry-macros">${e.cal} kcal &middot; P:${e.p}g &middot; C:${e.c}g &middot; F:${e.f}g</div>
+      </div>
+      <button class="food-entry-del" onclick="deleteBhFoodEntry(${i})">&#128465;</button>
+    </div>`).join('');
+}
+
+function deleteBhFoodEntry(idx) {
+  const dateKey = getBhLocalDateKey();
+  const entries = getBhFoodLog(dateKey);
+  entries.splice(idx, 1);
+  saveBhFoodLog(dateKey, entries);
+  renderFoodLog();
+}
+
+function openFoodPicker() {
+  _bhSelectedFood = null;
+  renderFoodPickerBrowse();
+  document.getElementById('food-picker-sheet').classList.add('show');
+}
+
+function closeFoodPicker() {
+  document.getElementById('food-picker-sheet').classList.remove('show');
+  _bhSelectedFood = null;
+}
+
+function renderFoodPickerBrowse() {
+  const body = document.getElementById('food-picker-body');
+  let html = '';
+  BH_FOOD_DB.forEach(cat => {
+    html += `<div class="food-cat-label">${cat.cat}</div>`;
+    cat.items.forEach((item, i) => {
+      const key = cat.cat + '_' + i;
+      html += `<button class="food-item-btn" onclick="selectBhFoodItem('${key}')">
+        <span>${item.name} <span style="font-size:11px;color:var(--text3)">(${item.unit})</span></span>
+        <span class="food-item-macros">${item.cal} kcal &middot; P${item.p}g</span>
+      </button>`;
+    });
+  });
+  body.innerHTML = html;
+}
+
+function selectBhFoodItem(key) {
+  _bhSelectedFood = window._bhFoodMap[key];
+  if (!_bhSelectedFood) return;
+  const body = document.getElementById('food-picker-body');
+  body.innerHTML = `
+    <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px">${_bhSelectedFood.name}</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:12px">Per ${_bhSelectedFood.unit}: ${_bhSelectedFood.cal} kcal &middot; P${_bhSelectedFood.p}g &middot; C${_bhSelectedFood.c}g &middot; F${_bhSelectedFood.f}g</div>
+    <div class="food-qty-row">
+      <span class="food-qty-label">Servings:</span>
+      <input type="number" class="food-qty-input" id="bh-food-qty" value="1" min="0.25" step="0.25">
+    </div>
+    <button class="btn btn-primary" style="margin-top:8px" onclick="addBhFoodEntry()">Add to Log</button>
+    <button class="btn btn-ghost" style="margin-top:8px" onclick="renderFoodPickerBrowse()">&larr; Back</button>`;
+}
+
+function addBhFoodEntry() {
+  if (!_bhSelectedFood) return;
+  const qty = parseFloat(document.getElementById('bh-food-qty').value) || 1;
+  const dateKey = getBhLocalDateKey();
+  const entries = getBhFoodLog(dateKey);
+  entries.push({
+    name: _bhSelectedFood.name,
+    qty,
+    cal: Math.round(_bhSelectedFood.cal * qty),
+    p: Math.round(_bhSelectedFood.p * qty),
+    c: Math.round(_bhSelectedFood.c * qty),
+    f: Math.round(_bhSelectedFood.f * qty)
+  });
+  saveBhFoodLog(dateKey, entries);
+  closeFoodPicker();
+  renderFoodLog();
+  showToast(_bhSelectedFood.name + ' added');
+}
+
+// ==================== HISTORY SUB-TABS ====================
+function switchHistTab(tab) {
+  document.getElementById('hist-panel-log').style.display = tab === 'log' ? '' : 'none';
+  document.getElementById('hist-panel-prs').style.display = tab === 'prs' ? '' : 'none';
+  document.getElementById('htab-log').classList.toggle('active', tab === 'log');
+  document.getElementById('htab-prs').classList.toggle('active', tab === 'prs');
+  if (tab === 'prs') renderPRBoard();
+  if (tab === 'log') { drawProgressChart('thrust-chart','mon_p1'); drawProgressChart('squat-chart','wed_p1'); }
+}
+
+// ==================== PERSONAL RECORDS ====================
+function getPRStore() { return bhLs('bh_prs', {}); }
+function savePRStore(store) { bhLsSet('bh_prs', store); syncToCloud(); }
+function getPR(prog, exId) { return getPRStore()[(prog||'build') + '_' + exId] || null; }
+
+function updatePRIfBetter(prog, exId, exName, weightStr, week) {
+  const weight = parseFloat(weightStr);
+  if (!weight || weight <= 0) return false;
+  const store = getPRStore();
+  const key = (prog||'build') + '_' + exId;
+  const existing = store[key];
+  if (!existing || weight > parseFloat(existing.weight)) {
+    store[key] = { weight, week, name: exName, date: new Date().toLocaleDateString() };
+    savePRStore(store);
+    return true;
+  }
+  return false;
+}
+
+function scanAndSavePRsOnComplete(week) {
+  const pIdx = getPhaseIdx(week);
+  const exercises = getCurrentWorkouts()[currentWorkoutDay].phases[pIdx];
+  const newPRs = [];
+  exercises.forEach(ex => {
+    if (isSkipped(ex.id, week)) return;
+    const w = getW(ex.id, week);
+    if (w && parseFloat(w) > 0) {
+      const isNew = updatePRIfBetter(activeProgram, ex.id, ex.name, w, week);
+      if (isNew) newPRs.push(ex.name);
+    }
+  });
+  return newPRs;
+}
+
+function renderPRBoard() {
+  const store = getPRStore();
+  const el = document.getElementById('pr-board-list');
+  if (!el) return;
+  const entries = Object.values(store).filter(e => e && e.name);
+  if (entries.length === 0) {
+    el.innerHTML = `<div class="empty-state">
+      <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke-width="1.5"/></svg>
+      <p>No PRs yet</p>
+      <small>Complete workouts with weights logged to build your record</small>
+    </div>`;
+    return;
+  }
+  entries.sort((a,b) => b.week - a.week);
+  el.innerHTML = entries.map(e => `
+    <div class="pr-item">
+      <div>
+        <div class="pr-exercise-name">${e.name}</div>
+        <div class="pr-detail">${e.date} &middot; Week ${e.week}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="pr-weight">${e.weight} lbs</div>
+        <div class="pr-week">Week ${e.week}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ==================== PROGRESS PHOTOS ====================
+function getBhPhotos() { return bhLs('bh_photos', {}); }
+function saveBhPhotos(store) {
+  try { bhLsSet('bh_photos', store); }
+  catch(e) {
+    const entries = Object.entries(store).sort((a,b) => parseInt(a[0].slice(1)) - parseInt(b[0].slice(1)));
+    if (entries.length > 1) { delete store[entries[0][0]]; try { bhLsSet('bh_photos', store); } catch(e2) { showToast('Storage full'); } }
+  }
+}
+
+function renderPhotos() {
+  const store = getBhPhotos();
+  const allEntries = Object.entries(store).sort((a,b) => parseInt(a[0].slice(1)) - parseInt(b[0].slice(1)));
+  const compareEl = document.getElementById('photos-compare-section');
+  if (allEntries.length >= 2) {
+    const first = allEntries[0], latest = allEntries[allEntries.length-1];
+    compareEl.innerHTML = `
+      <div class="section-title">Your Transformation</div>
+      <div class="photo-compare-wrap">
+        <div class="photo-compare-img"><img src="${first[1]}" alt="Week ${first[0].slice(1)}"><div class="pcl">Week ${first[0].slice(1)} — Start</div></div>
+        <div class="photo-compare-img"><img src="${latest[1]}" alt="Week ${latest[0].slice(1)}"><div class="pcl">Week ${latest[0].slice(1)} — Now</div></div>
+      </div>`;
+  } else {
+    compareEl.innerHTML = '';
+  }
+  const grid = document.getElementById('photos-week-grid');
+  let html = '';
+  for (let w = 1; w <= 8; w++) {
+    const key = 'w' + w;
+    const photo = store[key];
+    if (photo) {
+      html += `<div class="photo-week-slot" onclick="bhViewOrReplacePhoto(${w})"><img src="${photo}" alt="Week ${w}"><div class="photo-slot-label">Wk ${w} ✓</div></div>`;
+    } else {
+      html += `<div class="photo-week-slot" onclick="bhCapturePhoto(${w})"><div class="photo-add-icon">📷</div><div class="photo-slot-label">Week ${w}</div></div>`;
+    }
+  }
+  grid.innerHTML = html;
+}
+
+function bhCapturePhoto(weekNum) {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*'; input.capture = 'user';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 800;
+        let w = img.width, h = img.height;
+        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        const compressed = canvas.toDataURL('image/jpeg', 0.75);
+        const store = getBhPhotos();
+        store['w' + weekNum] = compressed;
+        saveBhPhotos(store);
+        renderPhotos();
+        showToast('Week ' + weekNum + ' photo saved');
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+function bhViewOrReplacePhoto(weekNum) {
+  if (confirm('Replace your Week ' + weekNum + ' photo?')) bhCapturePhoto(weekNum);
+}
+
+// ==================== PRE-WORKOUT RITUAL ====================
+const BH_AFFIRMATIONS = [
+  "I am strong, capable, and unstoppable.",
+  "Every rep makes me more powerful.",
+  "I show up for myself — every single day.",
+  "My body is built for strength and beauty.",
+  "I choose progress over perfection.",
+  "I am exactly where I am supposed to be.",
+  "Discipline is my superpower.",
+  "I am building the strongest version of me.",
+  "My consistency is my greatest asset.",
+  "I lift heavy and I love who I'm becoming.",
+  "I am not competing with anyone but yesterday's version of me.",
+  "Hard work looks good on me.",
+  "Every workout is a deposit into my future self.",
+  "I am worthy of the results I am working for.",
+  "She believed she could, so she did.",
+  "My strength is a gift I give myself.",
+  "I earn my confidence in the gym.",
+  "I am powerful beyond measure.",
+  "Growth requires discomfort — I welcome it.",
+  "Today I choose strength."
+];
+
+function bhRitualEnabled() { return bhLs('bh_ritual_enabled', true); }
+function toggleRitual() {
+  const cur = bhRitualEnabled();
+  bhLsSet('bh_ritual_enabled', !cur);
+  updateRitualToggleBtn();
+  showToast('Ritual ' + (!cur ? 'enabled' : 'disabled'));
+}
+function updateRitualToggleBtn() {
+  const btn = document.getElementById('ritual-toggle-btn');
+  if (btn) btn.textContent = '✨ Ritual: ' + (bhRitualEnabled() ? 'ON' : 'OFF');
+}
+
+function showBhRitual(exercises, onComplete) {
+  if (!bhRitualEnabled()) { onComplete(); return; }
+  let step = 1;
+  let timerInterval = null;
+  let timerSeconds = 0;
+  let timerRunning = false;
+  const overlay = document.getElementById('bh-ritual-overlay');
+  overlay.classList.add('show');
+
+  function clearTimer() {
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    timerRunning = false;
+  }
+  function fmt(s) { return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
+
+  function makeVid(id) {
+    return `<div class="bh-ritual-video-wrap" id="bhvid-${id}">
+      <img class="bh-ritual-video-thumb" src="https://img.youtube.com/vi/${id}/hqdefault.jpg" alt="Video">
+      <div class="bh-ritual-play-btn" onclick="(function(){document.getElementById('bhvid-${id}').innerHTML='<iframe style=\\'width:100%;aspect-ratio:16/9;border:none;display:block;\\' src=\\'https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1\\' allow=\\'autoplay;encrypted-media\\' allowfullscreen></iframe>';})()">
+        <svg viewBox="0 0 68 48" style="width:60px"><rect width="68" height="48" rx="10" fill="rgba(0,0,0,0.7)"/><polygon points="26,14 26,34 48,24" fill="#fff"/></svg>
+      </div>
+    </div>`;
+  }
+
+  function updateDots() {
+    document.getElementById('bh-ritual-dots').innerHTML = [1,2,3].map(i =>
+      `<div class="bh-ritual-dot${i < step ? ' done' : i === step ? ' active' : ''}"></div>`
+    ).join('');
+  }
+
+  function render() {
+    clearTimer();
+    updateDots();
+    const body = document.getElementById('bh-ritual-body');
+    const nextBtn = document.getElementById('bh-ritual-next');
+    if (step === 1) {
+      timerSeconds = 120;
+      nextBtn.style.display = '';
+      body.innerHTML = `
+        <div class="bh-ritual-step-label">Step 1 of 3</div>
+        <div class="bh-ritual-heading">Power Pose</div>
+        <div class="bh-ritual-sub">Amy Cuddy &middot; 2 Minutes</div>
+        ${makeVid('Ks-_Mh1QhMc')}
+        <div class="bh-ritual-instructions">Stand tall. Feet wide. Hands on hips or arms raised. Own your space. Science shows this shifts your hormones — and your mindset.</div>
+        <div class="bh-ritual-timer-display" id="bh-ritual-timer">${fmt(timerSeconds)}</div>
+        <button class="bh-ritual-timer-btn" id="bh-timer-btn" onclick="bhStartRitualTimer()">START TIMER</button>`;
+    } else if (step === 2) {
+      timerSeconds = 90;
+      nextBtn.style.display = '';
+      const exHtml = exercises.length
+        ? `<div class="bh-ritual-ex-list">${exercises.map(e=>`<div class="bh-ritual-ex-item">&bull; ${e.name}</div>`).join('')}</div>`
+        : '';
+      body.innerHTML = `
+        <div class="bh-ritual-step-label">Step 2 of 3</div>
+        <div class="bh-ritual-heading">See It First</div>
+        <div class="bh-ritual-sub">Visualization &middot; 90 Seconds</div>
+        ${makeVid('A8ouwuq3Yps')}
+        <div class="bh-ritual-instructions">Close your eyes. See yourself completing every rep with perfect form. Feel the strength. Own the outcome before you pick up a single weight.</div>
+        ${exHtml}
+        <div class="bh-ritual-timer-display" id="bh-ritual-timer">${fmt(timerSeconds)}</div>
+        <button class="bh-ritual-timer-btn" id="bh-timer-btn" onclick="bhStartRitualTimer()">START TIMER</button>`;
+    } else {
+      nextBtn.style.display = 'none';
+      const aff = BH_AFFIRMATIONS[Math.floor(Math.random()*BH_AFFIRMATIONS.length)];
+      body.innerHTML = `
+        <div class="bh-ritual-step-label">Step 3 of 3</div>
+        <div class="bh-ritual-heading">Declare It</div>
+        <div class="bh-ritual-sub">Your affirmation for today</div>
+        <div class="bh-ritual-affirmation" id="bh-aff-text">${aff}</div>
+        <button class="bh-ritual-new-btn" onclick="document.getElementById('bh-aff-text').textContent=BH_AFFIRMATIONS[Math.floor(Math.random()*BH_AFFIRMATIONS.length)]">🔄 New Affirmation</button>
+        <button class="bh-ritual-begin-btn" onclick="bhRitualFinish()">Begin Workout &rarr;</button>`;
+    }
+  }
+
+  window.bhStartRitualTimer = function() {
+    if (timerRunning) return;
+    timerRunning = true;
+    const btn = document.getElementById('bh-timer-btn');
+    const display = document.getElementById('bh-ritual-timer');
+    if (btn) { btn.textContent = 'Running…'; btn.classList.add('running'); }
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      if (display) display.textContent = fmt(timerSeconds);
+      if (timerSeconds <= 0) {
+        clearTimer();
+        if (display) display.textContent = '0:00';
+        setTimeout(() => { step++; if (step > 3) bhRitualFinish(); else render(); }, 600);
+      }
+    }, 1000);
+  };
+
+  document.getElementById('bh-ritual-next').onclick = () => { clearTimer(); step++; if (step > 3) bhRitualFinish(); else render(); };
+  document.getElementById('bh-ritual-skip-all').onclick = () => bhRitualFinish();
+
+  window.bhRitualFinish = function() {
+    clearTimer();
+    overlay.classList.remove('show');
+    onComplete();
+  };
+
+  render();
+}
 </script>
 </body>
 </html>
