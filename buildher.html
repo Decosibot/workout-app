@@ -2873,10 +2873,7 @@ function renderMeditationVideos() {
 }
 
 function openMedVideo(id) {
-  const overlay = document.getElementById('med-video-overlay');
-  const iframe = document.getElementById('med-video-iframe');
-  iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1`;
-  overlay.style.display = 'flex';
+  window.open(`https://www.youtube.com/watch?v=${id}`, '_blank');
 }
 
 function closeMedVideo() {
