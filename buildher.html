@@ -439,6 +439,8 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
       <div class="streak" id="streak-display">&#x1F525; 0 week streak</div>
     </div>
 
+    <div id="bh-daily-quote" style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--pink);border-radius:10px;padding:14px 16px;margin:0 0 16px;"></div>
+
     <div id="today-start-btn-wrap" style="margin-bottom:16px">
       <button class="btn btn-primary" id="start-today-btn">Start Today&apos;s Workout &rarr;</button>
     </div>
@@ -1661,6 +1663,12 @@ function renderToday() {
   document.getElementById('hero-week').textContent = 'Week ' + state.week;
   document.getElementById('streak-display').textContent = '🔥 ' + getStreakWeeks() + ' week streak';
 
+  const bhQuote = getBhDailyQuote();
+  const quoteEl = document.getElementById('bh-daily-quote');
+  if (quoteEl) {
+    quoteEl.innerHTML = `<div style="font-size:14px;font-style:italic;color:var(--text2);line-height:1.5;margin-bottom:4px;">"${bhQuote.q}"</div><div style="font-size:12px;font-weight:700;color:var(--pink);">— ${bhQuote.a}</div>`;
+  }
+
   const done = isDone(state.week, displayDay);
   document.getElementById('today-start-btn-wrap').style.display = done ? 'none' : 'block';
   document.getElementById('today-done-badge').style.display = done ? 'flex' : 'none';
@@ -1806,13 +1814,7 @@ function buildVideoHtml(ex) {
 }
 
 function bhExpandVideo(exId, ytId) {
-  const thumb = document.querySelector(`#vid-wrap-${exId} > div:first-child`);
-  const player = document.getElementById(`vid-player-${exId}`);
-  const iframe = document.getElementById(`vid-iframe-${exId}`);
-  if (!thumb || !player || !iframe) return;
-  thumb.style.display = 'none';
-  player.style.display = 'block';
-  iframe.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`;
+  openMedVideo(ytId);
 }
 
 function bhCollapseVideo(exId) {
@@ -1826,13 +1828,7 @@ function bhCollapseVideo(exId) {
 }
 
 function bhExpandSearchVideo(exId, query) {
-  const thumb = document.querySelector(`#vid-wrap-${exId} > div:first-child`);
-  const player = document.getElementById(`vid-player-${exId}`);
-  const iframe = document.getElementById(`vid-iframe-${exId}`);
-  if (!thumb || !player || !iframe) return;
-  thumb.style.display = 'none';
-  player.style.display = 'block';
-  iframe.src = `https://www.youtube-nocookie.com/embed?listType=search&list=${query}&rel=0&modestbranding=1`;
+  window.open('https://www.youtube.com/results?search_query=' + query, '_blank');
 }
 
 function buildExCard(ex, week, exercises, idx) {
@@ -2604,6 +2600,38 @@ const BH_AFFIRMATIONS = [
   "Growth requires discomfort — I welcome it.",
   "Today I choose strength."
 ];
+
+const BH_NEVILLE_QUOTES = [
+  { q: "Assume the feeling of the wish fulfilled.", a: "Neville Goddard" },
+  { q: "Change your conception of yourself and you will automatically change the world in which you live.", a: "Neville Goddard" },
+  { q: "You are already that which you want to be, and your refusal to believe it is the only reason you do not see it.", a: "Neville Goddard" },
+  { q: "The world is yourself pushed out.", a: "Neville Goddard" },
+  { q: "Dare to believe in the reality of your assumption and watch the world play its part.", a: "Neville Goddard" },
+  { q: "Sleep is the door into the subconscious. Before you sleep, feel the wish fulfilled.", a: "Neville Goddard" },
+  { q: "Your imagination is able to do all that you ask in proportion to the degree of your attention.", a: "Neville Goddard" },
+  { q: "You must make your future dream a present fact by assuming the feeling of the wish fulfilled.", a: "Neville Goddard" },
+  { q: "Live in the end. Dwell in the feeling of your wish already fulfilled.", a: "Neville Goddard" },
+  { q: "All things are possible to her who believes.", a: "Neville Goddard" },
+];
+
+const BH_FSS_QUOTES = [
+  { q: "Every great work, every big accomplishment, has been brought into manifestation through holding to the vision.", a: "Florence Scovel Shinn" },
+  { q: "The game of life is a game of boomerangs. Our thoughts, deeds and words return to us sooner or later with astounding accuracy.", a: "Florence Scovel Shinn" },
+  { q: "You will be a failure until you impress the subconscious with the conviction you are a success.", a: "Florence Scovel Shinn" },
+  { q: "Faith knows it has already received and acts accordingly.", a: "Florence Scovel Shinn" },
+  { q: "No man is your enemy, no man is your friend, every man is your teacher.", a: "Florence Scovel Shinn" },
+  { q: "Intuition is a spiritual faculty and does not explain, but simply points the way.", a: "Florence Scovel Shinn" },
+  { q: "The invisible forces are ever working for the woman who is always expecting the best.", a: "Florence Scovel Shinn" },
+  { q: "There is a place that you are to fill and no one else can fill — something you are to do which no one else can do.", a: "Florence Scovel Shinn" },
+  { q: "Divine love now dissolves and dissipates every wrong condition in my mind, body and affairs.", a: "Florence Scovel Shinn" },
+  { q: "Bless your enemy and you rob him of his ammunition.", a: "Florence Scovel Shinn" },
+];
+
+function getBhDailyQuote() {
+  const pool = [...BH_NEVILLE_QUOTES, ...BH_FSS_QUOTES];
+  const day = Math.floor(Date.now() / 86400000);
+  return pool[day % pool.length];
+}
 
 function bhRitualEnabled() { return bhLs('bh_ritual_enabled', true); }
 function toggleRitual() {

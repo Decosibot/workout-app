@@ -3338,6 +3338,24 @@ const FSS_AFFIRMATIONS = [
   "I am thankful for this program, this moment, and this version of me that decided to begin.",
 ];
 
+const NAPOLEON_HILL_QUOTES = [
+  "Whatever the mind can conceive and believe, it can achieve.",
+  "A goal is a dream with a deadline.",
+  "The starting point of all achievement is desire.",
+  "Strength and growth come only through continuous effort and struggle.",
+  "If you cannot do great things, do small things in a great way.",
+  "Your big opportunity may be right where you are now.",
+  "The man who does more than he is paid for will soon be paid for more than he does.",
+  "Think twice before you speak, because your words and influence will plant the seed of either success or failure in the mind of another.",
+  "Most great people have attained their greatest success just one step beyond their greatest failure.",
+  "Create a definite plan for carrying out your desire and begin at once.",
+  "It takes half your life before you discover life is a do-it-yourself project.",
+  "Patience, persistence and perspiration make an unbeatable combination for success.",
+  "Victory is always possible for the person who refuses to stop fighting.",
+  "The more you give, the more comes back to you.",
+  "Do not wait; the time will never be 'just right.'",
+];
+
 function getDayOfYear() {
   const now = new Date();
   const start = new Date(now.getFullYear(), 0, 0);
@@ -3389,7 +3407,13 @@ function renderHome() {
   const bwEntries = getBWLog();
   const latestBW = bwEntries.length ? bwEntries[bwEntries.length - 1].weight : null;
 
-  const aff = FSS_AFFIRMATIONS[getDayOfYear() % FSS_AFFIRMATIONS.length];
+  const _allQuotes = [
+    ...FSS_AFFIRMATIONS.map(q => ({ q, a: 'Florence Scovel Shinn' })),
+    ...NAPOLEON_HILL_QUOTES.map(q => ({ q, a: 'Napoleon Hill' })),
+  ];
+  const _todayQuote = _allQuotes[getDayOfYear() % _allQuotes.length];
+  const aff = _todayQuote.q;
+  const affAuthor = _todayQuote.a;
 
   // 16 pips for progress bar
   const pips = Array.from({length: 16}, (_,i) => {
@@ -3403,7 +3427,7 @@ function renderHome() {
     <!-- Affirmation -->
     <div class="home-affirmation">
       <div class="aff-text">"${aff}"</div>
-      <div class="aff-author">— Florence Scovel Shinn</div>
+      <div class="aff-author">— ${affAuthor}</div>
     </div>
 
     <!-- Go to Today's Workout -->
