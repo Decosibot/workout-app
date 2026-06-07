@@ -7153,21 +7153,29 @@ function calcMassGain() {
 
   // Save inputs
   lsSet('mass_inputs', { current, goal, ft, inches: inches, age, activity: selectedActivity });
+  // Keep program goal weight in sync
+  const gd = ls('goal_data', null);
+  if (gd) { gd.targetWeight = goal; lsSet('goal_data', gd); }
 }
 
 function loadMassInputs() {
   const saved = ls('mass_inputs', null);
-  if (!saved) return;
-  if (saved.current) document.getElementById('mass-current').value = saved.current;
-  if (saved.goal)    document.getElementById('mass-goal').value    = saved.goal;
-  if (saved.ft)      document.getElementById('mass-ft').value      = saved.ft;
-  if (saved.inches != null) document.getElementById('mass-in').value = saved.inches;
-  if (saved.age)     document.getElementById('mass-age').value     = saved.age;
-  if (saved.activity) {
-    selectedActivity = saved.activity;
-    document.querySelectorAll('.activity-btn').forEach(b => {
-      b.classList.toggle('active', parseFloat(b.dataset.val) === selectedActivity);
-    });
+  const goalData = ls('goal_data', null);
+  const programGoalWeight = goalData && goalData.targetWeight ? goalData.targetWeight : null;
+  if (!saved && !programGoalWeight) return;
+  if (saved && saved.current) document.getElementById('mass-current').value = saved.current;
+  const goalVal = (saved && saved.goal) ? saved.goal : (programGoalWeight || '');
+  if (goalVal) document.getElementById('mass-goal').value = goalVal;
+  if (saved) {
+    if (saved.ft)      document.getElementById('mass-ft').value      = saved.ft;
+    if (saved.inches != null) document.getElementById('mass-in').value = saved.inches;
+    if (saved.age)     document.getElementById('mass-age').value     = saved.age;
+    if (saved.activity) {
+      selectedActivity = saved.activity;
+      document.querySelectorAll('.activity-btn').forEach(b => {
+        b.classList.toggle('active', parseFloat(b.dataset.val) === selectedActivity);
+      });
+    }
   }
   calcMassGain();
 }
