@@ -226,6 +226,19 @@
     border: 1px solid var(--yellow-border);
     border-radius: var(--radius);
     padding: 16px;
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .today-hero.day-done {
+    background: linear-gradient(135deg, #0a1f0a 0%, #0d2b0d 100%);
+    border-color: #2d6a2d;
+  }
+  .today-hero.day-done .phase-badge {
+    background: #4caf50;
+    color: #fff;
+  }
+  .today-hero.day-done .start-btn {
+    background: #4caf50;
+    color: #fff;
   }
   .today-hero .phase-badge {
     display: inline-block;
@@ -1544,18 +1557,19 @@
       <div class="phase-badge" id="hero-phase">Phase 1</div>
       <h2 id="hero-day">Monday Upper</h2>
       <div class="subtitle" id="hero-sub">Week 1 · 8×5 Cluster</div>
+
+      <!-- Prev / Next inside the card -->
+      <div style="display:flex;gap:8px;margin-top:12px;margin-bottom:10px;">
+        <button onclick="todayNavShift(-1)" id="today-nav-prev" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">‹ Prev Day</button>
+        <button onclick="todayNavShift(1)" id="today-nav-next" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Next Day ›</button>
+      </div>
+
+      <!-- Preview list inside card -->
+      <div id="today-workout-preview" style="display:none;margin-bottom:10px;border-top:1px solid rgba(255,255,255,0.1);padding-top:10px;">
+        <div id="today-preview-list"></div>
+      </div>
+
       <button class="start-btn" onclick="startWorkout()">Start This Workout →</button>
-    </div>
-
-    <!-- Prev / Next day nav -->
-    <div style="display:flex;gap:8px;margin-top:10px;">
-      <button onclick="todayNavShift(-1)" id="today-nav-prev" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;">‹ Prev Day</button>
-      <button onclick="todayNavShift(1)" id="today-nav-next" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;">Next Day ›</button>
-    </div>
-
-    <!-- Workout preview panel -->
-    <div id="today-workout-preview" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-top:10px;display:none;overflow-y:auto;max-height:220px;">
-      <div id="today-preview-list"></div>
     </div>
 
     <!-- Rest day card -->
@@ -3675,7 +3689,28 @@ function renderToday() {
   renderLevelNav();
   renderTodayNutritionBar();
   renderTodayPreview();
+  applyHeroDoneState();
   updateTodayNavArrows();
+}
+
+function applyHeroDoneState() {
+  const heroCard = document.getElementById('today-hero-card');
+  if (!heroCard) return;
+  let done = false;
+  if (activeMensProgram === 'mansour') {
+    const d = getMansourDay();
+    done = ls(`mansour_done_${d}`, false);
+  } else if (activeMensProgram === 'growth') {
+    const gs = getGrowthState();
+    done = ls(`growth_done_${gs.day}`, false);
+  } else {
+    const dayData = getCurrentDayData();
+    if (dayData) done = ls(`wk_done_${state.currentWeek}_${dayData.id}`, false);
+  }
+  heroCard.classList.toggle('day-done', !!done);
+  // Update start button text
+  const startBtn = heroCard.querySelector('.start-btn');
+  if (startBtn) startBtn.textContent = done ? '✓ Done — Start Again →' : 'Start This Workout →';
 }
 
 function updateTodayNavArrows() {
@@ -3750,6 +3785,7 @@ function renderTodayGrowth() {
   renderLevelNav();
   renderTodayNutritionBar();
   renderTodayPreview();
+  applyHeroDoneState();
   updateTodayNavArrows();
 }
 
@@ -3798,6 +3834,7 @@ function renderTodayMansour() {
   renderLevelNav();
   renderTodayNutritionBar();
   renderTodayPreview();
+  applyHeroDoneState();
   updateTodayNavArrows();
 }
 
