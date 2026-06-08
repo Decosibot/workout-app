@@ -302,7 +302,7 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
 .log-delta.gain{background:rgba(245,66,66,.12);color:var(--red)}
 
 /* NUTRITION SUB-TABS */
-.nutr-sub-tabs{display:flex;gap:0;margin-bottom:16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:3px;}
+.nutr-sub-tabs{display:flex;gap:0;margin-bottom:16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:3px;position:sticky;top:0;z-index:10;}
 .nutr-sub-tab{flex:1;padding:9px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer;background:none;color:var(--text3);font-family:inherit;transition:all .2s;}
 .nutr-sub-tab.active{background:var(--bg2);color:var(--pink);box-shadow:0 1px 4px rgba(0,0,0,.4);}
 
@@ -331,7 +331,7 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
 .food-qty-input:focus{border-color:var(--pink);}
 
 /* HISTORY SUB-TABS */
-.hist-sub-tabs{display:flex;gap:0;margin-bottom:16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:3px;}
+.hist-sub-tabs{display:flex;gap:0;margin-bottom:16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:3px;position:sticky;top:0;z-index:10;}
 .hist-sub-tab{flex:1;padding:9px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer;background:none;color:var(--text3);font-family:inherit;transition:all .2s;}
 .hist-sub-tab.active{background:var(--bg2);color:var(--pink);box-shadow:0 1px 4px rgba(0,0,0,.4);}
 .pr-item{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;}
@@ -441,26 +441,44 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
 
     <div id="bh-daily-quote" style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--pink);border-radius:10px;padding:14px 16px;margin:0 0 16px;"></div>
 
-    <div id="today-start-btn-wrap" style="margin-bottom:16px">
-      <button class="btn btn-primary" id="start-today-btn">Start Today&apos;s Workout &rarr;</button>
-    </div>
-    <div id="today-done-badge" class="complete-badge" style="display:none">
-      <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--green);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>
-      Workout Complete!
-    </div>
-
-    <div style="margin-bottom:12px">
-      <div class="section-title" style="margin-bottom:8px">Day</div>
-      <div class="day-sel">
-        <button class="day-btn" data-day="mon" id="daybtn-mon">Mon</button>
-        <button class="day-btn" data-day="wed" id="daybtn-wed">Wed</button>
-        <button class="day-btn" data-day="fri" id="daybtn-fri">Fri</button>
+    <!-- Day + Week navigator -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;">
+      <!-- Week row with prev/next -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <button id="week-prev-btn" onclick="shiftWeek(-1)" style="width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg3);color:var(--text2);font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;">‹</button>
+        <div style="font-size:13px;font-weight:700;color:var(--text2);">Week <span id="week-nav-label" style="color:var(--pink);font-size:16px;">1</span> <span style="font-size:11px;color:var(--text3);">of 8</span></div>
+        <button id="week-next-btn" onclick="shiftWeek(1)" style="width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg3);color:var(--text2);font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;">›</button>
+      </div>
+      <!-- Week pill row -->
+      <div class="week-row" id="week-row" style="margin-bottom:12px;"></div>
+      <!-- Day selector with prev/next -->
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button onclick="shiftDay(-1)" style="width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg3);color:var(--text2);font-size:16px;font-weight:700;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;">‹</button>
+        <div class="day-sel" style="flex:1;">
+          <button class="day-btn" data-day="mon" id="daybtn-mon">Mon</button>
+          <button class="day-btn" data-day="wed" id="daybtn-wed">Wed</button>
+          <button class="day-btn" data-day="fri" id="daybtn-fri">Fri</button>
+        </div>
+        <button onclick="shiftDay(1)" style="width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg3);color:var(--text2);font-size:16px;font-weight:700;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;">›</button>
       </div>
     </div>
 
-    <div style="margin-bottom:16px">
-      <div class="section-title" style="margin-bottom:8px">Week</div>
-      <div class="week-row" id="week-row"></div>
+    <!-- Workout preview card -->
+    <div id="workout-preview-card" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div>
+          <div id="preview-day-label" style="font-size:15px;font-weight:800;color:var(--text);"></div>
+          <div id="preview-phase-label" style="font-size:11px;color:var(--text3);margin-top:2px;"></div>
+        </div>
+        <div id="today-done-badge" class="complete-badge" style="display:none;padding:6px 12px;margin:0;">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--green);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>
+          Done
+        </div>
+      </div>
+      <div id="preview-exercise-list" style="margin-bottom:14px;"></div>
+      <div id="today-start-btn-wrap">
+        <button class="btn btn-primary" id="start-today-btn">Start This Workout →</button>
+      </div>
     </div>
 
     <div id="rest-day-card"></div>
@@ -482,7 +500,11 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
       <div class="phase-name" id="phase-name-text">Phase 1: Foundation</div>
       <div class="phase-goal" id="phase-goal-text"></div>
     </div>
-    <div style="display:flex;justify-content:flex-end;padding:0 0 8px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:0 0 8px;">
+      <div style="display:flex;gap:6px;">
+        <button onclick="workoutNavShift(-1)" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;">‹ Prev Day</button>
+        <button onclick="workoutNavShift(1)" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;">Next Day ›</button>
+      </div>
       <button onclick="openCustomize()" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;">✏️ Customize</button>
     </div>
     <div id="exercise-list"></div>
@@ -554,6 +576,11 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
     <div id="tracker-panel-bp" style="display:none;">
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:16px;">
       <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px;">🩺 Blood Pressure</div>
+      <!-- Morning / Evening toggle -->
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button id="bp-tog-morning" onclick="setBPTime('morning')" style="flex:1;padding:9px;border-radius:8px;border:2px solid var(--pink);background:var(--pink);color:#fff;font-size:13px;font-weight:700;cursor:pointer;">🌅 Morning</button>
+        <button id="bp-tog-evening" onclick="setBPTime('evening')" style="flex:1;padding:9px;border-radius:8px;border:2px solid var(--border);background:var(--bg3);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;">🌙 Evening</button>
+      </div>
       <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
         <input type="number" id="bp-systolic" placeholder="Systolic" min="60" max="250" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:15px;">
         <span style="color:var(--text2);font-weight:700;">/</span>
@@ -572,14 +599,17 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
 
       <!-- BP Chart -->
       <div id="bp-chart-wrap" style="display:none;margin-bottom:16px;">
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;">Trend</div>
-        <div style="display:flex;gap:12px;margin-bottom:8px;">
-          <span style="font-size:11px;font-weight:700;color:#e91e8c;">— Systolic</span>
-          <span style="font-size:11px;font-weight:700;color:#9b59b6;">— Diastolic</span>
-          <span style="font-size:11px;font-weight:700;color:#14b8a6;">- - Pulse</span>
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">vs. Normal Range</div>
+        <!-- Line legend -->
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;align-items:center;">
+          <span style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:#e91e8c;"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#e91e8c" stroke-width="2.5" stroke-linecap="round"/></svg>🌅 Sys</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:#9b59b6;"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#9b59b6" stroke-width="2.5" stroke-linecap="round"/></svg>🌅 Dia</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:#ff6b9d;"><svg width="18" height="6"><line x1="0" y1="3" x2="9" y2="3" stroke="#ff6b9d" stroke-width="2" stroke-dasharray="3,2"/><line x1="11" y1="3" x2="18" y2="3" stroke="#ff6b9d" stroke-width="2" stroke-dasharray="3,2"/></svg>🌙 Sys</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:#c77dff;"><svg width="18" height="6"><line x1="0" y1="3" x2="9" y2="3" stroke="#c77dff" stroke-width="2" stroke-dasharray="3,2"/><line x1="11" y1="3" x2="18" y2="3" stroke="#c77dff" stroke-width="2" stroke-dasharray="3,2"/></svg>🌙 Dia</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:#4caf50;"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#4caf50" stroke-width="1.5" stroke-dasharray="4,2"/></svg>Normal</span>
         </div>
         <div style="position:relative;overflow:hidden;border-radius:8px;background:var(--bg3);">
-          <svg id="bp-chart" viewBox="0 0 300 140" style="width:100%;display:block;"></svg>
+          <svg id="bp-chart" viewBox="0 0 300 180" style="width:100%;display:block;overflow:visible;"></svg>
         </div>
         <!-- Zone legend -->
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
@@ -628,6 +658,22 @@ body.slim-mode .weight-input:focus{border-color:#14b8a6}
       </div>
 
       <div id="bp-log-list"></div>
+
+      <!-- BP Reminders -->
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:16px;">
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;">⏰ Reading Reminders</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <span style="font-size:13px;color:var(--text2);width:64px;flex-shrink:0;">🌅 Morning</span>
+          <input type="time" id="bp-reminder-morning" style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:9px;color:var(--text);font-size:14px;">
+          <button onclick="saveBPReminder('morning')" style="background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none;border-radius:8px;padding:9px 14px;font-weight:700;font-size:13px;cursor:pointer;">Set</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <span style="font-size:13px;color:var(--text2);width:64px;flex-shrink:0;">🌙 Evening</span>
+          <input type="time" id="bp-reminder-evening" style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:9px;color:var(--text);font-size:14px;">
+          <button onclick="saveBPReminder('evening')" style="background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none;border-radius:8px;padding:9px 14px;font-weight:700;font-size:13px;cursor:pointer;">Set</button>
+        </div>
+        <div id="bp-reminder-status" style="font-size:12px;color:var(--text2);"></div>
+      </div>
     </div>
     </div><!-- end tracker-panel-bp -->
 
@@ -1120,6 +1166,10 @@ function logMeasurement() {
   logs.unshift({ date: new Date().toLocaleDateString(), weight: w, waist: waist||null, hips: hips||null, thigh: thigh||null });
   if (logs.length > 52) logs.pop();
   saveMeasurementLog(logs);
+  // Keep nutrition weight in sync with latest body log
+  const nutr = getNutrition();
+  nutr.weight = w;
+  saveNutrition(nutr);
   document.getElementById('t-weight').value = '';
   document.getElementById('t-waist').value = '';
   document.getElementById('t-hips').value = '';
@@ -1158,6 +1208,11 @@ function renderTracker() {
   }
   // Draw weight chart
   drawWeightChart();
+  // Pre-fill body tracker inputs from latest log + profile
+  const latestW = getLatestWeight();
+  const latestLog = getMeasurements()[0] || {};
+  const wInp = document.getElementById('t-weight');
+  if (wInp && !wInp.value && latestW) wInp.placeholder = latestW + ' (last logged)';
   // Update reminder UI
   const savedTime = bhLs('bh_reminder_time', null);
   const tInput = document.getElementById('reminder-time');
@@ -1169,6 +1224,14 @@ function renderTracker() {
     const now = new Date();
     bpDateInput.value = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
   }
+  // Restore BP reminder inputs and reschedule
+  ['morning','evening'].forEach(which => {
+    const saved = bhLs('bh_bp_reminder_' + which, null);
+    const inp = document.getElementById('bp-reminder-' + which);
+    if (inp && saved) inp.value = saved;
+    if (saved) scheduleBPReminder(which, saved);
+  });
+  updateBPReminderStatus();
 }
 
 function drawWeightChart() {
@@ -1200,6 +1263,21 @@ function drawWeightChart() {
 function getBPLog() { return bhLs('bh_bp_log', []); }
 function saveBPLog(arr) { bhLsSet('bh_bp_log', arr); }
 
+let _bpTime = 'morning';
+function setBPTime(t) {
+  _bpTime = t;
+  const mBtn = document.getElementById('bp-tog-morning');
+  const eBtn = document.getElementById('bp-tog-evening');
+  if (!mBtn || !eBtn) return;
+  if (t === 'morning') {
+    mBtn.style.background = 'var(--pink)'; mBtn.style.borderColor = 'var(--pink)'; mBtn.style.color = '#fff';
+    eBtn.style.background = 'var(--bg3)'; eBtn.style.borderColor = 'var(--border)'; eBtn.style.color = 'var(--text2)';
+  } else {
+    eBtn.style.background = 'var(--purple)'; eBtn.style.borderColor = 'var(--purple)'; eBtn.style.color = '#fff';
+    mBtn.style.background = 'var(--bg3)'; mBtn.style.borderColor = 'var(--border)'; mBtn.style.color = 'var(--text2)';
+  }
+}
+
 function getBPCategory(sys, dia) {
   if (sys < 120 && dia < 80) return { label: 'Normal', color: '#4caf50' };
   if (sys < 130 && dia < 80) return { label: 'Elevated', color: '#ff9800' };
@@ -1218,10 +1296,16 @@ function saveBP() {
   const dateISO = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
   const dateLabel = d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
   const log = getBPLog();
-  const existing = log.findIndex(e => e.dateISO === dateISO);
   const pulse = parseInt(document.getElementById('bp-pulse').value) || null;
-  const entry = { systolic: sys, diastolic: dia, pulse, dateISO, date: dateLabel };
-  if (existing >= 0) log[existing] = entry; else log.unshift(entry);
+  const reading = { systolic: sys, diastolic: dia, pulse };
+  let existing = log.findIndex(e => e.dateISO === dateISO);
+  if (existing >= 0) {
+    log[existing][_bpTime] = reading;
+  } else {
+    const entry = { dateISO, date: dateLabel };
+    entry[_bpTime] = reading;
+    log.unshift(entry);
+  }
   log.sort((a, b) => b.dateISO.localeCompare(a.dateISO));
   saveBPLog(log);
   document.getElementById('bp-systolic').value = '';
@@ -1229,7 +1313,8 @@ function saveBP() {
   document.getElementById('bp-pulse').value = '';
   const cat = getBPCategory(sys, dia);
   const pulseStr = pulse ? ` · ❤️ ${pulse} bpm` : '';
-  if (statusEl) statusEl.innerHTML = `<span style="color:${cat.color};font-weight:700;">✓ Logged: ${sys}/${dia} — ${cat.label}${pulseStr}</span>`;
+  const timeLabel = _bpTime === 'morning' ? '🌅 Morning' : '🌙 Evening';
+  if (statusEl) statusEl.innerHTML = `<span style="color:${cat.color};font-weight:700;">✓ ${timeLabel}: ${sys}/${dia} — ${cat.label}${pulseStr}</span>`;
   renderBPLog();
 }
 
@@ -1238,69 +1323,125 @@ function drawBPChart(log) {
   const wrap = document.getElementById('bp-chart-wrap');
   const tipsWrap = document.getElementById('bp-tips-wrap');
   if (!svg) return;
-  const pts = [...log].reverse().slice(0, 20);
-  if (pts.length < 2) { if (wrap) wrap.style.display = 'none'; return; }
+
+  const pts = [...log].reverse().slice(0, 20).map(e => ({
+    date: e.date, dateISO: e.dateISO,
+    morning: e.morning || (e.systolic ? { systolic: e.systolic, diastolic: e.diastolic, pulse: e.pulse } : null),
+    evening: e.evening || null,
+  }));
+  const validPts = pts.filter(p => p.morning?.systolic || p.evening?.systolic);
+  if (validPts.length < 2) { if (wrap) wrap.style.display = 'none'; return; }
   if (wrap) wrap.style.display = '';
   if (tipsWrap) tipsWrap.style.display = '';
-  const W = 300, H = 140, padL = 30, padR = 10, padT = 10, padB = 20;
-  const chartW = W - padL - padR, chartH = H - padT - padB;
-  const hasPulse = pts.some(e => e.pulse);
-  const allVals = pts.flatMap(e => [e.systolic, e.diastolic, e.pulse].filter(Boolean));
-  const minV = Math.max(50, Math.min(...allVals) - 10);
-  const maxV = Math.min(200, Math.max(...allVals) + 10);
+
+  // Always include normal reference values (120 sys / 80 dia) in the scale
+  const allVals = [120, 80, ...validPts.flatMap(p => [
+    p.morning?.systolic, p.morning?.diastolic,
+    p.evening?.systolic, p.evening?.diastolic,
+  ].filter(Boolean))];
+  const minV = Math.max(50, Math.min(...allVals) - 8);
+  const maxV = Math.min(210, Math.max(...allVals) + 12);
   const range = maxV - minV || 1;
-  const xOf = i => padL + (i / (pts.length - 1)) * chartW;
+
+  const W = 300, H = 180, padL = 34, padR = 12, padT = 14, padB = 22;
+  const chartW = W - padL - padR, chartH = H - padT - padB;
+  const xOf = i => padL + (i / Math.max(validPts.length - 1, 1)) * chartW;
   const yOf = v => padT + chartH - ((v - minV) / range) * chartH;
 
   // Zone bands
-  const zones = [
-    { min: 140, max: 200, color: 'rgba(183,28,28,0.15)' },
-    { min: 130, max: 140, color: 'rgba(244,67,54,0.12)' },
-    { min: 120, max: 130, color: 'rgba(255,152,0,0.12)' },
-    { min: 50,  max: 120, color: 'rgba(76,175,80,0.10)' },
+  const zoneDefs = [
+    { min: 140, max: 210, color: 'rgba(183,28,28,0.13)' },
+    { min: 130, max: 140, color: 'rgba(244,67,54,0.10)' },
+    { min: 120, max: 130, color: 'rgba(255,152,0,0.10)' },
+    { min: 50,  max: 120, color: 'rgba(76,175,80,0.08)'  },
   ];
-  const bands = zones.map(z => {
+  const bands = zoneDefs.map(z => {
     const y1 = Math.max(padT, yOf(Math.min(z.max, maxV)));
     const y2 = Math.min(padT + chartH, yOf(Math.max(z.min, minV)));
-    if (y2 <= y1) return '';
-    return `<rect x="${padL}" y="${y1}" width="${chartW}" height="${y2 - y1}" fill="${z.color}"/>`;
+    return y2 > y1 ? `<rect x="${padL}" y="${y1}" width="${chartW}" height="${y2 - y1}" fill="${z.color}"/>` : '';
   }).join('');
 
-  // Lines
-  const sysPath = pts.map((e, i) => `${i === 0 ? 'M' : 'L'}${xOf(i)},${yOf(e.systolic)}`).join(' ');
-  const diaPath = pts.map((e, i) => `${i === 0 ? 'M' : 'L'}${xOf(i)},${yOf(e.diastolic)}`).join(' ');
-  const pulsePts = pts.filter(e => e.pulse);
-  const pulsePathSegs = hasPulse ? pts.map((e, i) => e.pulse ? `${i === 0 || !pts[i-1].pulse ? 'M' : 'L'}${xOf(i)},${yOf(e.pulse)}` : '').filter(Boolean).join(' ') : '';
+  // Normal reference lines: 120 systolic and 80 diastolic
+  const refLines = [
+    { val: 120, label: '120', labelRight: 'Normal Sys', color: '#4caf50' },
+    { val: 80,  label: '80',  labelRight: 'Normal Dia', color: '#4caf50' },
+  ].filter(r => r.val >= minV && r.val <= maxV).map(r => {
+    const y = yOf(r.val);
+    return `
+      <line x1="${padL}" y1="${y}" x2="${padL + chartW}" y2="${y}" stroke="${r.color}" stroke-width="1" stroke-dasharray="4,3" opacity="0.7"/>
+      <text x="${padL - 3}" y="${y + 3.5}" text-anchor="end" fill="${r.color}" font-size="8" font-family="system-ui" font-weight="700">${r.label}</text>
+    `;
+  }).join('');
 
-  // Dots
-  const sysDots = pts.map((e, i) => `<circle cx="${xOf(i)}" cy="${yOf(e.systolic)}" r="3.5" fill="#e91e8c"/>`).join('');
-  const diaDots = pts.map((e, i) => `<circle cx="${xOf(i)}" cy="${yOf(e.diastolic)}" r="3.5" fill="#9b59b6"/>`).join('');
-  const pulseDots = hasPulse ? pts.filter(e => e.pulse).map((e, i) => {
-    const idx = pts.indexOf(e);
-    return `<circle cx="${xOf(idx)}" cy="${yOf(e.pulse)}" r="3.5" fill="#14b8a6"/>`;
-  }).join('') : '';
+  // Y axis tick labels (every ~20 units, rounded)
+  const tickStep = range > 80 ? 20 : 10;
+  const firstTick = Math.ceil(minV / tickStep) * tickStep;
+  let yTicks = '';
+  for (let v = firstTick; v <= maxV; v += tickStep) {
+    if (v === 120 || v === 80) continue; // reference lines already label these
+    const y = yOf(v);
+    yTicks += `<text x="${padL - 3}" y="${y + 3.5}" text-anchor="end" fill="#555" font-size="8" font-family="system-ui">${v}</text>`;
+    yTicks += `<line x1="${padL - 2}" y1="${y}" x2="${padL}" y2="${y}" stroke="#444" stroke-width="1"/>`;
+  }
 
-  // Y axis labels
-  const yLabels = [120, 140].filter(v => v >= minV && v <= maxV).map(v =>
-    `<text x="${padL - 4}" y="${yOf(v) + 4}" text-anchor="end" fill="#666" font-size="9" font-family="system-ui">${v}</text>`
-  ).join('');
+  // X date labels — show up to 5 evenly spaced
+  const xLabelCount = Math.min(validPts.length, 5);
+  let xLabels = '';
+  for (let k = 0; k < xLabelCount; k++) {
+    const idx = Math.round(k / (xLabelCount - 1) * (validPts.length - 1));
+    const p = validPts[idx];
+    const x = xOf(idx);
+    const short = p.date.replace(/,.*/, '');
+    xLabels += `<text x="${x}" y="${H - 4}" text-anchor="middle" fill="#555" font-size="8" font-family="system-ui">${short}</text>`;
+  }
 
-  // X labels (first and last date)
-  const xLabels = [
-    `<text x="${padL}" y="${H}" text-anchor="start" fill="#666" font-size="9" font-family="system-ui">${pts[0].date.replace(/,.*/, '')}</text>`,
-    `<text x="${W - padR}" y="${H}" text-anchor="end" fill="#666" font-size="9" font-family="system-ui">${pts[pts.length-1].date.replace(/,.*/, '')}</text>`,
-  ].join('');
+  // Build person's lines — morning solid, evening dashed
+  const mPts = validPts.filter(p => p.morning?.systolic);
+  const ePts = validPts.filter(p => p.evening?.systolic);
 
+  const linePath = (arr, key) => arr.length < 1 ? '' :
+    arr.map((p, i) => `${i===0?'M':'L'}${xOf(validPts.indexOf(p))},${yOf(p[key].systolic)}`).join(' ');
+  const diaPath = (arr, key) => arr.length < 1 ? '' :
+    arr.map((p, i) => `${i===0?'M':'L'}${xOf(validPts.indexOf(p))},${yOf(p[key].diastolic)}`).join(' ');
+
+  const mSysPath = linePath(mPts, 'morning');
+  const mDiaPath = diaPath(mPts, 'morning');
+  const eSysPath = linePath(ePts, 'evening');
+  const eDiaPath = diaPath(ePts, 'evening');
+
+  const dots = (arr, key, fillSys, fillDia) => arr.map(p => {
+    const xi = xOf(validPts.indexOf(p));
+    return `<circle cx="${xi}" cy="${yOf(p[key].systolic)}" r="3" fill="${fillSys}"/>
+            <circle cx="${xi}" cy="${yOf(p[key].diastolic)}" r="3" fill="${fillDia}"/>`;
+  }).join('');
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.innerHTML = `
     ${bands}
-    <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT+chartH}" stroke="#333" stroke-width="1"/>
-    ${yLabels}
+    <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT+chartH}" stroke="#444" stroke-width="1"/>
+    <line x1="${padL}" y1="${padT+chartH}" x2="${padL+chartW}" y2="${padT+chartH}" stroke="#444" stroke-width="1"/>
+    ${yTicks}
+    ${refLines}
     ${xLabels}
-    <path d="${sysPath}" fill="none" stroke="#e91e8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="${diaPath}" fill="none" stroke="#9b59b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    ${hasPulse ? `<path d="${pulsePathSegs}" fill="none" stroke="#14b8a6" stroke-width="2" stroke-dasharray="4,3" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
-    ${sysDots}${diaDots}${pulseDots}
+    ${mSysPath ? `<path d="${mSysPath}" fill="none" stroke="#e91e8c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
+    ${mDiaPath ? `<path d="${mDiaPath}" fill="none" stroke="#9b59b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
+    ${eSysPath ? `<path d="${eSysPath}" fill="none" stroke="#ff6b9d" stroke-width="2" stroke-dasharray="5,3" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
+    ${eDiaPath ? `<path d="${eDiaPath}" fill="none" stroke="#c77dff" stroke-width="2" stroke-dasharray="5,3" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
+    ${dots(mPts, 'morning', '#e91e8c', '#9b59b6')}
+    ${dots(ePts, 'evening', '#ff6b9d', '#c77dff')}
   `;
+}
+
+function renderBPReading(r, label, color) {
+  if (!r || !r.systolic) return '';
+  const cat = getBPCategory(r.systolic, r.diastolic);
+  const pulseStr = r.pulse ? `<span style="font-size:11px;color:#14b8a6;margin-left:6px;">❤️ ${r.pulse}</span>` : '';
+  return `<div style="font-size:13px;color:var(--text);margin-top:4px;">
+    <span style="font-size:11px;color:${color};font-weight:700;margin-right:5px;">${label}</span>
+    <span style="font-weight:700;">${r.systolic}/${r.diastolic}</span>
+    <span style="font-size:11px;color:${cat.color};font-weight:700;margin-left:5px;">${cat.label}</span>
+    ${pulseStr}
+  </div>`;
 }
 
 function renderBPLog() {
@@ -1317,13 +1458,16 @@ function renderBPLog() {
   drawBPChart(log);
   if (tipsWrap) tipsWrap.style.display = '';
   list.innerHTML = log.slice(0, 30).map(e => {
-    const cat = getBPCategory(e.systolic, e.diastolic);
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
-      <div>
-        <div style="font-size:13px;color:var(--text2);">${e.date}</div>
-        <div style="font-size:16px;font-weight:700;color:var(--text);">${e.systolic}/${e.diastolic} <span style="font-size:11px;color:${cat.color};font-weight:700;">${cat.label}</span>${e.pulse ? `<span style="font-size:12px;color:#14b8a6;margin-left:8px;">❤️ ${e.pulse} bpm</span>` : ''}</div>
+    // Support legacy entries that stored systolic/diastolic directly
+    const morning = e.morning || (e.systolic ? { systolic: e.systolic, diastolic: e.diastolic, pulse: e.pulse } : null);
+    const evening = e.evening || null;
+    return `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);">
+      <div style="flex:1;">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:2px;">${e.date}</div>
+        ${renderBPReading(morning, '🌅', '#e91e8c')}
+        ${renderBPReading(evening, '🌙', '#9b59b6')}
       </div>
-      <button onclick="deleteBPEntry('${e.dateISO}')" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:4px 8px;">×</button>
+      <button onclick="deleteBPEntry('${e.dateISO}')" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:4px 8px;flex-shrink:0;">×</button>
     </div>`;
   }).join('');
 }
@@ -1749,6 +1893,17 @@ function bhLsSet(key, val) {
 function getNutrition() { return bhLs('bh_nutrition', {}); }
 function saveNutrition(obj) { bhLsSet('bh_nutrition', obj); syncToCloud(); }
 
+// ---- Central profile: height, age, goal weight, activity ----
+function getProfile() { return bhLs('bh_profile', {}); }
+function saveProfile(obj) { bhLsSet('bh_profile', obj); syncToCloud(); }
+function mergeProfile(partial) { saveProfile(Object.assign(getProfile(), partial)); }
+
+// Latest logged body weight (from measurement log)
+function getLatestWeight() {
+  const logs = getMeasurements().filter(e => e.weight);
+  return logs.length ? logs[0].weight : null;
+}
+
 // ==================== TOAST ====================
 let toastTimer;
 function showToast(msg) {
@@ -1882,6 +2037,70 @@ function getDayOfWeek() {
   return days[new Date().getDay()];
 }
 
+const WORKOUT_DAYS = ['mon','wed','fri'];
+
+function shiftDay(dir) {
+  const idx = WORKOUT_DAYS.indexOf(state.day);
+  const newIdx = idx + dir;
+  if (newIdx < 0) {
+    // wrap back to previous week's Friday
+    if (state.week > 1) { state.week--; state.day = 'fri'; }
+  } else if (newIdx >= WORKOUT_DAYS.length) {
+    // wrap forward to next week's Monday
+    if (state.week < 8) { state.week++; state.day = 'mon'; }
+  } else {
+    state.day = WORKOUT_DAYS[newIdx];
+  }
+  saveState();
+  renderToday();
+}
+
+function shiftWeek(dir) {
+  const newWeek = state.week + dir;
+  if (newWeek < 1 || newWeek > 8) return;
+  state.week = newWeek;
+  saveState();
+  renderToday();
+}
+
+function renderWorkoutPreview() {
+  const week = state.week;
+  const day = state.day;
+  const phase = getCurrentGetPhase(week);
+  const pIdx = getPhaseIdx(week);
+  const wkData = getCurrentWorkouts()[day];
+  const _hidden = getHiddenExs(activeProgram, week, day);
+  const _custom = getCustomExs(activeProgram, week, day);
+  const exercises = [...wkData.phases[pIdx].filter(e => !_hidden.includes(e.id)), ..._custom];
+
+  // Type labels and colors
+  const typeInfo = { cns: { label: 'Warm-up', color: '#14b8a6' }, pink: { label: 'Main', color: 'var(--pink)' }, purple: { label: 'Accessory', color: 'var(--purple)' }, red: { label: 'Finisher', color: '#f44336' } };
+
+  const previewEl = document.getElementById('preview-exercise-list');
+  previewEl.innerHTML = exercises.map(ex => {
+    const t = typeInfo[ex.type] || { label: '', color: 'var(--text3)' };
+    const lastW = getLastW(ex.id, week);
+    const weightHint = lastW?.val ? `<span style="font-size:10px;color:var(--text3);margin-left:6px;">${lastW.val} lbs last time</span>` : '';
+    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">
+      <span style="width:6px;height:6px;border-radius:50%;background:${t.color};flex-shrink:0;"></span>
+      <div style="flex:1;min-width:0;">
+        <span style="font-size:13px;font-weight:600;color:var(--text);">${ex.name}</span>
+        ${weightHint}
+      </div>
+      <span style="font-size:11px;color:var(--text3);flex-shrink:0;">${ex.sets}×${ex.reps}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('preview-day-label').textContent = wkData.name;
+  document.getElementById('preview-phase-label').textContent = `${phase.name} · Week ${week}`;
+
+  const done = isDone(week, day);
+  document.getElementById('today-start-btn-wrap').style.display = done ? 'none' : 'block';
+  document.getElementById('today-done-badge').style.display = done ? 'flex' : 'none';
+  const startBtn = document.getElementById('start-today-btn');
+  if (startBtn) startBtn.textContent = done ? '✓ Done — Start Again →' : 'Start This Workout →';
+}
+
 function renderToday() {
   const phase = getCurrentGetPhase(state.week);
   const dow = getDayOfWeek();
@@ -1900,10 +2119,6 @@ function renderToday() {
     quoteEl.innerHTML = `<div style="font-size:14px;font-style:italic;color:var(--text2);line-height:1.5;margin-bottom:4px;">"${bhQuote.q}"</div><div style="font-size:12px;font-weight:700;color:var(--pink);">— ${bhQuote.a}</div>`;
   }
 
-  const done = isDone(state.week, displayDay);
-  document.getElementById('today-start-btn-wrap').style.display = done ? 'none' : 'block';
-  document.getElementById('today-done-badge').style.display = done ? 'flex' : 'none';
-
   // Day buttons
   ['mon','wed','fri'].forEach(d => {
     const btn = document.getElementById('daybtn-' + d);
@@ -1911,7 +2126,15 @@ function renderToday() {
     btn.classList.toggle('done', isDone(state.week, d));
   });
 
-  // Week buttons
+  // Week nav label
+  const weekNavLabel = document.getElementById('week-nav-label');
+  if (weekNavLabel) weekNavLabel.textContent = state.week;
+  const prevBtn = document.getElementById('week-prev-btn');
+  const nextBtn = document.getElementById('week-next-btn');
+  if (prevBtn) prevBtn.style.opacity = state.week <= 1 ? '0.3' : '1';
+  if (nextBtn) nextBtn.style.opacity = state.week >= 8 ? '0.3' : '1';
+
+  // Week pill row
   const wr = document.getElementById('week-row');
   wr.innerHTML = '';
   for (let w = 1; w <= 8; w++) {
@@ -1929,8 +2152,9 @@ function renderToday() {
     wr.appendChild(btn);
   }
 
+  renderWorkoutPreview();
   updateRitualToggleBtn();
-  // Rest day card (only show if today is a rest day and we're on today's week context)
+
   const restCard = document.getElementById('rest-day-card');
   if (!isWorkoutDay && dow in REST_TIPS) {
     const rt = REST_TIPS[dow];
@@ -1963,6 +2187,27 @@ document.getElementById('start-today-btn').addEventListener('click', () => {
 });
 
 // ==================== WORKOUT VIEW ====================
+function workoutNavShift(dir) {
+  const days = WORKOUT_DAYS;
+  const idx = days.indexOf(currentWorkoutDay);
+  const newIdx = idx + dir;
+  if (newIdx < 0) {
+    if (currentWorkoutWeek <= 1) return;
+    currentWorkoutWeek--;
+    currentWorkoutDay = 'fri';
+  } else if (newIdx >= days.length) {
+    if (currentWorkoutWeek >= 8) return;
+    currentWorkoutWeek++;
+    currentWorkoutDay = 'mon';
+  } else {
+    currentWorkoutDay = days[newIdx];
+  }
+  // Keep state in sync so completing this workout marks the right day
+  state.week = currentWorkoutWeek;
+  state.day = currentWorkoutDay;
+  saveState();
+  launchWorkout(currentWorkoutWeek, currentWorkoutDay);
+}
 function getPhaseIdx(week) {
   if (week <= 3) return 0;
   if (week <= 6) return 1;
@@ -2338,12 +2583,21 @@ let currentSurplus = 200;
 
 function loadNutritionInputs() {
   const n = getNutrition();
-  if (n.heightFt) document.getElementById('n-height-ft').value = n.heightFt;
-  if (n.heightIn !== undefined) document.getElementById('n-height-in').value = n.heightIn;
-  if (n.weight) document.getElementById('n-weight').value = n.weight;
-  if (n.goalWeight) document.getElementById('n-goal-weight').value = n.goalWeight;
-  if (n.age) document.getElementById('n-age').value = n.age;
-  if (n.activity) document.getElementById('n-activity').value = n.activity;
+  const p = getProfile();
+  // Height, age, goal, activity come from profile (most authoritative), fall back to nutrition cache
+  const hFt = p.heightFt || n.heightFt;
+  const hIn = p.heightIn !== undefined ? p.heightIn : n.heightIn;
+  const age = p.age || n.age;
+  const goal = p.goalWeight || n.goalWeight;
+  const activity = p.activity || n.activity;
+  // Weight: latest body log entry wins, then nutrition cache
+  const currentW = getLatestWeight() || n.weight;
+  if (hFt) document.getElementById('n-height-ft').value = hFt;
+  if (hIn !== undefined && hIn !== null) document.getElementById('n-height-in').value = hIn;
+  if (currentW) document.getElementById('n-weight').value = currentW;
+  if (goal) document.getElementById('n-goal-weight').value = goal;
+  if (age) document.getElementById('n-age').value = age;
+  if (activity) document.getElementById('n-activity').value = activity;
 }
 
 function getCalcInputs() {
@@ -2362,6 +2616,8 @@ document.getElementById('calc-btn').addEventListener('click', () => {
   if (!ft || !weightLbs || !age) { showToast('Fill in all fields first'); return; }
   const nutr = { heightFt: ft, heightIn: ins, weight: weightLbs, goalWeight: goalLbs, age, activity };
   saveNutrition(nutr);
+  // Sync static profile fields (height, age, goal, activity) globally
+  mergeProfile({ heightFt: ft, heightIn: ins, goalWeight: goalLbs, age, activity });
 
   const heightCm = (ft * 12 + ins) * 2.54;
   const weightKg = weightLbs / 2.205;
@@ -2480,6 +2736,22 @@ document.getElementById('env-btn-home').classList.toggle('active', activeEnv ===
 loadFromCloud(() => {
   activeProgram = localStorage.getItem('bh_program') || null;
   state = JSON.parse(localStorage.getItem('bh_state') || '{"week":1,"day":"mon"}');
+
+  // One-time migration: promote height/age/goal/activity from bh_nutrition → bh_profile
+  const _p = getProfile();
+  if (!_p.heightFt) {
+    const _n = getNutrition();
+    if (_n.heightFt || _n.age || _n.goalWeight) {
+      mergeProfile({
+        heightFt:   _n.heightFt   || undefined,
+        heightIn:   _n.heightIn   !== undefined ? _n.heightIn : undefined,
+        age:        _n.age        || undefined,
+        goalWeight: _n.goalWeight || undefined,
+        activity:   _n.activity   || undefined,
+      });
+    }
+  }
+
   if (!activeProgram) {
     showProgramSelect();
   } else {
@@ -3038,6 +3310,56 @@ function updateReminderStatus() {
     statusEl.textContent = `✅ Reminder set for ${saved}`;
   } else {
     statusEl.textContent = `Reminder saved for ${saved} — tap Set to enable notifications.`;
+  }
+}
+
+function saveBPReminder(which) {
+  const timeVal = document.getElementById('bp-reminder-' + which).value;
+  if (!timeVal) return;
+  bhLsSet('bh_bp_reminder_' + which, timeVal);
+  if ('Notification' in window && Notification.permission !== 'granted') {
+    Notification.requestPermission().then(p => {
+      if (p === 'granted') scheduleBPReminder(which, timeVal);
+      updateBPReminderStatus();
+    });
+  } else {
+    scheduleBPReminder(which, timeVal);
+    updateBPReminderStatus();
+  }
+}
+
+function scheduleBPReminder(which, timeVal) {
+  if (!('Notification' in window)) return;
+  const [h, m] = timeVal.split(':').map(Number);
+  const now = new Date();
+  const next = new Date();
+  next.setHours(h, m, 0, 0);
+  if (next <= now) next.setDate(next.getDate() + 1);
+  setTimeout(() => {
+    if (Notification.permission === 'granted') {
+      const label = which === 'morning' ? '🌅 Morning' : '🌙 Evening';
+      new Notification('Build Her 🩺', { body: `${label} BP reading time! Log your blood pressure.`, icon: './logo.png' });
+    }
+    scheduleBPReminder(which, timeVal);
+  }, next - now);
+}
+
+function updateBPReminderStatus() {
+  const statusEl = document.getElementById('bp-reminder-status');
+  if (!statusEl) return;
+  const morning = bhLs('bh_bp_reminder_morning', null);
+  const evening = bhLs('bh_bp_reminder_evening', null);
+  const perm = 'Notification' in window ? Notification.permission : 'unsupported';
+  if (!morning && !evening) { statusEl.textContent = ''; return; }
+  if (perm === 'denied') {
+    statusEl.textContent = '⚠️ Notifications blocked — enable in browser settings.';
+  } else if (perm === 'granted') {
+    const parts = [];
+    if (morning) parts.push(`🌅 ${morning}`);
+    if (evening) parts.push(`🌙 ${evening}`);
+    statusEl.textContent = '✅ Reminders set: ' + parts.join('  ·  ');
+  } else {
+    statusEl.textContent = 'Reminders saved — tap Set to enable notifications.';
   }
 }
 

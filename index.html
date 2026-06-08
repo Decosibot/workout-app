@@ -1538,38 +1538,51 @@
 
   <!-- TODAY VIEW -->
   <div id="view-today" class="view">
-    <!-- Centered card area -->
-    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
-      <!-- Hero card (workout day) -->
-      <div class="today-hero" id="today-hero-card">
-        <div class="phase-badge" id="hero-phase">Phase 1</div>
-        <h2 id="hero-day">Monday Upper</h2>
-        <div class="subtitle" id="hero-sub">Week 1 · 8×5 Cluster</div>
-        <button class="start-btn" onclick="startWorkout()">Start Today's Workout →</button>
-      </div>
 
-      <!-- Rest day card -->
-      <div id="rest-day-card" style="display:none;">
-        <h2 id="rest-day-heading">Rest Day 💪</h2>
-        <div class="rest-day-name" id="rest-day-name"></div>
-        <div class="rest-tip" id="rest-day-tip"></div>
-        <button onclick="skipRestDay()" style="display:block;width:100%;margin-top:14px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:var(--radius-sm);font-size:13px;font-weight:700;padding:10px;cursor:pointer;">Train Anyway →</button>
-      </div>
+    <!-- Hero card -->
+    <div class="today-hero" id="today-hero-card">
+      <div class="phase-badge" id="hero-phase">Phase 1</div>
+      <h2 id="hero-day">Monday Upper</h2>
+      <div class="subtitle" id="hero-sub">Week 1 · 8×5 Cluster</div>
+      <button class="start-btn" onclick="startWorkout()">Start This Workout →</button>
+    </div>
+
+    <!-- Prev / Next day nav -->
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button onclick="todayNavShift(-1)" id="today-nav-prev" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;">‹ Prev Day</button>
+      <button onclick="todayNavShift(1)" id="today-nav-next" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;">Next Day ›</button>
+    </div>
+
+    <!-- Workout preview panel -->
+    <div id="today-workout-preview" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-top:10px;display:none;overflow-y:auto;max-height:220px;">
+      <div id="today-preview-list"></div>
+    </div>
+
+    <!-- Rest day card -->
+    <div id="rest-day-card" style="display:none;">
+      <h2 id="rest-day-heading">Rest Day 💪</h2>
+      <div class="rest-day-name" id="rest-day-name"></div>
+      <div class="rest-tip" id="rest-day-tip"></div>
+      <button onclick="skipRestDay()" style="display:block;width:100%;margin-top:14px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:var(--radius-sm);font-size:13px;font-weight:700;padding:10px;cursor:pointer;">Train Anyway →</button>
     </div>
 
     <!-- Log Food shortcut -->
-    <div id="today-nutrition-bar" style="margin-top:12px;"></div>
+    <div id="today-nutrition-bar" style="margin-top:8px;"></div>
 
-    <!-- Level nav pinned to bottom of view -->
-    <div id="level-nav-row" style="display:flex;gap:8px;padding-bottom:8px;"></div>
+    <!-- Level nav -->
+    <div id="level-nav-row" style="display:flex;gap:8px;padding-bottom:4px;margin-top:auto;"></div>
   </div>
 
   <!-- WORKOUT VIEW -->
   <div id="view-workout" class="view">
-    <button onclick="backFromWorkout()" style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px 16px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px;width:100%;-webkit-tap-highlight-color:transparent;">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      Back to Today
-    </button>
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button onclick="backFromWorkout()" style="display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer;flex:1;-webkit-tap-highlight-color:transparent;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <button onclick="workoutNavShift(-1)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer;">‹ Prev</button>
+      <button onclick="workoutNavShift(1)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer;">Next ›</button>
+    </div>
     <div id="workout-timer-bar">
       <div><div class="wtb-label">Duration</div><div class="wtb-time" id="wtb-time">0:00</div></div>
       <div style="font-size:11px;color:var(--text3);text-align:right;">Started<br><span id="wtb-start-label" style="color:var(--text2);font-weight:700;"></span></div>
@@ -3661,6 +3674,19 @@ function renderToday() {
   updateProgressBar();
   renderLevelNav();
   renderTodayNutritionBar();
+  renderTodayPreview();
+  updateTodayNavArrows();
+}
+
+function updateTodayNavArrows() {
+  const prev = document.getElementById('today-nav-prev');
+  const next = document.getElementById('today-nav-next');
+  if (!prev || !next) return;
+  if (activeMensProgram === 'mansour' || activeMensProgram === 'growth') {
+    prev.style.opacity = '1'; next.style.opacity = '1'; return;
+  }
+  prev.style.opacity = (state.currentWeek <= 1 && state.currentDayIdx <= 0) ? '0.3' : '1';
+  next.style.opacity = (state.currentWeek >= 8 && state.currentDayIdx >= 3) ? '0.3' : '1';
 }
 
 // Skip rest day — show the next scheduled workout instead
@@ -3723,6 +3749,8 @@ function renderTodayGrowth() {
   updateProgressBar();
   renderLevelNav();
   renderTodayNutritionBar();
+  renderTodayPreview();
+  updateTodayNavArrows();
 }
 
 // ════════════════════════════════════════════════════════════
@@ -3769,6 +3797,8 @@ function renderTodayMansour() {
   updateProgressBar();
   renderLevelNav();
   renderTodayNutritionBar();
+  renderTodayPreview();
+  updateTodayNavArrows();
 }
 
 function mansourPrevDay() {
@@ -3785,6 +3815,147 @@ function mansourNextDay() {
   saveMansourDay(d);
   renderTodayMansour();
   updateHeader();
+}
+
+// ════════════════════════════════════════════════════════════
+// DAY NAVIGATION (prev / next) — Today view + Workout view
+// ════════════════════════════════════════════════════════════
+
+function todayNavShift(dir) {
+  if (activeMensProgram === 'mansour') {
+    dir > 0 ? mansourNextDay() : mansourPrevDay();
+    renderTodayPreview();
+    return;
+  }
+  if (activeMensProgram === 'growth') {
+    _growthNavShift(dir);
+    renderTodayPreview();
+    return;
+  }
+  // HC12: 4 days (0-3), 8 weeks
+  const maxDayIdx = 3;
+  let newIdx = state.currentDayIdx + dir;
+  if (newIdx < 0) {
+    if (state.currentWeek <= 1) return;
+    state.currentWeek--;
+    newIdx = maxDayIdx;
+  } else if (newIdx > maxDayIdx) {
+    if (state.currentWeek >= 8) return;
+    state.currentWeek++;
+    newIdx = 0;
+  }
+  state.currentDayIdx = newIdx;
+  saveState();
+  renderToday();
+  updateHeader();
+  renderTodayPreview();
+}
+
+function _growthNavShift(dir) {
+  const gs = getGrowthState();
+  const match = gs.day.match(/w(\d)_d(\d)/);
+  if (!match) return;
+  let week = parseInt(match[1]);
+  let dNum = parseInt(match[2]);
+  dNum += dir;
+  if (dNum < 1) {
+    week--;
+    if (week < 1) { week = 1; dNum = 1; }
+    else { dNum = 6; while (dNum > 1 && !GROWTH_PLAN.days[`w${week}_d${dNum}`]) dNum--; }
+  } else if (dNum > 6 || !GROWTH_PLAN.days[`w${week}_d${dNum}`]) {
+    week++;
+    if (week > 4) { week = 4; dNum = 6; while (!GROWTH_PLAN.days[`w${week}_d${dNum}`]) dNum--; }
+    else dNum = 1;
+  }
+  const newKey = `w${week}_d${dNum}`;
+  if (GROWTH_PLAN.days[newKey]) saveGrowthState({ week, day: newKey });
+  renderTodayGrowth();
+  updateHeader();
+}
+
+// Shift day inside the active Workout view (re-renders the workout in place)
+function workoutNavShift(dir) {
+  if (activeMensProgram === 'mansour') {
+    dir > 0 ? mansourNextDay() : mansourPrevDay();
+    renderWorkoutMansour();
+    return;
+  }
+  if (activeMensProgram === 'growth') {
+    _growthNavShift(dir);
+    renderWorkoutGrowth();
+    return;
+  }
+  // HC12
+  const maxDayIdx = 3;
+  let newIdx = state.currentDayIdx + dir;
+  if (newIdx < 0) {
+    if (state.currentWeek <= 1) return;
+    state.currentWeek--;
+    newIdx = maxDayIdx;
+  } else if (newIdx > maxDayIdx) {
+    if (state.currentWeek >= 8) return;
+    state.currentWeek++;
+    newIdx = 0;
+  }
+  state.currentDayIdx = newIdx;
+  saveState();
+  renderWorkout();
+  updateHeader();
+}
+
+// Render exercise preview list on the Today view
+function renderTodayPreview() {
+  const wrap = document.getElementById('today-workout-preview');
+  const list = document.getElementById('today-preview-list');
+  if (!wrap || !list) return;
+
+  let exercises = [];
+  let isDone = false;
+
+  if (activeMensProgram === 'mansour') {
+    const d = getMansourDay();
+    if (d % 2 === 0) { wrap.style.display = 'none'; return; } // recovery day
+    const dayData = getMansourDayData(d);
+    if (!dayData) { wrap.style.display = 'none'; return; }
+    exercises = dayData.exercises || [];
+    isDone = ls(`mansour_done_${d}`, false);
+  } else if (activeMensProgram === 'growth') {
+    const gs = getGrowthState();
+    const dayData = GROWTH_PLAN.days[gs.day];
+    if (!dayData) { wrap.style.display = 'none'; return; }
+    exercises = dayData.exercises || [];
+    isDone = ls(`growth_done_${gs.day}`, false);
+  } else {
+    if (isMaxTestDay()) { wrap.style.display = 'none'; return; }
+    const dayData = getCurrentDayData();
+    if (!dayData) { wrap.style.display = 'none'; return; }
+    exercises = dayData.exercises || [];
+    const phase = getPhaseForWeek(state.currentWeek);
+    isDone = ls(`wk_done_${state.currentWeek}_${dayData.id}`, false);
+  }
+
+  if (!exercises.length) { wrap.style.display = 'none'; return; }
+
+  const typeColors = { cns: '#14b8a6', yellow: 'var(--yellow)', orange: '#f97316', red: '#ef4444' };
+  const typeLabels = { cns: 'Activation', yellow: 'Primary', orange: 'Accessory', red: 'Finisher' };
+
+  list.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;">Workout Preview</div>
+      ${isDone ? `<span style="font-size:11px;font-weight:700;color:#4caf50;background:rgba(76,175,80,0.12);border-radius:4px;padding:2px 8px;">✓ Done</span>` : ''}
+    </div>
+    ${exercises.map(ex => {
+      const color = typeColors[ex.type] || 'var(--text3)';
+      const lastW = getWeight(ex.id, (activeMensProgram === 'hc12' || !activeMensProgram) ? state.currentWeek : (getGrowthState ? getGrowthState().week : 1));
+      const hint = lastW ? `<span style="font-size:10px;color:var(--text3);margin-left:6px;">${lastW} lbs</span>` : '';
+      return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">
+        <span style="width:6px;height:6px;border-radius:50%;background:${color};flex-shrink:0;"></span>
+        <span style="flex:1;font-size:13px;font-weight:600;color:var(--text);">${ex.name}${hint}</span>
+        <span style="font-size:11px;color:var(--text3);flex-shrink:0;">${ex.sets}×${ex.reps}</span>
+      </div>`;
+    }).join('')}
+  `;
+  wrap.style.display = '';
 }
 
 // ════════════════════════════════════════════════════════════
