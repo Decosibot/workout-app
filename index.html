@@ -371,9 +371,9 @@
   @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(245,200,66,0.4); } 50% { box-shadow: 0 0 0 6px rgba(245,200,66,0); } }
 
   .ex-weight {
-    display: flex; align-items: center; gap: 8px;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   }
-  .ex-weight label { font-size: 12px; color: var(--text2); white-space: nowrap; }
+  .ex-weight label { font-size: 12px; color: var(--text2); flex: 1; min-width: 0; }
   .ex-weight input {
     background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
     color: var(--text); font-size: 14px; font-weight: 600;
@@ -488,6 +488,40 @@
   .orm-pct-item { background: var(--bg3); border-radius: 6px; padding: 8px 4px; text-align: center; }
   .orm-pct-item .pct-label { font-size: 10px; color: var(--text3); font-weight: 600; }
   .orm-pct-item .pct-val { font-size: 15px; font-weight: 800; color: var(--text); margin-top: 2px; }
+
+  /* ── PLATE CALCULATOR ── */
+  .plate-calc-btn {
+    background: var(--bg3); border: 1px solid var(--border); color: var(--text2);
+    border-radius: 6px; font-size: 11px; font-weight: 700; padding: 6px 8px;
+    cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  }
+  .plate-calc-btn:active { background: var(--bg4); }
+  .plate-panel {
+    display: none; margin-top: 8px; background: var(--bg3);
+    border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px;
+  }
+  .plate-panel.open { display: block; }
+  .plate-bar-row {
+    display: flex; gap: 6px; margin-bottom: 8px; align-items: center;
+  }
+  .plate-bar-row label { font-size: 11px; color: var(--text3); font-weight: 600; white-space: nowrap; }
+  .plate-bar-select {
+    background: var(--bg4); border: 1px solid var(--border); border-radius: 5px;
+    color: var(--text); font-size: 12px; font-weight: 700; padding: 4px 6px;
+    outline: none; flex: 1;
+  }
+  .plate-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+  .plate-chip {
+    background: var(--yellow-bg); border: 1px solid var(--yellow-border);
+    color: var(--yellow); border-radius: 6px; font-size: 13px; font-weight: 800;
+    padding: 5px 10px; min-width: 36px; text-align: center;
+  }
+  .plate-chip.lg { background: var(--orange-bg); border-color: var(--orange-border); color: var(--orange); }
+  .plate-remainder { font-size: 11px; color: var(--text3); margin-top: 4px; }
+  .plate-standalone-wrap {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; margin-top: 20px;
+  }
 
   /* ── ACTIVITY BUTTONS ── */
   .activity-btn {
@@ -1649,6 +1683,25 @@
       <p style="font-size:13px;color:var(--text2);margin-bottom:4px;line-height:1.5;">Enter your 3-rep max to get your estimated 1RM and every training percentage you need.</p>
       <p style="font-size:12px;color:var(--yellow);margin-bottom:16px;line-height:1.5;">Dumbbells: enter the weight of ONE dumbbell — 2×25 lbs = 25 lbs.</p>
       <div id="orm-cards"></div>
+
+      <!-- Standalone Plate Calculator -->
+      <div class="plate-standalone-wrap">
+        <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:12px;">Plate Calculator</div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5;">Enter any target weight to see which plates to load per side.</p>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
+          <input id="plate-standalone-input" type="number" placeholder="Target lbs" step="5" min="0"
+            oninput="updateStandalonePlates()"
+            style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:8px 12px;width:140px;outline:none;text-align:center;">
+          <span style="font-size:13px;color:var(--text3);">lbs on a</span>
+          <select id="plate-standalone-bar" onchange="updateStandalonePlates()"
+            style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-weight:700;padding:8px 10px;outline:none;">
+            <option value="45">Standard bar (45 lbs)</option>
+            <option value="35">Women's bar (35 lbs)</option>
+            <option value="15">EZ curl bar (15 lbs)</option>
+          </select>
+        </div>
+        <div id="plate-standalone-result"></div>
+      </div>
     </div>
 
     <!-- Calories sub-tab -->
@@ -4749,12 +4802,28 @@ function renderExCardSimple(ex, prevWeekKey) {
   const dbNote = isDB ? `<div style="font-size:10px;color:var(--yellow);margin-top:3px;">Per dumbbell — enter weight of one DB</div>` : '';
   const _sugg = getSuggestedWeight(ex);
   const suggestedTag = _sugg ? `<span style="margin-left:6px;font-size:11px;font-weight:700;color:var(--yellow);background:rgba(245,200,66,0.12);border-radius:4px;padding:2px 6px;">~${_sugg} lbs suggested</span>` : '';
+  const isBarbellSimple = !isDB && !ex.name?.includes('Dumbbell') && !ex.name?.includes('Cable') && !ex.name?.includes('Machine') && !ex.name?.includes('Bodyweight') && !ex.name?.includes('Push-Up') && !ex.name?.includes('Pull-Up') && !ex.name?.includes('Chin Up') && !ex.name?.includes('Band');
+  const plateBtnS = isBarbellSimple ? `<button class="plate-calc-btn" onclick="togglePlatePanel('${ex.id}')">Plates</button>` : '';
+  const platePanelS = isBarbellSimple ? `
+    <div class="plate-panel" id="plate-panel-${ex.id}">
+      <div class="plate-bar-row">
+        <label>Bar:</label>
+        <select class="plate-bar-select" id="plate-bar-${ex.id}" onchange="updatePlatePanel('${ex.id}')">
+          <option value="45">Standard (45 lbs)</option>
+          <option value="35">Women's (35 lbs)</option>
+          <option value="15">EZ Curl (15 lbs)</option>
+        </select>
+      </div>
+      <div id="plate-result-${ex.id}"></div>
+    </div>` : '';
   const weightSection = ex.type !== 'cns' ? `
     <div class="ex-weight">
       <label>Weight used:${suggestedTag}</label>
-      <input type="number" id="weight-${ex.id}" placeholder="lbs" step="5" min="0">
+      <input type="number" id="weight-${ex.id}" placeholder="lbs" step="5" min="0" oninput="updatePlatePanel('${ex.id}')">
       <span class="weight-unit">lbs</span>
+      ${plateBtnS}
     </div>
+    ${platePanelS}
     ${dbNote}
     ${prevHint}
     ${poNudge}` : '';
@@ -4999,12 +5068,29 @@ function renderExCard(ex, weekIdx, currentWeekNum) {
   const dbNote2 = isDB2 ? `<div style="font-size:10px;color:var(--yellow);margin-top:3px;">Per dumbbell — enter weight of one DB</div>` : '';
   const _sugg2 = getSuggestedWeight(ex);
   const suggestedTag2 = _sugg2 ? `<span style="margin-left:6px;font-size:11px;font-weight:700;color:var(--yellow);background:rgba(245,200,66,0.12);border-radius:4px;padding:2px 6px;">~${_sugg2} lbs suggested</span>` : '';
+  const isBarbell = !ex.name?.startsWith('DB') && !ex.name?.includes('Dumbbell') && !ex.name?.includes('Cable') && !ex.name?.includes('Machine') && !ex.name?.includes('Bodyweight');
+  const plateBtn = isBarbell ? `<button class="plate-calc-btn" onclick="togglePlatePanel('${ex.id}')">Plates</button>` : '';
+  const platePanel = isBarbell ? `
+    <div class="plate-panel" id="plate-panel-${ex.id}">
+      <div class="plate-bar-row">
+        <label>Bar:</label>
+        <select class="plate-bar-select" id="plate-bar-${ex.id}" onchange="updatePlatePanel('${ex.id}')">
+          <option value="45">Standard (45 lbs)</option>
+          <option value="35">Women's (35 lbs)</option>
+          <option value="15">EZ Curl (15 lbs)</option>
+        </select>
+      </div>
+      <div id="plate-result-${ex.id}"></div>
+    </div>` : '';
+
   const weightSection = ex.type !== 'cns' ? `
     <div class="ex-weight">
       <label>Weight used:${suggestedTag2}</label>
-      <input type="number" id="weight-${ex.id}" placeholder="lbs" step="5" min="0">
+      <input type="number" id="weight-${ex.id}" placeholder="lbs" step="5" min="0" oninput="updatePlatePanel('${ex.id}')">
       <span class="weight-unit">lbs</span>
+      ${plateBtn}
     </div>
+    ${platePanel}
     ${dbNote2}
     ${prevHint}
     ${poNudge}` : '';
@@ -5881,6 +5967,83 @@ function calcORM(name) {
     else if (activeMensProgram === 'mansour') renderWorkoutMansour && renderWorkoutMansour();
   }
   showToast(`${name}: ~${estimated} lbs 1RM — weights updated`);
+}
+
+// ════════════════════════════════════════════════════════════
+// PLATE CALCULATOR
+// ════════════════════════════════════════════════════════════
+const PLATE_SIZES = [45, 35, 25, 10, 5, 2.5];
+const BAR_WEIGHTS = { '45':45, '35':35, '15':15 };
+
+function calcPlates(totalWeight, barWeight) {
+  let remaining = (totalWeight - barWeight) / 2;
+  const plates = [];
+  if (remaining < 0) return { plates: [], remainder: totalWeight };
+  for (const p of PLATE_SIZES) {
+    const count = Math.floor(remaining / p);
+    if (count > 0) { plates.push({ lbs: p, count }); remaining -= count * p; }
+  }
+  return { plates, remainder: Math.round(remaining * 10) / 10 };
+}
+
+function renderPlateChips(plates, remainder) {
+  if (!plates.length && remainder > 0) {
+    return `<div class="plate-remainder">Can't make this weight with standard plates on this bar.</div>`;
+  }
+  let html = '<div class="plate-chips">';
+  plates.forEach(({ lbs, count }) => {
+    const big = lbs >= 35;
+    for (let i = 0; i < count; i++) {
+      html += `<div class="plate-chip${big ? ' lg' : ''}">${lbs}</div>`;
+    }
+  });
+  html += '</div>';
+  if (remainder > 0) html += `<div class="plate-remainder">+${remainder} lbs unaccounted (add fractional plates)</div>`;
+  return html;
+}
+
+function togglePlatePanel(exId) {
+  const panel = document.getElementById(`plate-panel-${exId}`);
+  if (!panel) return;
+  const isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open', !isOpen);
+  if (!isOpen) updatePlatePanel(exId);
+}
+
+function updatePlatePanel(exId) {
+  const panel = document.getElementById(`plate-panel-${exId}`);
+  if (!panel || !panel.classList.contains('open')) return;
+  const weightInput = document.getElementById(`weight-${exId}`);
+  const barSel = document.getElementById(`plate-bar-${exId}`);
+  if (!weightInput || !barSel) return;
+  const total = parseFloat(weightInput.value);
+  const bar = parseFloat(barSel.value);
+  const resultEl = document.getElementById(`plate-result-${exId}`);
+  if (!resultEl) return;
+  if (!total || total <= 0) {
+    resultEl.innerHTML = '<div class="plate-remainder">Enter a weight above first.</div>';
+    return;
+  }
+  const { plates, remainder } = calcPlates(total, bar);
+  const perSideLabel = `<div style="font-size:11px;font-weight:800;color:var(--text2);margin-bottom:6px;">Per side (each arm of bar):</div>`;
+  resultEl.innerHTML = perSideLabel + renderPlateChips(plates, remainder);
+}
+
+// Standalone plate calc in Tools → 1RM tab
+function updateStandalonePlates() {
+  const input = document.getElementById('plate-standalone-input');
+  const barSel = document.getElementById('plate-standalone-bar');
+  const resultEl = document.getElementById('plate-standalone-result');
+  if (!input || !barSel || !resultEl) return;
+  const total = parseFloat(input.value);
+  const bar = parseFloat(barSel.value);
+  if (!total || total <= 0) {
+    resultEl.innerHTML = '';
+    return;
+  }
+  const { plates, remainder } = calcPlates(total, bar);
+  const perSideLabel = `<div style="font-size:11px;font-weight:800;color:var(--text2);margin-bottom:6px;">Per side (each arm of bar):</div>`;
+  resultEl.innerHTML = perSideLabel + renderPlateChips(plates, remainder);
 }
 
 // ════════════════════════════════════════════════════════════
