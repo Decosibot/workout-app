@@ -1446,6 +1446,187 @@
     background: linear-gradient(90deg, var(--text3) 0%, var(--green) 40%, var(--yellow) 70%, var(--orange) 85%, var(--red) 100%);
     position: relative;
   }
+
+  /* ══════════════════════════════════════════════════════════
+     ANIMATION SYSTEM
+  ══════════════════════════════════════════════════════════ */
+
+  /* ── Keyframes ── */
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes viewSlideIn {
+    from { opacity: 0; transform: translateX(22px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes popIn {
+    0%   { transform: scale(0.7); opacity: 0; }
+    70%  { transform: scale(1.12); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes setDone {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.35); box-shadow: 0 0 0 6px rgba(76,175,80,0.35); }
+    70%  { transform: scale(0.92); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 transparent; }
+  }
+  @keyframes ripple {
+    0%   { transform: scale(0); opacity: 0.6; }
+    100% { transform: scale(2.8); opacity: 0; }
+  }
+  @keyframes heroGreen {
+    0%   { box-shadow: 0 0 0 0 rgba(76,175,80,0.5); }
+    50%  { box-shadow: 0 0 0 16px rgba(76,175,80,0); }
+    100% { box-shadow: 0 0 0 0 rgba(76,175,80,0); }
+  }
+  @keyframes macroFill {
+    from { width: 0%; }
+  }
+  @keyframes countUp {
+    from { opacity: 0; transform: translateY(6px) scale(0.9); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  @keyframes confettiFall {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+  @keyframes weightBounce {
+    0%   { transform: scale(1); }
+    30%  { transform: scale(1.18) rotate(-2deg); }
+    60%  { transform: scale(0.94) rotate(1deg); }
+    80%  { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  @keyframes ormReveal {
+    0%   { opacity: 0; transform: scale(0.8) translateY(10px); }
+    60%  { transform: scale(1.06) translateY(-2px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes cardEntrance {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes navPop {
+    0%   { transform: translateY(0) scale(1); }
+    40%  { transform: translateY(-5px) scale(1.15); }
+    70%  { transform: translateY(1px) scale(0.95); }
+    100% { transform: translateY(0) scale(1); }
+  }
+  @keyframes prShine {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  @keyframes toastSlide {
+    from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+  @keyframes levelUpEntrance {
+    0%   { opacity: 0; transform: scale(0.85) translateY(30px); }
+    60%  { transform: scale(1.03) translateY(-4px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* ── View transitions ── */
+  .view.active { animation: viewSlideIn 0.28s cubic-bezier(0.22,1,0.36,1) both; }
+  #view-today.active { animation: fadeIn 0.22s ease both; }
+
+  /* ── Card entrances (staggered via nth-child delays) ── */
+  .ex-card { animation: cardEntrance 0.28s ease both; }
+  .ex-card:nth-child(1) { animation-delay: 0.04s; }
+  .ex-card:nth-child(2) { animation-delay: 0.09s; }
+  .ex-card:nth-child(3) { animation-delay: 0.14s; }
+  .ex-card:nth-child(4) { animation-delay: 0.19s; }
+  .ex-card:nth-child(5) { animation-delay: 0.24s; }
+  .ex-card:nth-child(n+6) { animation-delay: 0.28s; }
+
+  .history-item { animation: cardEntrance 0.25s ease both; }
+  .history-item:nth-child(1) { animation-delay: 0.03s; }
+  .history-item:nth-child(2) { animation-delay: 0.08s; }
+  .history-item:nth-child(3) { animation-delay: 0.13s; }
+  .history-item:nth-child(n+4) { animation-delay: 0.18s; }
+
+  .orm-card { animation: cardEntrance 0.25s ease both; }
+  .orm-card:nth-child(1) { animation-delay: 0.03s; }
+  .orm-card:nth-child(2) { animation-delay: 0.08s; }
+  .orm-card:nth-child(3) { animation-delay: 0.13s; }
+  .orm-card:nth-child(n+4) { animation-delay: 0.17s; }
+
+  /* ── Set circle done pop ── */
+  .set-circle.done { animation: setDone 0.38s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+  /* ── Hero card green flash ── */
+  .today-hero.day-done { animation: heroGreen 0.7s ease 0.1s both; }
+
+  /* ── Macro bar animated fill ── */
+  .nutr-macro-bar-fill { animation: macroFill 0.7s cubic-bezier(0.22,1,0.36,1) both; }
+
+  /* ── 1RM reveal ── */
+  .orm-result.show { animation: ormReveal 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+  /* ── 1RM value shimmer (PR shine effect) ── */
+  .orm-1rm.pr-shine {
+    background: linear-gradient(90deg, var(--yellow) 0%, #fff8c0 40%, var(--yellow) 60%, #ffe066 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: prShine 0.9s linear;
+  }
+
+  /* ── Toast entrance ── */
+  #toast.show { animation: toastSlide 0.22s cubic-bezier(0.22,1,0.36,1) both; }
+
+  /* ── Level up banner entrance ── */
+  #level-up-banner > div:first-of-type { animation: levelUpEntrance 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.1s both; }
+
+  /* ── Weight logged bounce (applied via JS) ── */
+  .bw-log-btn.logged { animation: weightBounce 0.45s cubic-bezier(0.34,1.56,0.64,1); }
+
+  /* ── Complete workout button ripple wrapper ── */
+  .complete-workout-btn { position: relative; overflow: hidden; }
+  .btn-ripple {
+    position: absolute; border-radius: 50%;
+    width: 10px; height: 10px; margin-top: -5px; margin-left: -5px;
+    background: rgba(255,255,255,0.35);
+    pointer-events: none;
+    animation: ripple 0.55s ease-out forwards;
+  }
+
+  /* ── Nav tab pop on switch ── */
+  .nav-tab.pop { animation: navPop 0.32s cubic-bezier(0.34,1.56,0.64,1); }
+
+  /* ── Confetti pieces ── */
+  .confetti-piece {
+    position: fixed; top: -12px; width: 10px; height: 10px;
+    border-radius: 2px; pointer-events: none; z-index: 9999;
+    animation: confettiFall linear forwards;
+  }
+
+  /* ── Start button pulse on today screen ── */
+  .today-hero .start-btn {
+    transition: transform 0.15s, box-shadow 0.15s, background 0.3s;
+  }
+  .today-hero .start-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 4px rgba(245,200,66,0.25);
+  }
+
+  /* ── Exercise card press feel ── */
+  .ex-card { transition: transform 0.12s, opacity 0.12s; }
+  .ex-card:active { transform: scale(0.985); }
+
+  /* ── Smooth complete button ── */
+  .complete-workout-btn { transition: transform 0.12s, opacity 0.12s, background 0.2s; }
+  .complete-workout-btn:active { transform: scale(0.97); opacity: 0.9; }
 </style>
 </head>
 <body>
@@ -9433,6 +9614,195 @@ window.bootApp = function(fromCloud) {
 })();
 
 init();
+
+// ════════════════════════════════════════════════════════════
+// ANIMATION SYSTEM
+// ════════════════════════════════════════════════════════════
+
+// ── Confetti burst ──
+function launchConfetti(count = 60) {
+  const colors = ['#f5c842','#f5922a','#4caf50','#4a9eff','#f54242','#fff','#ffe066','#b8ffc8'];
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = `
+      left: ${Math.random() * 100}vw;
+      background: ${colors[Math.floor(Math.random() * colors.length)]};
+      width: ${6 + Math.random() * 8}px;
+      height: ${6 + Math.random() * 8}px;
+      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+      animation-duration: ${1.2 + Math.random() * 1.6}s;
+      animation-delay: ${Math.random() * 0.5}s;
+    `;
+    document.body.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+  }
+}
+
+// ── Ripple on buttons ──
+function addRipple(btn, e) {
+  const r = document.createElement('div');
+  r.className = 'btn-ripple';
+  const rect = btn.getBoundingClientRect();
+  r.style.left = (e.clientX - rect.left) + 'px';
+  r.style.top  = (e.clientY - rect.top)  + 'px';
+  btn.appendChild(r);
+  r.addEventListener('animationend', () => r.remove());
+}
+
+// Wire ripple to complete workout buttons (delegated)
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('.complete-workout-btn');
+  if (btn) addRipple(btn, e);
+});
+
+// ── Nav tab pop ──
+const _origSwitchView = switchView;
+window.switchView = function(viewName) {
+  _origSwitchView.apply(this, arguments);
+  const tab = document.querySelector(`[data-view="${viewName}"]`);
+  if (tab) {
+    tab.classList.remove('pop');
+    void tab.offsetWidth; // reflow to restart animation
+    tab.classList.add('pop');
+    tab.addEventListener('animationend', () => tab.classList.remove('pop'), { once: true });
+  }
+};
+
+// ── Set circle done pop ──
+// Re-trigger animation every time a circle gets 'done' class
+const _origHandleSetClick = handleSetClick;
+window.handleSetClick = function(ex, idx, dayName) {
+  _origHandleSetClick.apply(this, arguments);
+  // Small delay so DOM updates first
+  setTimeout(() => {
+    const circle = document.getElementById(`set-${ex.id}-${idx}`);
+    if (circle && circle.classList.contains('done')) {
+      circle.style.animation = 'none';
+      void circle.offsetWidth;
+      circle.style.animation = '';
+    }
+  }, 10);
+};
+
+// ── Weight logged bounce ──
+const _origLogBodyWeight = logBodyWeight;
+window.logBodyWeight = function() {
+  _origLogBodyWeight.apply(this, arguments);
+  const btn = document.querySelector('.bw-log-btn');
+  if (btn) {
+    btn.classList.remove('logged');
+    void btn.offsetWidth;
+    btn.classList.add('logged');
+    btn.addEventListener('animationend', () => btn.classList.remove('logged'), { once: true });
+  }
+};
+
+// ── 1RM reveal shine ──
+const _origCalcORM = calcORM;
+window.calcORM = function(name) {
+  _origCalcORM.apply(this, arguments);
+  const key = name.replace(/\s/g,'_');
+  const el = document.querySelector(`#orm-result-${key} .orm-1rm`);
+  if (el) {
+    el.classList.remove('pr-shine');
+    void el.offsetWidth;
+    el.classList.add('pr-shine');
+    el.addEventListener('animationend', () => el.classList.remove('pr-shine'), { once: true });
+  }
+};
+
+// ── Macro bar animated fill — re-trigger on each nutrition render ──
+function animateMacroBars() {
+  document.querySelectorAll('.nutr-macro-bar-fill').forEach(fill => {
+    fill.style.animation = 'none';
+    void fill.offsetWidth;
+    fill.style.animation = '';
+  });
+}
+// Patch nutrition render to trigger bar animations
+const _origRenderNutrMain = renderNutritionMain;
+if (typeof renderNutritionMain === 'function') {
+  window.renderNutritionMain = function() {
+    _origRenderNutrMain.apply(this, arguments);
+    setTimeout(animateMacroBars, 30);
+  };
+}
+
+// ── Workout completion confetti ──
+['completeWorkout','completeWorkoutGrowth','completeWorkoutMansour'].forEach(fnName => {
+  const orig = window[fnName];
+  if (typeof orig !== 'function') return;
+  window[fnName] = function() {
+    launchConfetti(80);
+    orig.apply(this, arguments);
+  };
+});
+
+// ── Hero card green flash re-trigger when day is done ──
+function animateHeroDone() {
+  const hero = document.getElementById('today-hero-card');
+  if (hero && hero.classList.contains('day-done')) {
+    hero.style.animation = 'none';
+    void hero.offsetWidth;
+    hero.style.animation = '';
+  }
+}
+// Hook into applyHeroDoneState
+const _origApplyHeroDone = applyHeroDoneState;
+if (typeof applyHeroDoneState === 'function') {
+  window.applyHeroDoneState = function() {
+    const wasAlreadyDone = document.getElementById('today-hero-card')?.classList.contains('day-done');
+    _origApplyHeroDone.apply(this, arguments);
+    if (!wasAlreadyDone) animateHeroDone();
+  };
+}
+
+// ── PR Board count-up numbers ──
+function animatePRNumbers() {
+  document.querySelectorAll('.pr-val').forEach(el => {
+    const target = parseFloat(el.textContent);
+    if (!target || isNaN(target)) return;
+    el.style.animation = 'none';
+    void el.offsetWidth;
+    el.style.animation = 'countUp 0.4s ease both';
+    el.addEventListener('animationend', () => el.style.animation = '', { once: true });
+  });
+}
+
+// Patch renderHome to trigger PR animation after render
+const _origRenderHomeAnim = renderHome;
+window.renderHome = function() {
+  _origRenderHomeAnim.apply(this, arguments);
+  setTimeout(animatePRNumbers, 50);
+};
+
+// ── Level up banner entrance ──
+const _origShowLevelUp = showLevelUpBanner;
+if (typeof showLevelUpBanner === 'function') {
+  window.showLevelUpBanner = function(title, desc, btnText) {
+    _origShowLevelUp.apply(this, arguments);
+    // Trigger confetti too
+    setTimeout(() => launchConfetti(100), 200);
+  };
+}
+
+// ── Stagger card entrances on workout render ──
+function staggerCards(selector) {
+  document.querySelectorAll(selector).forEach((card, i) => {
+    card.style.animation = 'none';
+    void card.offsetWidth;
+    card.style.animationDelay = `${i * 0.05}s`;
+    card.style.animation = `cardEntrance 0.28s ease ${i * 0.05}s both`;
+  });
+}
+const _origRenderWorkoutAnim = renderWorkout;
+if (typeof renderWorkout === 'function') {
+  window.renderWorkout = function() {
+    _origRenderWorkoutAnim.apply(this, arguments);
+    setTimeout(() => staggerCards('#workout-content .ex-card'), 10);
+  };
+}
 </script>
 </body>
 </html>
