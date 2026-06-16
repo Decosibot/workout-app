@@ -2874,8 +2874,7 @@ function getSuggestedWeight(ex) {
 function getBWLog() { return ls('bw_log', []); }
 function logBW(weightLbs) {
   const log = getBWLog();
-  const today = new Date().toISOString().slice(0,10); // YYYY-MM-DD
-  // Overwrite today's entry if it already exists
+  const today = new Date().toISOString().slice(0,10);
   const existingIdx = log.findIndex(e => e.dateISO === today);
   const entry = { weight: weightLbs, dateISO: today, dateRaw: Date.now(),
     date: new Date().toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) };
@@ -2883,6 +2882,25 @@ function logBW(weightLbs) {
   else log.push(entry);
   log.sort((a,b) => (a.dateISO||'').localeCompare(b.dateISO||''));
   lsSet('bw_log', log);
+
+  // Recalculate calorie/macro targets with new weight (keeps height/age/activity the same)
+  recalcNutrProfileForWeight(weightLbs);
+
+  // Keep mass_inputs.current in sync so calorie calculator pre-fills correctly
+  const mi = ls('mass_inputs', {});
+  lsSet('mass_inputs', { ...mi, current: weightLbs });
+
+  // Keep body comp weight in sync
+  const bci = ls('bc_inputs', {});
+  lsSet('bc_inputs', { ...bci, weight: weightLbs });
+
+  // Refresh goal progress so home card shows latest weight immediately
+  updateGoalProgress();
+
+  // Refresh whatever view is active
+  syncActiveView();
+  syncGoalViews();
+
   syncToCloud();
 }
 function deleteBWByDate(dateISO) {
@@ -2900,6 +2918,12 @@ function syncActiveView() {
   const v = state.activeView;
   if (v === 'home') { renderHome(); }
   if (v === 'tools') { switchToolsSub(ls('tools_sub','weight')); }
+  if (v === 'workout') {
+    if (activeMensProgram === 'growth') { if (typeof renderWorkoutGrowth === 'function') renderWorkoutGrowth(); }
+    else if (activeMensProgram === 'mansour') { if (typeof renderWorkoutMansour === 'function') renderWorkoutMansour(); }
+    else renderWorkout();
+  }
+  if (v === 'today') { renderToday(); }
 }
 
 // Refresh Home after goal/nutrition changes
@@ -2907,9 +2931,10 @@ function syncGoalViews() {
   if (state.activeView === 'home') renderHome();
 }
 
-// Refresh Home PRs after a 1RM is written
+// Refresh Home PRs + workout suggested weights after a 1RM is written
 function syncPRViews() {
   if (state.activeView === 'home') renderHome();
+  if (state.activeView === 'workout') syncActiveView();
 }
 
 // Refresh body weight on Home or Tools when either logs weight
@@ -4608,7 +4633,10 @@ function completeWorkoutGrowth() {
     });
   }
   const notesArea = document.getElementById('workout-notes-area');
-  if (notesArea && notesArea.value) lsSet(`notes_growth_${gs.day}`, notesArea.value);
+  const noteVal = notesArea ? notesArea.value : '';
+  if (noteVal) lsSet(`notes_growth_${gs.day}`, noteVal);
+  // Mark day done so hero card turns green and preview updates
+  lsSet(`growth_done_${gs.day}`, true);
   addHistory({
     date: new Date().toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}),
     dateRaw: Date.now(),
@@ -4716,7 +4744,10 @@ function completeWorkoutMansour() {
     if (w) weights[ex.name] = w;
   });
   const notesArea = document.getElementById('workout-notes-area');
-  if (notesArea && notesArea.value) lsSet(`notes_mansour_d${currentDay}`, notesArea.value);
+  const noteVal = notesArea ? notesArea.value : '';
+  if (noteVal) lsSet(`notes_mansour_d${currentDay}`, noteVal);
+  // Mark day done so hero card turns green and preview updates
+  lsSet(`mansour_done_${currentDay}`, true);
   addHistory({
     date: new Date().toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}),
     dateRaw: Date.now(),
@@ -5761,7 +5792,18 @@ function renderHistory() {
   } else {
     history.forEach(session => {
       const weights = Object.entries(session.weights || {});
-      const sessionNote = session.dayId ? ls(`notes_week${session.week}_${session.dayId}`, '') : '';
+      // Resolve note from the correct key for each program type
+      let sessionNote = '';
+      if (session.dayId) {
+        if (session.dayId.startsWith('mansour_d')) {
+          const mDay = session.dayId.replace('mansour_d','');
+          sessionNote = ls(`notes_mansour_d${mDay}`, '');
+        } else if (/^w\d_d\d/.test(session.dayId)) {
+          sessionNote = ls(`notes_growth_${session.dayId}`, '');
+        } else {
+          sessionNote = ls(`notes_week${session.week}_${session.dayId}`, '');
+        }
+      }
       html += `
         <div class="history-item">
           <div class="hi-header">
@@ -6649,6 +6691,23 @@ function computeNutrProfile(bw, heightFt, heightIn, age, actMult, goal) {
   }
   const carbs = Math.max(0, Math.floor((calTarget - protein * 4 - fat * 9) / 4));
   return { bw, heightFt, heightIn, age, actMult, goal, tdee, calTarget, protein, fat, carbs };
+}
+
+// Called whenever a new body weight is logged — recalculates calorie/macro targets
+// using the stored height/age/activity so targets stay current without manual setup
+function recalcNutrProfileForWeight(newBW) {
+  const profile = ls('nutr_profile', null);
+  if (!profile) return; // no profile set up yet — nothing to update
+  const updated = computeNutrProfile(
+    newBW,
+    profile.heightFt,
+    profile.heightIn,
+    profile.age,
+    profile.actMult,
+    profile.goal
+  );
+  lsSet('nutr_profile', updated);
+  lsSet('nutr_bw', newBW);
 }
 
 function saveNutritionProfile() {
