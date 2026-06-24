@@ -1101,6 +1101,7 @@
   .prog-tag-y{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:#2a2200;color:var(--yellow)}
   .prog-tag-o{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:#2a1500;color:var(--orange)}
   .prog-tag-b{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:#0d1f33;color:var(--blue)}
+  .prog-tag-g{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:#0d2010;color:var(--green)}
 
   /* ── SUPERSET BADGE ── */
   .superset-badge{font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:rgba(74,158,255,.15);color:var(--blue);margin-left:6px}
@@ -1757,6 +1758,21 @@
     </div>
   </div>
   <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:8px">Complete each phase in order for best results — or jump to where you are now.</div>
+
+  <div style="display:flex;align-items:center;gap:12px;margin:24px 0 16px;width:100%;max-width:400px">
+    <div style="flex:1;height:1px;background:var(--border);"></div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text3);text-transform:uppercase;">Add-On</div>
+    <div style="flex:1;height:1px;background:var(--border);"></div>
+  </div>
+  <div class="prog-sel-card" onclick="selectDailyPractice()" id="psc-daily">
+    <div style="font-size:28px;margin-bottom:10px">💪</div>
+    <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">Daily Practice</div>
+    <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Stack With Any Phase</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px">Specialty mass work your main program ignores. 30 min/day: Popeye forearms, Tyson neck, calisthenics stability. Run it alongside any phase.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <span class="prog-tag-g">Forearms</span><span class="prog-tag-g">Neck</span><span class="prog-tag-g">Calisthenics</span><span class="prog-tag">Daily · 30 min</span>
+    </div>
+  </div>
 </div>
 
 <main id="app-main">
@@ -2851,6 +2867,38 @@ function showProgSelect() {
   document.getElementById('psc-hc12').classList.toggle('selected', activeMensProgram === 'hc12');
   document.getElementById('psc-growth').classList.toggle('selected', activeMensProgram === 'growth');
   document.getElementById('psc-mansour').classList.toggle('selected', activeMensProgram === 'mansour');
+  document.getElementById('psc-daily').classList.toggle('selected', activeMensProgram === 'daily_practice');
+}
+
+// ── Daily Practice helpers ──
+function selectDailyPractice() {
+  activeMensProgram = 'daily_practice';
+  localStorage.setItem('mens_program', 'daily_practice');
+  const overlay = document.getElementById('prog-select-overlay');
+  overlay.style.display = 'none';
+  ['hc12','growth','mansour'].forEach(p => document.getElementById('psc-'+p).classList.remove('selected'));
+  document.getElementById('psc-daily').classList.add('selected');
+  updateProgHeader();
+  renderToday();
+}
+
+function getDailyPracticeLog() {
+  try { return JSON.parse(localStorage.getItem('daily_practice_log') || '{}'); } catch(e) { return {}; }
+}
+function saveDailyPracticeLog(log) {
+  localStorage.setItem('daily_practice_log', JSON.stringify(log));
+}
+function getDailyPracticeKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+function toggleDailyExercise(module, idx) {
+  const log = getDailyPracticeLog();
+  const key = getDailyPracticeKey();
+  if (!log[key]) log[key] = {};
+  if (!log[key][module]) log[key][module] = {};
+  log[key][module][idx] = !log[key][module][idx];
+  saveDailyPracticeLog(log);
+  renderTodayDailyPractice();
 }
 
 function updateProgHeader() {
@@ -2858,6 +2906,15 @@ function updateProgHeader() {
 }
 
 function updateProgressBar() {
+  if (activeMensProgram === 'daily_practice') {
+    const weekLabel = document.getElementById('progress-week-label');
+    const barFill = document.getElementById('progress-bar-fill');
+    const levelEl = document.getElementById('prog-level-label');
+    if (weekLabel) weekLabel.textContent = 'Daily Practice';
+    if (barFill) barFill.style.width = '100%';
+    if (levelEl) levelEl.textContent = 'Specialty Mass Work';
+    return;
+  }
   let overallWeek = 1;
   let levelLabel = 'Phase 1 · The Grind';
   if (!activeMensProgram || activeMensProgram === 'hc12') {
@@ -3682,9 +3739,9 @@ function renderHome() {
   const pct = Math.round((overallWeek - 1) / 16 * 100);
 
   // Current level label
-  const levelLabels = { hc12: 'Phase 1 — The Grind', growth: 'Phase 2 — The Surge', mansour: 'Phase 3 — The Takeover' };
+  const levelLabels = { hc12: 'Phase 1 — The Grind', growth: 'Phase 2 — The Surge', mansour: 'Phase 3 — The Takeover', daily_practice: 'Daily Practice' };
   const currentLevel = levelLabels[activeMensProgram] || 'Phase 1 — The Grind';
-  const levelNum = activeMensProgram === 'mansour' ? 3 : activeMensProgram === 'growth' ? 2 : 1;
+  const levelNum = activeMensProgram === 'mansour' ? 3 : activeMensProgram === 'growth' ? 2 : activeMensProgram === 'daily_practice' ? 0 : 1;
 
   // PRs
   const prLifts = ['Bench Press','Front Squat','High Bar Back Squat','Low Bar Back Squat','Deadlift','Trap Bar Deadlift','DB Bench Press'];
@@ -3880,6 +3937,10 @@ function updateHeader() {
     setEl('header-week', `P3 · Day ${d}`);
     return;
   }
+  if (activeMensProgram === 'daily_practice') {
+    setEl('header-week', 'Daily Practice');
+    return;
+  }
   setEl('header-week', `P1 · Wk ${state.currentWeek}`);
 }
 
@@ -3894,6 +3955,7 @@ function getCurrentDayData() {
 function renderToday() {
   if (activeMensProgram === 'growth') { renderTodayGrowth(); return; }
   if (activeMensProgram === 'mansour') { renderTodayMansour(); return; }
+  if (activeMensProgram === 'daily_practice') { renderTodayDailyPractice(); return; }
 
   // ── Max Test Day Detection ──
   if (isMaxTestDay()) {
@@ -4096,6 +4158,123 @@ function renderTodayMansour() {
   renderTodayPreview();
   applyHeroDoneState();
   updateTodayNavArrows();
+}
+
+// ════════════════════════════════════════════════════════════
+// DAILY PRACTICE TODAY VIEW
+// ════════════════════════════════════════════════════════════
+function renderTodayDailyPractice() {
+  const heroCard = document.getElementById('today-hero-card');
+  const restCard = document.getElementById('rest-day-card');
+  heroCard.style.display = '';
+  restCard.style.display = 'none';
+
+  const today = getDailyPracticeKey();
+  const log = getDailyPracticeLog();
+  const todayLog = log[today] || {};
+
+  document.getElementById('hero-phase').textContent = 'DAILY PRACTICE';
+  document.getElementById('hero-day').textContent = 'Specialty Mass Work';
+  document.getElementById('hero-sub').textContent = 'Forearms · Neck · Calisthenics · ~30 min';
+
+  const modules = [
+    {
+      id: 'forearms',
+      icon: '💪',
+      title: 'Popeye Forearms',
+      subtitle: 'Arm Wrestling Strength & Wrist Mass',
+      color: 'var(--yellow)',
+      exercises: [
+        { name: 'Wrist Curls', sets: '4×15', note: 'Palms up, full ROM' },
+        { name: 'Reverse Wrist Curls', sets: '4×15', note: 'Palms down, slow eccentric' },
+        { name: 'Hammer Curls', sets: '3×12', note: 'Neutral grip, controlled' },
+        { name: 'Pinch Plate Hold', sets: '3×30s', note: 'Pinch 25lb plate at your side' },
+        { name: 'Rice Bucket Rotations', sets: '3×60s', note: 'Bury fist, rotate wrist both ways' },
+      ]
+    },
+    {
+      id: 'neck',
+      icon: '🏋️',
+      title: 'Tyson Neck Protocol',
+      subtitle: 'Bull Neck Thickness & Spine Protection',
+      color: 'var(--orange)',
+      exercises: [
+        { name: 'Neck Bridge (Front)', sets: '3×30s', note: 'On mat, forehead down — build up slowly' },
+        { name: 'Neck Bridge (Back)', sets: '3×30s', note: 'Back of head on mat, controlled' },
+        { name: 'Plate Neck Flexion', sets: '3×15', note: '10lb plate on forehead, lying down' },
+        { name: 'Plate Neck Extension', sets: '3×15', note: '10lb plate on back of head' },
+        { name: 'Band Side Neck Raises', sets: '3×15 each', note: 'Band attached low, tilt ear to shoulder' },
+      ]
+    },
+    {
+      id: 'calisthenics',
+      icon: '🤸',
+      title: 'Calisthenics — Stability & Flex',
+      subtitle: 'Body Control, Mobility & Functional Strength',
+      color: 'var(--green)',
+      exercises: [
+        { name: 'Hollow Body Hold', sets: '3×30s', note: 'Lower back pressed flat, arms overhead' },
+        { name: 'L-Sit Tuck Hold', sets: '3×20s', note: 'On parallettes or floor, knees tucked' },
+        { name: 'Deep Squat Hold', sets: '3×60s', note: 'Heels down, chest up, hands together' },
+        { name: '90/90 Hip Stretch', sets: '3×45s each', note: 'Both hips to floor, rotate through' },
+        { name: 'Jefferson Curl', sets: '3×8', note: 'Light weight, roll down vertebra by vertebra' },
+        { name: 'Wall Handstand Hold', sets: '3×20s', note: 'Face wall, kick up — build shoulder stability' },
+        { name: 'Shoulder Dislocates', sets: '3×10', note: 'Band or stick, wide grip, slow arc over head' },
+      ]
+    }
+  ];
+
+  const totalEx = modules.reduce((s, m) => s + m.exercises.length, 0);
+  const doneEx = modules.reduce((s, m) => {
+    const ml = todayLog[m.id] || {};
+    return s + m.exercises.filter((_, i) => ml[i]).length;
+  }, 0);
+  const allDone = doneEx === totalEx;
+
+  const banner = document.getElementById('today-banners');
+  if (banner) {
+    banner.innerHTML = `
+      <div style="background:${allDone ? 'var(--green)' : 'var(--bg3)'};border:1px solid ${allDone ? 'var(--green)' : 'var(--border)'};border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;">
+        <div style="font-size:22px">${allDone ? '✅' : '🎯'}</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:${allDone ? '#fff' : 'var(--text)'};">${allDone ? 'Daily Practice Complete!' : `${doneEx} / ${totalEx} exercises done`}</div>
+          <div style="font-size:11px;color:${allDone ? 'rgba(255,255,255,0.8)' : 'var(--text3)'};margin-top:2px;">${allDone ? 'Come back tomorrow. Growth happens overnight.' : 'Check off each exercise as you go'}</div>
+        </div>
+      </div>`;
+  }
+
+  const preview = document.getElementById('today-preview');
+  if (!preview) return;
+  preview.innerHTML = modules.map(mod => {
+    const ml = todayLog[mod.id] || {};
+    const modDone = mod.exercises.filter((_, i) => ml[i]).length;
+    const modTotal = mod.exercises.length;
+    const modComplete = modDone === modTotal;
+    return `
+      <div style="background:var(--bg2);border:1px solid ${modComplete ? mod.color : 'var(--border)'};border-radius:14px;padding:16px;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <div style="font-size:24px">${mod.icon}</div>
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:800;color:${mod.color}">${mod.title}</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:1px">${mod.subtitle}</div>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:${modComplete ? mod.color : 'var(--text3)'};">${modDone}/${modTotal}</div>
+        </div>
+        ${mod.exercises.map((ex, i) => {
+          const done = !!ml[i];
+          return `
+          <div onclick="toggleDailyExercise('${mod.id}',${i})" style="display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--bg4);cursor:pointer;">
+            <div style="width:22px;height:22px;border-radius:6px;border:2px solid ${done ? mod.color : 'var(--border)'};background:${done ? mod.color : 'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;">
+              ${done ? '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:700;color:${done ? 'var(--text3)' : 'var(--text)'};text-decoration:${done ? 'line-through' : 'none'}">${ex.name}</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:1px">${ex.sets} · ${ex.note}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+  }).join('');
 }
 
 function mansourPrevDay() {
@@ -5442,6 +5621,7 @@ function advanceToNextLevel() {
 function renderLevelNav() {
   const row = document.getElementById('level-nav-row');
   if (!row) return;
+  if (activeMensProgram === 'daily_practice') { row.innerHTML = ''; return; }
   const levels = ['hc12', 'growth', 'mansour'];
   const labels = ['P1: Grind', 'P2: Surge', 'P3: Takeover'];
   const current = levels.indexOf(activeMensProgram);
