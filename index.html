@@ -3781,14 +3781,25 @@ function renderHome() {
     </button>
 
     <!-- Daily Practice shortcut -->
-    <div onclick="selectDailyPractice();switchView('today');" style="background:var(--bg2);border:1px solid #1a3a1a;border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;">
-      <div style="font-size:28px;line-height:1">💪</div>
-      <div style="flex:1;">
-        <div style="font-size:14px;font-weight:800;color:var(--green);">Daily Practice</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:2px;">Forearms · Neck · Calisthenics · ~30 min</div>
-      </div>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
+    ${(()=>{
+      const _dow = new Date().getDay();
+      const _mp = localStorage.getItem('mens_program');
+      let _isOff;
+      if (_mp === 'growth') { _isOff = _dow === 0; }
+      else if (_mp === 'mansour') { _isOff = getMansourDay() % 3 === 0; }
+      else { _isOff = !({ 1:1, 2:1, 4:1, 5:1 }[_dow]); }
+      const _icon = _isOff ? '💪' : '🤸';
+      const _label = _isOff ? 'Daily Practice — Off Day' : 'Daily Practice — Warm-Up';
+      const _sub = _isOff ? 'Forearms · Neck · Calisthenics · ~40 min' : 'Calisthenics warm-up before your lift · 10 min';
+      return `<div onclick="selectDailyPractice();switchView('today');" style="background:var(--bg2);border:1px solid #1a3a1a;border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+        <div style="font-size:28px;line-height:1">${_icon}</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:800;color:var(--green);">${_label}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;">${_sub}</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>`;
+    })()}
 
     <!-- Stats grid -->
     <div class="home-stat-grid">
@@ -4173,21 +4184,57 @@ function renderTodayMansour() {
 // ════════════════════════════════════════════════════════════
 // DAILY PRACTICE TODAY VIEW
 // ════════════════════════════════════════════════════════════
-function renderTodayDailyPractice() {
-  const heroCard = document.getElementById('today-hero-card');
-  const restCard = document.getElementById('rest-day-card');
-  heroCard.style.display = '';
-  restCard.style.display = 'none';
+function getDailyPracticeMode() {
+  // Returns 'warmup' (training day) or 'offday' (rest day) based on active phase
+  const dow = new Date().getDay(); // 0=Sun,1=Mon,...,6=Sat
+  const mainProg = localStorage.getItem('mens_program');
+  if (mainProg === 'hc12' || !mainProg) {
+    // Phase 1: Mon/Tue/Thu/Fri = train, Wed/Sat/Sun = off
+    return (dow in { 1:1, 2:1, 4:1, 5:1 }) ? 'warmup' : 'offday';
+  } else if (mainProg === 'growth') {
+    // Phase 2: Mon–Sat = train, Sun = off
+    return dow === 0 ? 'offday' : 'warmup';
+  } else if (mainProg === 'mansour') {
+    // Phase 3: 2-on/1-off — even cycle days are off days
+    return getMansourDay() % 3 === 0 ? 'offday' : 'warmup';
+  }
+  return 'offday'; // standalone daily_practice with no main phase
+}
 
-  const today = getDailyPracticeKey();
-  const log = getDailyPracticeLog();
-  const todayLog = log[today] || {};
-
-  document.getElementById('hero-phase').textContent = 'DAILY PRACTICE';
-  document.getElementById('hero-day').textContent = 'Specialty Mass Work';
-  document.getElementById('hero-sub').textContent = 'Forearms · Neck · Calisthenics · ~30 min';
-
-  const modules = [
+const DP_MODULES = {
+  warmup: [
+    {
+      id: 'calisthenics',
+      icon: '🤸',
+      title: 'Calisthenics Warm-Up',
+      subtitle: 'Do this before your main workout — 10 min',
+      color: 'var(--green)',
+      exercises: [
+        { name: 'Shoulder Dislocates', sets: '2×10', note: 'Band or stick, wide grip, slow arc over head' },
+        { name: 'Deep Squat Hold', sets: '2×45s', note: 'Heels down, chest up, hands together' },
+        { name: '90/90 Hip Stretch', sets: '2×30s each', note: 'Both hips to floor, rotate through' },
+        { name: 'Hollow Body Hold', sets: '2×20s', note: 'Lower back pressed flat, arms overhead' },
+        { name: 'Jefferson Curl', sets: '2×6', note: 'Light weight only — this is a warm-up' },
+      ]
+    }
+  ],
+  finisher: [
+    {
+      id: 'calisthenics_fin',
+      icon: '🤸',
+      title: 'Calisthenics Finisher',
+      subtitle: 'Do this after your main workout — 15 min',
+      color: 'var(--green)',
+      exercises: [
+        { name: 'L-Sit Tuck Hold', sets: '3×20s', note: 'On parallettes or floor, knees tucked' },
+        { name: 'Wall Handstand Hold', sets: '3×20s', note: 'Face wall, kick up — build shoulder stability' },
+        { name: 'Hollow Body Hold', sets: '3×30s', note: 'Lower back pressed flat, arms overhead' },
+        { name: 'Jefferson Curl', sets: '3×8', note: 'Light weight, roll down vertebra by vertebra' },
+        { name: 'Deep Squat Hold', sets: '2×60s', note: 'Heels down, chest up — full mobility work' },
+      ]
+    }
+  ],
+  offday: [
     {
       id: 'forearms',
       icon: '💪',
@@ -4219,8 +4266,8 @@ function renderTodayDailyPractice() {
     {
       id: 'calisthenics',
       icon: '🤸',
-      title: 'Calisthenics — Stability & Flex',
-      subtitle: 'Body Control, Mobility & Functional Strength',
+      title: 'Calisthenics — Full Session',
+      subtitle: 'Body Control, Mobility & Functional Strength · ~20 min',
       color: 'var(--green)',
       exercises: [
         { name: 'Hollow Body Hold', sets: '3×30s', note: 'Lower back pressed flat, arms overhead' },
@@ -4232,7 +4279,31 @@ function renderTodayDailyPractice() {
         { name: 'Shoulder Dislocates', sets: '3×10', note: 'Band or stick, wide grip, slow arc over head' },
       ]
     }
-  ];
+  ]
+};
+
+function renderTodayDailyPractice() {
+  const heroCard = document.getElementById('today-hero-card');
+  const restCard = document.getElementById('rest-day-card');
+  heroCard.style.display = '';
+  restCard.style.display = 'none';
+
+  const mode = getDailyPracticeMode();
+  const isOffDay = mode === 'offday';
+  const modules = DP_MODULES[isOffDay ? 'offday' : 'warmup'];
+
+  const today = getDailyPracticeKey();
+  const log = getDailyPracticeLog();
+  const todayLog = log[today] || {};
+
+  document.getElementById('hero-phase').textContent = 'DAILY PRACTICE';
+  if (isOffDay) {
+    document.getElementById('hero-day').textContent = 'Off Day — Specialty Work';
+    document.getElementById('hero-sub').textContent = 'Forearms · Neck · Calisthenics · ~40 min';
+  } else {
+    document.getElementById('hero-day').textContent = 'Training Day — Warm-Up';
+    document.getElementById('hero-sub').textContent = 'Calisthenics warm-up before your lift · 10 min';
+  }
 
   const totalEx = modules.reduce((s, m) => s + m.exercises.length, 0);
   const doneEx = modules.reduce((s, m) => {
