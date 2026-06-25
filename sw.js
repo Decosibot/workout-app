@@ -1,4 +1,4 @@
-const CACHE = 'hc12-v2';
+const CACHE = 'hc12-v3';
 const ASSETS = [
   './index.html',
   './manifest.json',
