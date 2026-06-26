@@ -2147,7 +2147,7 @@ const PROGRAM = {
         {
           id: "tue", label: "Tuesday", name: "Lower",
           exercises: [
-            { id:"p1-tue-1", type:"cns", name:"Trap Bar Jump", sets:3, reps:"5", tempo:"Explosive", weekLoads:["~20% 1RM","~15% 1RM","~10% 1RM"], notes:"Start on the ground every rep. Let the weight hit the ground instead of absorbing it. Rest ~60 sec between sets. Week 1: ~20% 1RM. Week 2: ~15% 1RM. Week 3: ~10% 1RM." },
+            { id:"p1-tue-1", type:"cns", name:"Trap Bar Jump", sets:3, reps:"5", tempo:"Explosive", weekLoads:["~20% 1RM","~15% 1RM","~10% 1RM"], notes:"Start on the ground every rep. Let the weight hit the ground instead of absorbing it. Rest ~60 sec between sets. Week 1: ~20% 1RM. Week 2: ~15% 1RM. Week 3: ~10% 1RM.", alt:{ name:"Dumbbell Jump Squat", notes:"No trap bar? Grab two light dumbbells (10–20 lbs each). Squat down to parallel, explode up as fast as possible, land soft with knees bent. Reset fully before each rep. Same CNS goal — max speed, not max weight. Rest 60 sec between sets." } },
             { id:"p1-tue-2", type:"yellow", name:"Front Squat", sets:8, reps:"5", tempo:"Normal", load:"65-70% 1RM", superset:"B", notes:"Superset with mobility. 8 sets of 5 back-to-back. Elbows high, upright torso. If you suck at front squat — get better. Rest ~60 sec. Week 1: Find 1RM, use 65-70%. Weeks 2-3: 2-3 warm-up sets then get into it." },
             { id:"p1-tue-3", type:"yellow", name:"DB Step Up", sets:8, reps:"5/side", tempo:"Normal", load:"7-8 RPE", superset:"B", notes:"Superset with Front Squat. Hold a DB in each hand. Only touch toes on ground between reps. Use mainly the leg on the box. Do one side, then the other, rest 45-60 sec. 7-8 RPE." },
             { id:"p1-tue-4", type:"orange", name:"Barbell Glute Bridge", sets:3, reps:"10", tempo:"Top ISO", load:"8 RPE", notes:"Back on the ground, feet on the ground. Hold the top for ~1 second, squeeze the glutes. Let it crash down. One warm-up set. 8 RPE, should be able to go up weekly." },
@@ -5444,6 +5444,7 @@ const YT_VIDEOS = window._YT_VIDEOS = {
   "Push Up": "Zi6c09DRGxk",
   "DB Curl (Supinated)": "DgTlETfEuEU",
   "Trap Bar Jump": "rZGkx5PaZSM",
+  "Dumbbell Jump Squat": "rvFBMSGmSfE",
   "Front Squat": "ezRP5-ick9Q",
   "DB Step Up": "aKj-6hgiViA",
   "Barbell Glute Bridge": "ylpfCk3i-0Y",
@@ -5655,9 +5656,45 @@ function renderExCard(ex, weekIdx, currentWeekNum) {
       ${notesSection}
       <div class="ex-sets">${setsHtml}</div>
       ${weightSection}
+      ${ex.alt ? `<button onclick="toggleAltExercise('${ex.id}')" id="alt-btn-${ex.id}" style="width:100%;margin-top:8px;background:var(--bg3);border:1px dashed var(--border);color:var(--text2);border-radius:8px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⇄ No Trap Bar? Switch to Alternate</button>` : ''}
       <button class="skip-btn" id="skip-${ex.id}" onclick="skipExercise('${ex.id}')">Skip Exercise</button>
     </div>
   `;
+}
+
+function toggleAltExercise(exId) {
+  const card = document.getElementById(`card-${exId}`);
+  const btn = document.getElementById(`alt-btn-${exId}`);
+  const isAlt = card.dataset.altActive === '1';
+  const nameEl = card.querySelector('.ex-name');
+  const notesBody = card.querySelector('.ex-notes-body');
+  const vidWrap = document.getElementById(`vid-wrap-${exId}`);
+
+  let ex = null;
+  for (const phase of PROGRAM.phases) {
+    for (const day of phase.days) {
+      const found = (day.exercises || []).find(e => e.id === exId);
+      if (found) { ex = found; break; }
+    }
+    if (ex) break;
+  }
+  if (!ex || !ex.alt) return;
+
+  if (isAlt) {
+    card.dataset.altActive = '0';
+    nameEl.textContent = ex.name;
+    if (notesBody) notesBody.innerHTML = ex.notes || '';
+    btn.textContent = '⇄ No Trap Bar? Switch to Alternate';
+    const ytId = YT_VIDEOS[ex.name];
+    if (vidWrap && ytId) vidWrap.querySelector('img').src = `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`;
+  } else {
+    card.dataset.altActive = '1';
+    nameEl.textContent = ex.alt.name;
+    if (notesBody) notesBody.innerHTML = ex.alt.notes || '';
+    btn.textContent = '⇄ Switch Back to Trap Bar Jump';
+    const altYtId = YT_VIDEOS[ex.alt.name];
+    if (vidWrap && altYtId) vidWrap.querySelector('img').src = `https://img.youtube.com/vi/${altYtId}/mqdefault.jpg`;
+  }
 }
 
 function skipExercise(exId) {
