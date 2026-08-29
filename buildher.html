@@ -6,9 +6,12 @@
 <meta name="theme-color" content="#0f0f0f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Build Her">
+<meta name="apple-mobile-web-app-title" content="PEACH">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="buildher.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -35,7 +38,7 @@
     return username.toLowerCase().trim() + '@wgapp.local';
   }
 </script>
-<title>Build Her</title>
+<title>PEACH</title>
 <style>
   :root {
     --bg: #0a0a0a;
@@ -72,6 +75,16 @@
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   img, video, iframe, table, pre, canvas { max-width: 100%; }
   input, select, textarea, button { max-width: 100%; }
+
+  /* Sunni Montana wordmark (used until sunni-montana-logo.png is supplied) */
+  .sm-logo { display: inline-flex; flex-direction: column; align-items: center; line-height: 0.9; user-select: none; }
+  .sm-logo .sm-a { font-weight: 900; font-size: 1.55em; letter-spacing: 0.5px; color: #f3d9e6; }
+  .sm-logo .sm-b { font-family: 'Kaushan Script', 'Brush Script MT', cursive; font-size: 1.4em; color: var(--pink);
+    text-shadow: 0 0 10px rgba(224,102,163,0.75), 0 0 22px rgba(224,102,163,0.4); margin-top: -0.28em; transform: rotate(-5deg); }
+  .sm-logo.sm-row { flex-direction: row; align-items: baseline; gap: 0.28em; line-height: 1; }
+  .sm-logo.sm-row .sm-a { font-size: 1em; }
+  .sm-logo.sm-row .sm-b { font-size: 1.05em; margin-top: 0; transform: rotate(-3deg); }
+  .sm-logo-img { display: block; }
 
   html {
     height: 100%;
@@ -1638,8 +1651,9 @@
 
 <header id="app-header">
   <div style="display:flex;align-items:center;gap:10px;">
-    <img src="logo.png" alt="Build Her" style="height:40px;width:auto;flex-shrink:0;">
-    <span style="font-size:16px;font-weight:800;letter-spacing:2px;color:var(--text);">BUILD HER</span>
+    <img src="sunni-montana-logo.png" alt="Sunni Montana" class="sm-logo-img" style="height:30px;width:auto;flex-shrink:0;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';">
+    <span class="sm-logo sm-row" style="display:none;font-size:15px;"><span class="sm-a">sunni</span><span class="sm-b">Montana</span></span>
+    <span style="font-size:15px;font-weight:900;letter-spacing:3px;color:var(--pink);">PEACH</span>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <div id="header-week" style="font-size:12px;font-weight:700;color:var(--text2);"></div>
@@ -1657,29 +1671,13 @@
 <div id="login-overlay" style="display:flex;position:fixed;inset:0;background:var(--bg);z-index:900;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;overflow-y:auto;">
   <div style="width:100%;max-width:360px;">
     <div style="text-align:center;margin-bottom:32px;">
-      <div style="display:flex;justify-content:center;margin-bottom:20px;">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 92 92" style="height:80px;width:80px;color:#f0f0f0;" aria-label="Build Her">
-          <g fill="currentColor" transform="translate(4,4) scale(1)">
-            <rect x="18" y="14" width="56" height="6" rx="1"/>
-            <rect x="18" y="14" width="6" height="12" rx="1"/>
-            <rect x="68" y="14" width="6" height="12" rx="1"/>
-            <rect x="27" y="20" width="7" height="22" rx="1"/>
-            <rect x="58" y="20" width="7" height="22" rx="1"/>
-            <circle cx="46" cy="46" r="20" fill="none" stroke="currentColor" stroke-width="5"/>
-            <rect x="35" y="32" width="5" height="28" rx="1"/>
-            <polygon points="40,46 54,32 59,32 45,46"/>
-            <polygon points="40,46 54,60 59,60 45,46"/>
-            <rect x="44" y="10" width="4" height="62" rx="2"/>
-            <circle cx="46" cy="8" r="5" fill="none" stroke="currentColor" stroke-width="3.5"/>
-            <rect x="36" y="30" width="20" height="4" rx="2"/>
-            <polygon points="44,72 46,80 48,72"/>
-            <polygon points="30,64 38,68 34,72"/>
-            <polygon points="62,64 54,68 58,72"/>
-          </g>
-        </svg>
+      <div style="display:flex;justify-content:center;margin-bottom:18px;">
+        <img src="sunni-montana-logo.png" alt="Sunni Montana" class="sm-logo-img" style="height:70px;width:auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';">
+        <span class="sm-logo" style="display:none;font-size:26px;"><span class="sm-a">sunni</span><span class="sm-b">Montana</span></span>
       </div>
-      <div style="font-size:26px;font-weight:900;letter-spacing:4px;text-transform:uppercase;color:var(--text);">BUILD HER</div>
-      <div style="font-size:13px;color:var(--text2);margin-top:8px;line-height:1.5;">Pick a username and 4-digit PIN.<br>Use the same ones on any device to restore your progress.</div>
+      <div style="font-size:32px;font-weight:900;letter-spacing:8px;text-transform:uppercase;color:var(--pink);">PEACH</div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:2px;">Grow the peach</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:14px;line-height:1.5;">Pick a username and 4-digit PIN.<br>Use the same ones on any device to restore your progress.</div>
     </div>
 
     <!-- Google Sign-In (primary) -->
@@ -1706,41 +1704,19 @@
 
     <button onclick="continueAsGuest()" style="width:100%;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;padding:8px;text-decoration:underline;">Skip — save locally only</button>
 
-    <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);text-align:center;">
-      <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">In partnership with</div>
-      <img src="sunni-montana-logo.png" alt="Sunni Montana" style="height:48px;width:auto;opacity:0.95;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
-      <div style="display:none;line-height:1;">
-        <div style="font-size:22px;font-weight:900;letter-spacing:0.5px;color:#f7d9e8;">sunni<span style="color:var(--pink);">.</span></div>
-        <div style="font-size:20px;font-weight:600;font-style:italic;color:var(--pink);margin-top:-4px;text-shadow:0 0 8px rgba(224,102,163,0.7),0 0 16px rgba(224,102,163,0.4);font-family:'Brush Script MT','Segoe Script',cursive;">Montana</div>
-      </div>
+    <div style="margin-top:26px;padding-top:18px;border-top:1px solid var(--border);text-align:center;font-size:11px;color:var(--text3);letter-spacing:1px;">
+      A Sunni Montana program
     </div>
   </div>
 </div>
 
 <div id="prog-select-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:400;overflow-y:auto;padding:40px 20px 60px;flex-direction:column;align-items:center">
-  <div style="display:flex;justify-content:center;margin-bottom:12px;">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 92 92" style="height:52px;width:52px;color:var(--yellow);" aria-label="Build Her">
-      <g fill="currentColor" transform="translate(4,4) scale(1)">
-        <rect x="18" y="14" width="56" height="6" rx="1"/>
-        <rect x="18" y="14" width="6" height="12" rx="1"/>
-        <rect x="68" y="14" width="6" height="12" rx="1"/>
-        <rect x="27" y="20" width="7" height="22" rx="1"/>
-        <rect x="58" y="20" width="7" height="22" rx="1"/>
-        <circle cx="46" cy="46" r="20" fill="none" stroke="currentColor" stroke-width="5"/>
-        <rect x="35" y="32" width="5" height="28" rx="1"/>
-        <polygon points="40,46 54,32 59,32 45,46"/>
-        <polygon points="40,46 54,60 59,60 45,46"/>
-        <rect x="44" y="10" width="4" height="62" rx="2"/>
-        <circle cx="46" cy="8" r="5" fill="none" stroke="currentColor" stroke-width="3.5"/>
-        <rect x="36" y="30" width="20" height="4" rx="2"/>
-        <polygon points="44,72 46,80 48,72"/>
-        <polygon points="30,64 38,68 34,72"/>
-        <polygon points="62,64 54,68 58,72"/>
-      </g>
-    </svg>
+  <div style="display:flex;justify-content:center;margin-bottom:10px;">
+    <img src="sunni-montana-logo.png" alt="Sunni Montana" class="sm-logo-img" style="height:46px;width:auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';">
+    <span class="sm-logo" style="display:none;font-size:17px;"><span class="sm-a">sunni</span><span class="sm-b">Montana</span></span>
   </div>
-  <div style="font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--yellow);margin-bottom:8px;text-align:center">BUILD HER</div>
-  <div style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px;text-align:center">16 weeks. Three phases. One transformation.</div>
+  <div style="font-size:18px;font-weight:900;letter-spacing:6px;color:var(--pink);margin-bottom:8px;text-align:center">PEACH</div>
+  <div style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px;text-align:center">16 weeks. Three phases. One peach.</div>
   <div style="font-size:13px;color:var(--text2);text-align:center;margin-bottom:16px">Pick your phase — you can switch anytime</div>
 
   <div id="prog-sel-options" style="display:flex;gap:8px;justify-content:center;margin-bottom:24px;flex-wrap:wrap;">
@@ -5412,7 +5388,7 @@ const YT_VIDEOS = window._YT_VIDEOS = {
   "Dips": "vi1-BOcj3cQ",
   "Shrugs": "NAqCFlxy0gg",
   "Face Pulls": "rep-qVOkqgk",
-  // ── Build Her glute / lower-body program ──
+  // ── PEACH glute / lower-body program ──
   "Banded Glute Bridge": "wPM8icPu6H8",
   "Banded Clamshells": "2GEoAZOU83I",
   "Barbell Hip Thrust": "S_uZP4UH6J0",
@@ -8294,7 +8270,7 @@ function showAccountMenu() {
 
       ${sectionLabel('Privacy')}
       <div style="font-size:13px;color:var(--text2);line-height:1.6;padding:12px 16px;border-top:1px solid var(--border);">Your data is stored locally on your device and optionally synced to Firebase Firestore under your account. We do not sell or share your data with third parties. Workout history, body weight logs, and goal data are only accessible to your account.</div>
-      <div style="font-size:12px;color:var(--text3);padding:4px 16px 16px;">Build Her v1.0 &middot; in partnership with Sunni Montana</div>
+      <div style="font-size:12px;color:var(--text3);padding:4px 16px 16px;">PEACH v1.0 &middot; a Sunni Montana program</div>
     </div>`;
 
   overlay.addEventListener('click', function(e) {
@@ -9269,7 +9245,7 @@ function _scheduleWorkoutReminder() {
       const todayStr = new Date().toISOString().slice(0,10);
       const trainedToday = history.some(s => new Date(s.dateRaw).toISOString().slice(0,10) === todayStr);
       if (!trainedToday && Notification.permission === 'granted') {
-        new Notification('Build Her — Time to train', {
+        new Notification('PEACH — Time to train', {
           body: "You haven't logged a workout yet today. Let's go.",
           icon: './icon-192.png',
           badge: './icon-192.png'
@@ -9292,7 +9268,7 @@ function _scheduleFoodReminder() {
     setTimeout(() => {
       const log = getTodayLog();
       if (log.length < 3 && Notification.permission === 'granted') {
-        new Notification('Build Her — Hit your nutrition', {
+        new Notification('PEACH — Hit your nutrition', {
           body: "Don't forget to log your meals today. Fuel matters.",
           icon: './icon-192.png',
           badge: './icon-192.png'
@@ -9790,7 +9766,7 @@ function buildShareCard() {
     <div style="background:linear-gradient(160deg,#0a0a0a,#1a1200);padding:24px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
         <div>
-          <div style="font-size:11px;font-weight:800;color:#e066a3;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">BUILD HER</div>
+          <div style="font-size:11px;font-weight:800;color:#e066a3;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">PEACH</div>
           <div style="font-size:22px;font-weight:900;color:#f0f0f0;line-height:1.1;">${phase}</div>
           <div style="font-size:13px;color:#aaa;margin-top:2px;">Week ${overallWeek} of 16</div>
         </div>
@@ -9800,7 +9776,7 @@ function buildShareCard() {
       </div>
       ${sessionRows ? `<div style="margin-bottom:16px;"><div style="font-size:10px;font-weight:800;color:#555;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Recent Sessions</div>${sessionRows}</div>` : ''}
       ${prRows ? `<div><div style="font-size:10px;font-weight:800;color:#555;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Top PRs</div>${prRows}</div>` : ''}
-      <div style="margin-top:20px;padding-top:12px;border-top:1px solid #222;font-size:10px;color:#444;text-align:center;letter-spacing:1px;">buildher.app</div>
+      <div style="margin-top:20px;padding-top:12px;border-top:1px solid #222;font-size:10px;color:#444;text-align:center;letter-spacing:1px;">sunnimontana.com</div>
     </div>`;
 }
 
@@ -9809,7 +9785,7 @@ async function doShareCard() {
   // Try native share first, fall back to screenshot instructions
   if (navigator.share) {
     try {
-      await navigator.share({ title: 'My Build Her Progress', text: 'Week ' + (ls('hc_state',{}).week||1) + ' of 16 — Build Her Program', url: 'https://buildher.app' });
+      await navigator.share({ title: 'My PEACH Progress', text: 'Week ' + (ls('hc_state',{}).week||1) + ' of 16 — PEACH by Sunni Montana', url: 'https://decosibot.github.io/workout-app/buildher.html' });
       return;
     } catch(e) {}
   }
@@ -9848,7 +9824,7 @@ renderHome = function() {
 const ONBOARD_SLIDES = [
   {
     icon: '⚡',
-    title: '16 Weeks.\nThree Phases.\nOne Transformation.',
+    title: '16 Weeks.\nThree Phases.\nOne Peach.',
     sub: 'This app runs your full training system — Phase 1: The Foundation, Phase 2: The Build, Phase 3: The Peak. Every workout, every weight, every PR tracked automatically.',
   },
   {

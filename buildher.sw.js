@@ -1,4 +1,4 @@
-const CACHE = 'buildher-v1';
+const CACHE = 'peach-v2';
 const ASSETS = [
   './buildher.html',
   './buildher.webmanifest',
