@@ -1843,6 +1843,7 @@
     <!-- Tools sub-nav -->
     <div style="display:flex;gap:0;margin-bottom:14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;flex-shrink:0;">
       <button class="tools-subnav active" data-tsub="weight"  onclick="switchToolsSub('weight')"  style="flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;color:var(--yellow);cursor:pointer;border-bottom:2px solid var(--yellow);">Weight</button>
+      <button class="tools-subnav"        data-tsub="hips"    onclick="switchToolsSub('hips')"    style="flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;">Hips</button>
       <button class="tools-subnav"        data-tsub="orm"     onclick="switchToolsSub('orm')"     style="flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;">1RM</button>
       <button class="tools-subnav"        data-tsub="calc"    onclick="switchToolsSub('calc')"    style="flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;">Calories</button>
       <button class="tools-subnav"        data-tsub="body"    onclick="switchToolsSub('body')"    style="flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;background:none;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;">Body</button>
@@ -1863,6 +1864,22 @@
       <div class="bw-stat" id="bw-stat"></div>
       <div class="section-header">Past Entries</div>
       <div class="bw-list" id="bw-list"></div>
+    </div>
+
+    <!-- Hips sub-tab -->
+    <div id="tools-sub-hips" class="tools-sub" style="display:none;">
+      <div class="section-header" style="margin-top:0">Hip / Glute Measurement</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.5;">Measure around the widest part of the hips/glutes, same spot every time, once a week. This is the most direct number for tracking growth — pair it with your weekly progress photo.</p>
+      <div class="bw-log-row">
+        <input type="number" id="hip-input" placeholder="in" step="0.25" min="0">
+        <button class="bw-log-btn" onclick="logHipMeasurement()">Log</button>
+      </div>
+      <div class="bw-chart-wrap" id="hip-chart-wrap">
+        <div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No data yet — log your first hip measurement above.</div>
+      </div>
+      <div class="bw-stat" id="hip-stat"></div>
+      <div class="section-header">Past Entries</div>
+      <div class="bw-list" id="hip-list"></div>
     </div>
 
     <!-- 1RM sub-tab -->
@@ -3267,6 +3284,34 @@ function logBW(weightLbs) {
 function deleteBWByDate(dateISO) {
   const log = getBWLog().filter(e => e.dateISO !== dateISO);
   lsSet('bw_log', log);
+  syncToCloud();
+}
+
+// ════════════════════════════════════════════════════════════
+// UNIFIED HIP / GLUTE MEASUREMENT LOG  (single source: 'hip_log' array)
+// ════════════════════════════════════════════════════════════
+function getHipLog() { return ls('hip_log', []); }
+function logHip(inches) {
+  const log = getHipLog();
+  const today = new Date().toISOString().slice(0,10);
+  const existingIdx = log.findIndex(e => e.dateISO === today);
+  const entry = { hip: inches, dateISO: today, dateRaw: Date.now(),
+    date: new Date().toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) };
+  if (existingIdx >= 0) log[existingIdx] = entry;
+  else log.push(entry);
+  log.sort((a,b) => (a.dateISO||'').localeCompare(b.dateISO||''));
+  lsSet('hip_log', log);
+
+  // Keep body comp hip field in sync so it pre-fills with the latest measurement
+  const bci = ls('bc_inputs', {});
+  lsSet('bc_inputs', { ...bci, hip: inches });
+
+  syncActiveView();
+  syncToCloud();
+}
+function deleteHipByDate(dateISO) {
+  const log = getHipLog().filter(e => e.dateISO !== dateISO);
+  lsSet('hip_log', log);
   syncToCloud();
 }
 
@@ -5881,6 +5926,7 @@ function switchToolsSub(sub) {
   if (panel) panel.style.display = 'block';
 
   if (sub === 'weight')  { renderWeightView(); }
+  if (sub === 'hips')    { renderHipsView(); }
   if (sub === 'orm')     { renderORM(); }
   if (sub === 'calc')    { loadMassInputs(); }
   if (sub === 'body')    { setTimeout(_loadBCInputs, 30); }
@@ -7998,6 +8044,122 @@ function renderBWChart(data) {
       ${dots}
       <text x="${PAD_L}" y="${PAD_T - 2}" fill="var(--text2)" font-size="9" font-weight="700">${maxW} lbs</text>
       <text x="${PAD_L}" y="${H - PAD_B + 10}" fill="var(--text3)" font-size="9" text-anchor="start">${minW} lbs</text>
+      <text x="${PAD_L}" y="${H}" fill="var(--text3)" font-size="9">${firstDate}</text>
+      <text x="${W - PAD_R}" y="${H}" fill="var(--text3)" font-size="9" text-anchor="end">${lastDate}</text>
+    </svg>
+  `;
+}
+
+// ════════════════════════════════════════════════════════════
+// HIP / GLUTE MEASUREMENT TRACKER
+// ════════════════════════════════════════════════════════════
+function getAllHipEntries() {
+  return getHipLog().map(e => ({
+    date: e.dateISO || e.date || '',
+    hip: e.hip,
+    dateRaw: e.dateRaw
+  }));
+}
+
+function logHipMeasurement() {
+  const input = document.getElementById('hip-input');
+  const val = parseFloat(input.value);
+  if (!val || val <= 0) { showToast('Enter a valid measurement'); return; }
+  logHip(val);
+  input.value = '';
+  showToast(`Logged ${val} in`);
+  renderHipsView();
+}
+
+function deleteHipEntry(dateStr) {
+  deleteHipByDate(dateStr);
+  renderHipsView();
+}
+
+function renderHipsView() {
+  const allEntries = getAllHipEntries();
+  const last30 = allEntries.slice(-30);
+
+  const chartWrap = document.getElementById('hip-chart-wrap');
+  if (chartWrap) {
+    if (last30.length >= 2) {
+      chartWrap.innerHTML = renderHipChart(last30);
+    } else {
+      chartWrap.innerHTML = `<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">Log at least 2 entries to see a chart.</div>`;
+    }
+  }
+
+  const statEl = document.getElementById('hip-stat');
+  if (statEl && allEntries.length >= 2) {
+    const first = allEntries[0].hip;
+    const latest = allEntries[allEntries.length-1].hip;
+    const diff = (latest - first).toFixed(2);
+    const sign = diff >= 0 ? '+' : '';
+    statEl.innerHTML = `Total gained: <strong>${sign}${diff} in</strong> since first log entry`;
+  } else if (statEl) {
+    statEl.innerHTML = '';
+  }
+
+  const listEl = document.getElementById('hip-list');
+  if (listEl) {
+    if (allEntries.length === 0) {
+      listEl.innerHTML = `<div style="text-align:center;color:var(--text3);font-size:13px;padding:20px 0;">No entries yet.</div>`;
+    } else {
+      const reversed = [...allEntries].reverse();
+      listEl.innerHTML = reversed.map(e => {
+        const isISO = /^\d{4}-\d{2}-\d{2}$/.test(e.date);
+        const label = isISO
+          ? new Date(e.date + 'T00:00:00').toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'})
+          : e.date;
+        return `
+          <div class="bw-list-item">
+            <span class="bw-date">${label}</span>
+            <span class="bw-val">${e.hip} in</span>
+            <button class="bw-del-btn" onclick="deleteHipEntry('${e.date}')" title="Delete">×</button>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+}
+
+function renderHipChart(data) {
+  const W = 340, H = 130, PAD_L = 40, PAD_R = 12, PAD_T = 14, PAD_B = 20;
+  const hips = data.map(d => d.hip);
+  const minH = Math.min(...hips), maxH = Math.max(...hips);
+  const range = maxH - minH || 1;
+
+  const pts = data.map((d, i) => {
+    const x = PAD_L + (i / (data.length - 1)) * (W - PAD_L - PAD_R);
+    const y = PAD_T + (1 - (d.hip - minH) / range) * (H - PAD_T - PAD_B);
+    return { x, y, d };
+  });
+
+  const pathD = pts.map((p,i) => (i===0?'M':'L') + `${p.x},${p.y}`).join(' ');
+  const areaD = `${pathD} L${pts[pts.length-1].x},${H-PAD_B} L${PAD_L},${H-PAD_B} Z`;
+
+  const dots = pts.map(p => `<circle cx="${p.x}" cy="${p.y}" r="3.5" fill="var(--yellow)"/>`).join('');
+
+  const axisX = `<line x1="${PAD_L}" y1="${H-PAD_B}" x2="${W-PAD_R}" y2="${H-PAD_B}" stroke="var(--text3)" stroke-width="1"/>`;
+  const axisY = `<line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${H-PAD_B}" stroke="var(--text3)" stroke-width="1"/>`;
+
+  const firstDate = new Date(data[0].date + 'T00:00:00').toLocaleDateString('en-US', {month:'short',day:'numeric'});
+  const lastDate = new Date(data[data.length-1].date + 'T00:00:00').toLocaleDateString('en-US', {month:'short',day:'numeric'});
+
+  return `
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;overflow:visible">
+      <defs>
+        <linearGradient id="hip-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--yellow)" stop-opacity="0.25"/>
+          <stop offset="100%" stop-color="var(--yellow)" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      ${axisX}${axisY}
+      <path d="${areaD}" fill="url(#hip-grad)"/>
+      <path d="${pathD}" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      ${dots}
+      <text x="${PAD_L}" y="${PAD_T - 2}" fill="var(--text2)" font-size="9" font-weight="700">${maxH} in</text>
+      <text x="${PAD_L}" y="${H - PAD_B + 10}" fill="var(--text3)" font-size="9" text-anchor="start">${minH} in</text>
       <text x="${PAD_L}" y="${H}" fill="var(--text3)" font-size="9">${firstDate}</text>
       <text x="${W - PAD_R}" y="${H}" fill="var(--text3)" font-size="9" text-anchor="end">${lastDate}</text>
     </svg>
