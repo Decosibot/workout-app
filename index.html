@@ -2857,7 +2857,6 @@ function selectMensProgram(prog) {
   document.getElementById('psc-growth').classList.toggle('selected', prog === 'growth');
   document.getElementById('psc-mansour').classList.toggle('selected', prog === 'mansour');
   updateProgHeader();
-  syncStateToCalendar();
   renderToday();
 }
 
@@ -4000,32 +3999,18 @@ function renderToday() {
   const dayData = getCurrentDayData();
   const wi = getWeekInPhase(state.currentWeek);
 
-  // ── Rest Day Detection ──
-  const REST_DAY_TIPS = {
-    3: "💤 Sleep — aim for 8+ hours tonight. Growth hormone peaks during deep sleep. This is when you actually grow.",
-    6: "🍽️ Eat big today. Your muscles are still repairing from Friday. Hit your protein and calorie targets.",
-    0: "🧘 Active recovery — a 20 min walk, light stretching, or foam rolling keeps blood flowing without taxing the CNS."
-  };
-  const REST_DAY_NAMES = {3:'Wednesday', 6:'Saturday', 0:'Sunday'};
-  const todayDow = new Date().getDay(); // 0=Sun,1=Mon,...,6=Sat
-  const isRestDay = todayDow in REST_DAY_TIPS;
+  // ── Always show the next workout in sequence (completion-driven, not calendar-driven) ──
+  // Rest days aren't tied to real-world weekdays here — the plan itself has no rest-day
+  // entries, so gating this by new Date().getDay() meant Wed/Sat/Sun always showed the
+  // rest screen regardless of actual progress. Removed; the hero card is always the
+  // source of truth for "what's next."
   const heroCard = document.getElementById('today-hero-card');
   const restCard = document.getElementById('rest-day-card');
-  if (isRestDay) {
-    heroCard.style.display = 'none';
-    restCard.style.display = 'block';
-    document.getElementById('rest-day-name').textContent = REST_DAY_NAMES[todayDow];
-    document.getElementById('rest-day-tip').textContent = REST_DAY_TIPS[todayDow];
-    // streak in rest card
-    
-  } else {
-    heroCard.style.display = '';
-    restCard.style.display = 'none';
-    document.getElementById('hero-phase').textContent = `PHASE 1 · WEEK ${state.currentWeek} OF 8`;
-    document.getElementById('hero-day').textContent = `${dayData.label} ${dayData.name}`;
-    document.getElementById('hero-sub').textContent = `Week ${state.currentWeek} · ${phase.scheme} Cluster`;
-    
-  }
+  heroCard.style.display = '';
+  restCard.style.display = 'none';
+  document.getElementById('hero-phase').textContent = `PHASE 1 · WEEK ${state.currentWeek} OF 8`;
+  document.getElementById('hero-day').textContent = `${dayData.label} ${dayData.name}`;
+  document.getElementById('hero-sub').textContent = `Week ${state.currentWeek} · ${phase.scheme} Cluster`;
 
   renderTodayBanners();
   updateProgressBar();
@@ -8401,7 +8386,10 @@ function confirmFullReset() {
 function bootApp(fromCloud) {
   loadState();
   activeMensProgram = localStorage.getItem('mens_program') || null;
-  syncStateToCalendar(); // apply calendar date sync now that activeMensProgram is known
+  // Note: no automatic syncStateToCalendar() here — progress is completion-driven.
+  // currentWeek/currentDayIdx come from loadState() (set by completeWorkout()) and
+  // persist across sessions. Calendar sync is opt-in only, via the Program Start
+  // Date picker in Settings, which calls syncStateToCalendar() explicitly.
   if (!activeMensProgram) {
     showProgSelect();
   } else {
